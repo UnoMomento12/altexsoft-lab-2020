@@ -71,7 +71,6 @@ namespace task1
         /// </summary>
         public void LinesToWordArray()
         {
-            
             for (int i= 0; i < lines.Count;i++)
             {
                 if (!String.IsNullOrEmpty(lines[i]))
@@ -83,9 +82,9 @@ namespace task1
 
         public List<string> StringToWordList(string text)
         {
-            char[] whitespace = new char[] { ' ', '\t', '\n' };
+            char[] whitespace = new char[] { ' ', '\t', '\n' , ',' , '.' , '?', '!' };
             if (!String.IsNullOrEmpty(text))
-                return Regex.Replace(text, "[^a-zA-Z0-9 ’]+", "").Split(whitespace, StringSplitOptions.RemoveEmptyEntries).Select(x => x.Trim()).ToList();
+                return Regex.Replace(text, "[^a-zA-Z0-9 ’,.?!]+", "").Split(whitespace, StringSplitOptions.RemoveEmptyEntries).Select(x => x.Trim()).ToList();
             else return null;
         }
 
