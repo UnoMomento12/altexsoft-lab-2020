@@ -89,9 +89,9 @@ namespace task1
         }
 
         /// <summary>
-        /// Counts quanity of words in the whole text
+        /// Counts quantity of words in the whole text
         /// </summary>
-        /// <returns> Quanity of words in the whole text</returns>
+        /// <returns> quantity of words in the whole text</returns>
         public int CountTextLength()
         {
             int count = 0;
