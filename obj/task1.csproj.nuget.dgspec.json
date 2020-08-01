@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\KDevAccount\\Desktop\\Altex tasks\\altexsoft-lab-2020\\task1\\task1.csproj": {}
+    "C:\\Users\\KDevAccount\\Desktop\\Altex tasks\\altexsoft-lab-2020\\task1.csproj": {}
   },
   "projects": {
-    "C:\\Users\\KDevAccount\\Desktop\\Altex tasks\\altexsoft-lab-2020\\task1\\task1.csproj": {
+    "C:\\Users\\KDevAccount\\Desktop\\Altex tasks\\altexsoft-lab-2020\\task1.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\KDevAccount\\Desktop\\Altex tasks\\altexsoft-lab-2020\\task1\\task1.csproj",
+        "projectUniqueName": "C:\\Users\\KDevAccount\\Desktop\\Altex tasks\\altexsoft-lab-2020\\task1.csproj",
         "projectName": "task1",
-        "projectPath": "C:\\Users\\KDevAccount\\Desktop\\Altex tasks\\altexsoft-lab-2020\\task1\\task1.csproj",
+        "projectPath": "C:\\Users\\KDevAccount\\Desktop\\Altex tasks\\altexsoft-lab-2020\\task1.csproj",
         "packagesPath": "C:\\Users\\KDevAccount\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\KDevAccount\\Desktop\\Altex tasks\\altexsoft-lab-2020\\task1\\obj\\",
+        "outputPath": "C:\\Users\\KDevAccount\\Desktop\\Altex tasks\\altexsoft-lab-2020\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"

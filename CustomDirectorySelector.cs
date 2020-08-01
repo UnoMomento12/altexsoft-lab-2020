@@ -57,7 +57,6 @@ namespace task1
                 directoryNames.Clear();
                 directoryNames.AddRange(GetDirNames(dirPath));
                 
-
             } else
             {
                 if (directoryNames.Count == 0) return;
@@ -75,16 +74,17 @@ namespace task1
         public void ListDirectoriesAndFiles()
         {
             Console.WriteLine("Directories:");
-            Console.WriteLine("{0, 5} | {1,20}", "Id", "Name");
+            Console.WriteLine("{0, 5} | {1,40}", "Id", "Name");
 
             for( int i = 0; i < directoryNames.Count; i++)
             {
-                Console.WriteLine("{0, 5} | {1,20}", i, directoryNames[i]);
+                Console.WriteLine("{0, 5} | {1,40}", i, directoryNames[i]);
             }
             Console.WriteLine("Files:");
+            Console.WriteLine("{0, 5} | {1,40}", "Id", "Name");
             for (int i = 0; i < fileList.Count; i++)
             {
-                Console.WriteLine("{0, 5} | {1,20}", i, fileList[i] );
+                Console.WriteLine("{0, 5} | {1,40}", i, fileList[i] );
             }
 
         }

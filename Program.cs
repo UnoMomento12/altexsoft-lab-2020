@@ -22,33 +22,83 @@ namespace task1
 
         static void Main(string[] args)
         {
-
             Program start = new Program();
-
-
-
-            //start.TaskFunction1(null, execOb);
-            //start.TaskFunction2(null, execOb);
-            //start.TaskFunction3(null, execOb);
-            start.TaskFunction4(null);
-            Console.ReadLine();
+            while (true)
+            {
+                if (args.Length == 0)
+                {
+                    Console.WriteLine("Please enter task function and arguments according to task1");
+                    Console.WriteLine("Implemented functions: func1, func2, func3, func4");
+                    Console.WriteLine("You can exit program by typing: exit ");
+                    args = ParseArguments(Console.ReadLine());
+                }
+                if (args[0].Equals("exit")) break;
+                start.ProcessArgs(args);
+                args = new string[0];
+            }
+        }
+        static string[] ParseArguments(string commandLine)
+        {
+            char[] parmChars = commandLine.ToCharArray();
+            bool inQuote = false;
+            for (int index = 0; index < parmChars.Length; index++)
+            {
+                if (parmChars[index] == '"')
+                    inQuote = !inQuote;
+                if (!inQuote && parmChars[index] == ' ')
+                    parmChars[index] = '\n';
+            }
+            return (new string(parmChars)).Split('\n');
         }
 
 
-        private void TaskFunction1(string filePath, CustomFileHandler cstFile)
+        private void ProcessArgs(string[] args)
         {
+            string path = null;
+            switch (args[0])
+            {
+                case "func1":
+                    path = args.Length > 1 ? args[1] : "";
+                    string wordToDel = args.Length > 2 ? args[2] : "";
+                    TaskFunction1(execOb, path, wordToDel);
+                    break;
+                case "func2":
+                    path = args.Length > 1 ? args[1] : "";
+                    TaskFunction2(execOb, path);
+                    break;
+                case "func3":
+                    path = args.Length > 1 ? args[1] : "";
+                    int id = 0;
+                    id = (args.Length > 2 && Int32.TryParse(args[2], out id)) ? id : 2;
+                    TaskFunction3(execOb, path, id);
+                    break;
+                case "func4":
+                    path = args.Length > 1 ? args[1] : "";
+                    TaskFunction4(path);
+                    break;
+                default:
+                    Console.WriteLine("There is no such function!");
+                    break;
+            }
+        }
 
-            ShowMenu();
+
+        private void TaskFunction1(CustomFileHandler cstFile,  string filePath,  string wordToDelete)
+        {
+            filePath = filePath.Replace("\"", "");
+            Console.WriteLine(filePath);
+            
             while (true)
             {
                 
                 if (!String.IsNullOrEmpty(filePath) && File.Exists(filePath))
                 {
                     FileInfo fileInfo = new FileInfo(filePath);
-                    Console.WriteLine("Please enter a word/symbol for deletion:");
-                    string wordToDelete = "";
-                    wordToDelete = Console.ReadLine();
-
+                    if (String.IsNullOrEmpty(wordToDelete))
+                    {
+                        Console.WriteLine("Please enter a word/symbol for deletion:");
+                        wordToDelete = Console.ReadLine();
+                    }
                     string directory = fileInfo.DirectoryName;
                     string extension = fileInfo.Extension;
                     string fileName = Regex.Replace(fileInfo.Name, extension, ".orig" + extension);
@@ -74,16 +124,17 @@ namespace task1
                     cstFile.WriteLinesToFile(filePath);
                     break;
                 } else {
-                    Console.WriteLine("Please enter correct file path!");
+                    Console.WriteLine("Please enter correct file path:");
                     filePath = Console.ReadLine().Replace("\"", "");
                 }
             }
             
         }
 
-        private void TaskFunction2(string filePath, CustomFileHandler cstFile)
+        private void TaskFunction2(CustomFileHandler cstFile, string filePath)
         {
-            ShowMenu();
+            filePath = filePath.Replace("\"", "");
+            
             while (true)
             {
 
@@ -97,10 +148,13 @@ namespace task1
 
                     Console.WriteLine("Quantity of words in text: {0} ", txtHolder.wordsInText.Count);
 
+                    Console.WriteLine("Every 10th word in text:");
+
                     for (int i=9; i<txtHolder.wordsInText.Count; i = i+10)
                     {
                         Console.Write("{0} ", txtHolder.wordsInText[i]);
                     }
+                    Console.WriteLine();
                     break;
                 }
                 else
@@ -111,9 +165,10 @@ namespace task1
             }
         }
 
-        private void TaskFunction3(string filePath, CustomFileHandler cstFile , int sentenceId = 2)
+        private void TaskFunction3(CustomFileHandler cstFile, string filePath, int sentenceId = 2)
         {
-            ShowMenu();
+            filePath = filePath.Replace("\"", "");
+            
             while (true)
             {
 
@@ -124,11 +179,12 @@ namespace task1
                     txtHolder.LinesToSentences();
                     Console.WriteLine(txtHolder.sentences[2]);
                     string[] targetSentence = txtHolder.SentenceToWordArray(sentenceId);
-                    Console.WriteLine("3rd sentence's words in reverse:");
+                    Console.WriteLine("\n3rd sentence's words in reverse: \n");
                     for (int i = targetSentence.Length-1; i >= 0; i--)
                     {
                         Console.Write("{0} ", targetSentence[i]);
                     }
+                    Console.WriteLine();
                     break;
                 }
                 else
@@ -178,12 +234,6 @@ namespace task1
         }
 
 
-        private void ShowMenu()
-        {
-            // Menu begins
-            Console.WriteLine("Enter file name in the same folder as executable file;");
-            Console.WriteLine("Or write full path including file name (Or drag and drop file on the console window).");
-        }
     }
 
 }
