@@ -59,7 +59,7 @@ namespace task1
                 
             } else
             {
-                if (directoryNames.Count == 0) return;
+                if (directoryNames.Count == 0 || directoryNames.Count <= id ) return;
                 dirPath = dirPath + "\\" + directoryNames[id];
                 directoryNames.Clear();
                 directoryNames.AddRange(GetDirNames(dirPath));

@@ -6,10 +6,17 @@ using System.Text.RegularExpressions;
 
 namespace task1
 {
+    /// <summary>
+    /// Class <c> TextHolder</c> is used for storing text from the file, transforming it
+    /// as stated in test task's specification.
+    /// </summary>
     class TextHolder
     {
 
         #region Lists which are needed for text deconstruction
+        /// <summary>
+        /// An array of lines in the text.
+        /// </summary>
         public List<string> lines;
         /// <summary>
         /// An array of sentences in the text.
@@ -29,7 +36,7 @@ namespace task1
         }
 
         /// <summary>
-        /// Method <c>TextToTheSentences</c> is used for transforming text from file into an array of strings (sentences),
+        /// Method <c>LinesToSentences</c> is used for transforming string lines into an array of strings (sentences),
         /// By using Regex engine text is split in cases where sequence of characters ends with sentence ending symbol or also a Quotation mark, 
         /// has white space after that AND the first char after white space is in the upper case.
         /// </summary>
@@ -43,30 +50,49 @@ namespace task1
 
         }
 
-        public string[] SentenceToWordArray(int id)
+        public void ClearTextHolder()
         {
+            lines.Clear();
+            sentences.Clear();
+            wordsInText.Clear();
+        }
+
+        public List<string> SentenceToWordArray(int id)
+        {
+
             if (id >= 0 && id < sentences.Count)
-                return sentences[id].Split(' ');
+                return StringToWordList(sentences[id]);
+            else return new List<string>();
+        }
+
+        /// <summary>
+        /// Method <c>LinesToWordArray</c> is used for transforming lines into a sorted list of strings (words).
+        /// Finally, the resulting collection is added to the word list.
+        /// </summary>
+        public void LinesToWordArray()
+        {
+            
+            for (int i= 0; i < lines.Count;i++)
+            {
+                if (!String.IsNullOrEmpty(lines[i]))
+                {
+                    wordsInText.AddRange(StringToWordList(lines[i]));
+                }
+            }
+        }
+
+        public List<string> StringToWordList(string text)
+        {
+            char[] whitespace = new char[] { ' ', '\t', '\n' };
+            if (!String.IsNullOrEmpty(text))
+                return Regex.Replace(text, "[^a-zA-Z0-9 ’]+", "").Split(whitespace, StringSplitOptions.RemoveEmptyEntries).Select(x => x.Trim()).ToList();
             else return null;
         }
 
         /// <summary>
-        /// Method <c>TextToWords</c> is used for transforming text into a sorted array of strings (words).
-        /// Using Regex text engine every not needed character is removed from the text, except for white spaces and apostrophes.
-        /// Then, text string is split on white spaces, removing empty strings and deleting white spaces around every word string.
-        /// Finally, the resulting collection is sorted and cast to an array.
+        /// Counts quanity of words in the whole text
         /// </summary>
-        public void LinesToWordArray()
-        {
-            char[] whitespace = new char[] { ' ', '\t', '\n' };
-            foreach (string line in lines)
-            {
-                if (!String.IsNullOrEmpty(line))
-                    wordsInText.AddRange(Regex.Replace(line, "[^a-zA-Z0-9 ’]+", "").Split(whitespace, StringSplitOptions.RemoveEmptyEntries).Select(x => x.Trim()));
-            }
-
-        }
-
+        /// <returns> Quanity of words in the whole text</returns>
         public int CountTextLength()
         {
             int count = 0;
