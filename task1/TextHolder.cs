@@ -88,6 +88,14 @@ namespace task1
             else return null;
         }
 
+        public void DeleteWordFromLines(string wordToDelete)
+        {
+            for (int i = 0; i < lines.Count; i++)
+            {
+                lines[i] = Regex.Replace(lines[i], wordToDelete, "");  //Replace symbol/word used for deletion with zero length string
+            }
+        }
+
         /// <summary>
         /// Counts quantity of words in the whole text
         /// </summary>

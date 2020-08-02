@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Text;
 using System.IO;
-using System.Linq;
 using System.Text.RegularExpressions;
 
 namespace task1
@@ -11,22 +9,13 @@ namespace task1
     class CustomFileHandler
     {
         
-
         private TextHolder textHolder;
 
-        
         public CustomFileHandler(TextHolder textHolder)
         {
-            
-            
             this.textHolder = textHolder;
-            
         }
 
-
-
-
-        
         public void ReadLinesFromFile(string filePathToRead)
         {
             string currentLine = null;
@@ -65,8 +54,15 @@ namespace task1
             }
         }
 
-        
+        public static void SaveOriginalFile(string filePath)
+        {
+            FileInfo fileInfo = new FileInfo(filePath);
+            string directory = fileInfo.DirectoryName;
+            string extension = fileInfo.Extension;
+            string fileName = Regex.Replace(fileInfo.Name, extension, ".orig" + extension);
+            string pathToCopy = directory + "\\" + fileName;
 
+            fileInfo.CopyTo(pathToCopy, true); // Make copy of original file 
+        }
     }
-
 }
