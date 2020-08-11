@@ -12,29 +12,29 @@ namespace task1.FileTaskExecutors
 
         public override void Execute(params string[] args)
         {
-            string filePath = !String.IsNullOrEmpty(args[0]) ? args[0].Replace("\"", "") : "";// Deletes quotes in the string
+            string filePath = CustomFileHandler.SetStringOrDefault(args[0], ""); // Deletes quotes in the string
+            filePath = filePath.Replace("\"", ""); // Deletes quotes in the string
             cstTextHolder.ClearTextHolder();
             while (true)
             {
 
-                if (!String.IsNullOrEmpty(filePath) && File.Exists(filePath)) // If path directs to existing file, execute following:
+                if (File.Exists(filePath)) // If path directs to existing file, execute following:
                 {
                     FileInfo fileInfo = new FileInfo(filePath);
 
-                    cstFile.ReadLinesFromFile(filePath);
+                    cstFile.ReadTextFromFile(filePath);
 
-                    cstTextHolder.LinesToWordArray(); // Split lines into words
+                    cstTextHolder.TextToWordList(); // Split lines into words
 
-                    Console.WriteLine("Quantity of words in text: {0} \n", cstTextHolder.wordsInText.Count); // Quantity of words
+                    Console.WriteLine("Quantity of words in text: {0} \n", cstTextHolder.WordsInText.Count); // Quantity of words
 
                     Console.WriteLine("Every 10th word in text:");
 
-                    for (int i = 9; i < cstTextHolder.wordsInText.Count; i = i + 10) // Display every tenth word in text
+                    for (int i = 9; i < cstTextHolder.WordsInText.Count; i = i + 10) // Display every tenth word in text
                     {
-                        Console.Write("{0} ", cstTextHolder.wordsInText[i]);
+                        Console.Write("{0} ", cstTextHolder.WordsInText[i]);
                     }
                     Console.WriteLine();
-
                     break;
                 }
                 else

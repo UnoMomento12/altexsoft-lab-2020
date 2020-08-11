@@ -16,10 +16,11 @@ namespace task1.DirectoryTaskExecutors
 
         public void Execute(params string[] args)
         {
-            string dirPath = !String.IsNullOrEmpty(args[0]) ? args[0].Replace("\"", "") : ""; // get directory path
+            string dirPath = CustomFileHandler.SetStringOrDefault(args[0], ""); // get directory path
+            dirPath = dirPath.Replace("\"", "");
             while (true)
             {
-                if (!String.IsNullOrEmpty(dirPath) && Directory.Exists(dirPath)) // If path directs to existing directory:
+                if (Directory.Exists(dirPath)) // If path directs to existing directory:
                 {
                     cstDirSel = new CustomDirectorySelector(dirPath); // Create directory selector
                     break; //exit cycle

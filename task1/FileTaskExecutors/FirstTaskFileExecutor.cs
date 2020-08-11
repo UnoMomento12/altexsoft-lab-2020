@@ -12,14 +12,14 @@ namespace task1.FileTaskExecutors
 
         public override void Execute(params string[] args)
         {
-            string filePath = !String.IsNullOrEmpty(args[0]) ? args[0] : "";
-            string wordToDelete = !String.IsNullOrEmpty(args[1]) ? args[1] : "";
+            string filePath = CustomFileHandler.SetStringOrDefault(args[0], "");
+            string wordToDelete = CustomFileHandler.SetStringOrDefault(args[1], "");
             filePath = filePath.Replace("\"", ""); // Deletes quotes in the string
            
             cstTextHolder.ClearTextHolder();
             while (true)
             {
-                if (!String.IsNullOrEmpty(filePath) && File.Exists(filePath)) // If path directs to existing file, execute following:
+                if (File.Exists(filePath)) // If path directs to existing file, execute following:
                 {
                     if (String.IsNullOrEmpty(wordToDelete))  // Check the viability of the word for deletion
                     {
@@ -29,20 +29,20 @@ namespace task1.FileTaskExecutors
 
                     CustomFileHandler.SaveOriginalFile(filePath);// save original file with .orig suffix
                     
-                    cstFile.ReadLinesFromFile(filePath); // Read lines of text from file
+                    cstFile.ReadTextFromFile(filePath); // Read lines of text from file
 
-                    int initialCount = cstTextHolder.CountTextLength(); //Count quantity of words in the whole file
+                    int initialCount = cstTextHolder.TextInFile.Length; //Count quantity of words in the whole file
                     int afterDelCount;  // Variable for storing quantity of words after deleting
 
-                    cstTextHolder.DeleteWordFromLines(wordToDelete);
+                    cstTextHolder.DeleteWordFromText(wordToDelete);
 
-                    afterDelCount = cstTextHolder.CountTextLength();
+                    afterDelCount = cstTextHolder.TextInFile.Length;
 
                     if (initialCount == afterDelCount)
                     {
                         Console.WriteLine("\nNo matching entries to delete in text!"); // If lengths are equal, then there was no match in text for deleting
                     }
-                    cstFile.WriteLinesToFile(filePath); //Write modified lines to file
+                    cstFile.WriteTextToFile(filePath); //Write modified lines to file
                     break;
                 }
                 else

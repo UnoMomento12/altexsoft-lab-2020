@@ -15,69 +15,53 @@ namespace task1
 
         #region Lists which are needed for text deconstruction
         /// <summary>
-        /// An array of lines in the text.
+        /// String of text.
         /// </summary>
-        public List<string> lines;
+        public string TextInFile { get; set; }
         /// <summary>
-        /// An array of sentences in the text.
+        /// An array of Sentences in the text.
         /// </summary>
-        public List<string> sentences;
+        public List<string> Sentences { get; set; }
         /// <summary>
         /// An array of words in the whole text.
         /// </summary>
-        public List<string> wordsInText;
+        public List<string> WordsInText { get; set; }
         #endregion
 
         public TextHolder()
         {
-            this.lines = new List<string>();
-            this.sentences = new List<string>();
-            this.wordsInText = new List<string>();
+            this.TextInFile = null;
+            this.Sentences = new List<string>();
+            this.WordsInText = new List<string>();
         }
 
         /// <summary>
-        /// Method <c>LinesToSentences</c> is used for transforming string lines into an array of strings (sentences),
+        /// Method <c>TextToSentences</c> is used for transforming Text string into a list strings (Sentences),
         /// By using Regex engine text is split in cases where sequence of characters ends with sentence ending symbol or also a Quotation mark, 
         /// has white space after that AND the first char after white space is in the upper case.
         /// </summary>
-        public void LinesToSentences()
+        public void TextToSentences()
         {
-            foreach (string line in lines)
-            {
-                if (!String.IsNullOrEmpty(line))
-                    sentences.AddRange(Regex.Split(line, @"(?<=[\.!\?]|[\.!\?\”?])\s+(?=[A-Z])").Select(x => x.Trim()));
-            }
-
+            Sentences = new List<string>(Regex.Split(TextInFile, @"(?<=[\.!\?]|[\.!\?\”?])\s+(?=[A-Z])").Select(x => x.Trim()));
         }
 
         public void ClearTextHolder()
         {
-            lines.Clear();
-            sentences.Clear();
-            wordsInText.Clear();
+            TextInFile = null;
+            Sentences.Clear();
+            WordsInText.Clear();
         }
 
-        public List<string> SentenceToWordArray(int id)
+        public List<string> SentenceToWordList(int id)
         {
-
-            if (id >= 0 && id < sentences.Count)
-                return StringToWordList(sentences[id]);
+            if (id >= 0 && id < Sentences.Count)
+                return StringToWordList(Sentences[id]);
             else return new List<string>();
         }
 
-        /// <summary>
-        /// Method <c>LinesToWordArray</c> is used for transforming lines into a sorted list of strings (words).
-        /// Finally, the resulting collection is added to the word list.
-        /// </summary>
-        public void LinesToWordArray()
+        public void TextToWordList()
         {
-            for (int i= 0; i < lines.Count;i++)
-            {
-                if (!String.IsNullOrEmpty(lines[i]))
-                {
-                    wordsInText.AddRange(StringToWordList(lines[i]));
-                }
-            }
+            WordsInText = StringToWordList(TextInFile);
         }
 
         public List<string> StringToWordList(string text)
@@ -88,26 +72,11 @@ namespace task1
             else return null;
         }
 
-        public void DeleteWordFromLines(string wordToDelete)
+        public void DeleteWordFromText(string wordToDelete)
         {
-            for (int i = 0; i < lines.Count; i++)
-            {
-                lines[i] = Regex.Replace(lines[i], wordToDelete, "");  //Replace symbol/word used for deletion with zero length string
-            }
+            TextInFile = Regex.Replace(TextInFile, wordToDelete, "");  //Replace symbol/word used for deletion with zero length string
         }
 
-        /// <summary>
-        /// Counts quantity of words in the whole text
-        /// </summary>
-        /// <returns> quantity of words in the whole text</returns>
-        public int CountTextLength()
-        {
-            int count = 0;
-            foreach (string line in lines)
-            {
-                count += line.Length;
-            }
-            return count;
-        }
+        
     }
 }

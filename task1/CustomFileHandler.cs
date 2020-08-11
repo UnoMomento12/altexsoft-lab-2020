@@ -16,42 +16,15 @@ namespace task1
             this.textHolder = textHolder;
         }
 
-        public void ReadLinesFromFile(string filePathToRead)
+        public void ReadTextFromFile(string filePathToRead)
         {
-            string currentLine = null;
-            try
-            {
-                using (StreamReader sr = new StreamReader(filePathToRead, Encoding.Default))
-                {
-                    while ((currentLine = sr.ReadLine()) != null)
-                    {
-                        //if (!String.IsNullOrEmpty(currentLine))
-                            textHolder.lines.Add(currentLine);
-                    }
-                }
-            } catch (Exception e)
-            {
-                Console.WriteLine(e.Message);
-            }
+            textHolder.TextInFile = File.ReadAllText(filePathToRead, Encoding.Default);
         }
 
         
-        public void WriteLinesToFile(string filePathToWrite)
+        public void WriteTextToFile(string filePathToWrite)
         {
-            try
-            {
-                using (StreamWriter sw = new StreamWriter(filePathToWrite, false, Encoding.Default))
-                {
-                    foreach(string line in textHolder.lines)
-                    {
-                        sw.WriteLine(line);     
-                    }
-                }
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e.Message);
-            }
+            File.WriteAllText(filePathToWrite, textHolder.TextInFile, Encoding.Default);
         }
 
         public static void SaveOriginalFile(string filePath)
@@ -64,5 +37,11 @@ namespace task1
 
             fileInfo.CopyTo(pathToCopy, true); // Make copy of original file 
         }
+        
+        public static string SetStringOrDefault(string str, string defaultStr)
+        {
+            return !(str == null) ? str : defaultStr;
+        }
+
     }
 }

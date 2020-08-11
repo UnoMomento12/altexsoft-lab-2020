@@ -49,23 +49,25 @@ namespace task1
 
         public void MoveToSelectedDir(int id)
         {
-            
-            if( id == -1)
+
+            if (id == -1)
             {
                 if (dirPath.Equals(Directory.GetDirectoryRoot(dirPath))) return;
                 dirPath = Directory.GetParent(dirPath).FullName;
                 directoryNames.Clear();
                 directoryNames.AddRange(GetDirNames(dirPath));
-                
-            } else
-            {
-                if (directoryNames.Count == 0 || directoryNames.Count <= id || id < -1 ) return;
-                dirPath = dirPath + "\\" + directoryNames[id];
-                directoryNames.Clear();
-                directoryNames.AddRange(GetDirNames(dirPath));
-            }
 
-            
+            }
+            else if (directoryNames.Count == 0 || directoryNames.Count <= id || id < -1)
+            {
+                return;
+            } 
+            else
+            {
+                dirPath = dirPath + "\\" + directoryNames[id];
+            }
+            directoryNames.Clear();
+            directoryNames.AddRange(GetDirNames(dirPath));
             fileList.Clear();
             fileList.AddRange(GetFileNames(dirPath));
             
