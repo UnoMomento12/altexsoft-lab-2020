@@ -54,9 +54,6 @@ namespace task1
             {
                 if (dirPath.Equals(Directory.GetDirectoryRoot(dirPath))) return;
                 dirPath = Directory.GetParent(dirPath).FullName;
-                directoryNames.Clear();
-                directoryNames.AddRange(GetDirNames(dirPath));
-
             }
             else if (directoryNames.Count == 0 || directoryNames.Count <= id || id < -1)
             {
