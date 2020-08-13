@@ -12,45 +12,42 @@ namespace task1.FileTaskExecutors
 
         public override void Execute(params string[] args)
         {
-            string filePath = CustomFileHandler.SetStringOrDefault(args[0], "");
-            string wordToDelete = CustomFileHandler.SetStringOrDefault(args[1], "");
-            filePath = filePath.Replace("\"", ""); // Deletes quotes in the string
-           
             cstTextHolder.ClearTextHolder();
+
+            cstFile.SetValidFilePath(args[0]);
+
+            string wordToDelete = args[1];
+            
             while (true)
             {
-                if (File.Exists(filePath)) // If path directs to existing file, execute following:
+                if (String.IsNullOrEmpty(wordToDelete))// Check the viability of the word for deletion
                 {
-                    if (String.IsNullOrEmpty(wordToDelete))  // Check the viability of the word for deletion
-                    {
-                        Console.WriteLine("Please enter a word/symbol for deletion:");
-                        wordToDelete = Console.ReadLine();
-                    }
-
-                    CustomFileHandler.SaveOriginalFile(filePath);// save original file with .orig suffix
-                    
-                    cstFile.ReadTextFromFile(filePath); // Read lines of text from file
-
-                    int initialCount = cstTextHolder.TextInFile.Length; //Count quantity of words in the whole file
-                    int afterDelCount;  // Variable for storing quantity of words after deleting
-
-                    cstTextHolder.DeleteWordFromText(wordToDelete);
-
-                    afterDelCount = cstTextHolder.TextInFile.Length;
-
-                    if (initialCount == afterDelCount)
-                    {
-                        Console.WriteLine("\nNo matching entries to delete in text!"); // If lengths are equal, then there was no match in text for deleting
-                    }
-                    cstFile.WriteTextToFile(filePath); //Write modified lines to file
+                    Console.WriteLine("Please enter a word/symbol for deletion:");
+                    wordToDelete = Console.ReadLine();
+                } else
+                {
                     break;
                 }
-                else
-                {
-                    Console.WriteLine("Please enter correct file path:");
-                    filePath = Console.ReadLine().Replace("\"", "");
-                }
             }
+
+            cstFile.ReadTextFromFile(); // Read text from file
+            cstFile.SaveOriginalFile(); // save original file with .orig suffix (no repeated reading)
+            
+            int initialCount = cstTextHolder.TextInFile.Length; //Count quantity of symbols in the whole file
+
+            cstTextHolder.DeleteWordFromText(wordToDelete);
+
+            int afterDelCount = cstTextHolder.TextInFile.Length;  // Count quantity of symbols after deleting
+
+            if (initialCount == afterDelCount)
+            {
+                Console.WriteLine("\nNo matching entries to delete in text!"); // If lengths are equal, then there was no match in text for deleting
+            } 
+            else
+            {
+                cstFile.WriteTextToFile(); //Write modified text to file if there were changes
+            }
+            
         }
     }
 }

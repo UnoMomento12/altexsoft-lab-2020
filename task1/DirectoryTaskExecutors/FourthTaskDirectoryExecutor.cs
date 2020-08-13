@@ -7,31 +7,17 @@ namespace task1.DirectoryTaskExecutors
 {
     class FourthTaskDirectoryExecutor : ITaskExecutor
     {
-        CustomDirectorySelector cstDirSel;
+        private CustomDirectorySelector cstDirSel;
 
         public FourthTaskDirectoryExecutor()
         {
-            this.cstDirSel = null;
+            this.cstDirSel = new CustomDirectorySelector();
         }
 
         public void Execute(params string[] args)
         {
-            string dirPath = CustomFileHandler.SetStringOrDefault(args[0], ""); // get directory path
-            dirPath = dirPath.Replace("\"", "");
-            while (true)
-            {
-                if (Directory.Exists(dirPath)) // If path directs to existing directory:
-                {
-                    cstDirSel = new CustomDirectorySelector(dirPath); // Create directory selector
-                    break; //exit cycle
-                }
-                else
-                {
-                    Console.WriteLine("Please enter correct directory path!"); // enter new path
-                    dirPath = Console.ReadLine().Replace("\"", "");
-                }
-            }
-
+            cstDirSel.SetValidDirectoryPath(args[0]);
+            
             while (true)
             {
                 cstDirSel.ListDirectoriesAndFiles(); //Display directories and files in the path

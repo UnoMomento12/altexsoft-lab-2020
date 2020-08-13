@@ -6,6 +6,6 @@ namespace task1.TaskInterfaces
 {
     interface ITaskExecutor
     {
-        public void Execute(params string[] args) { }
+        void Execute(params string[] args) { }
     }
 }

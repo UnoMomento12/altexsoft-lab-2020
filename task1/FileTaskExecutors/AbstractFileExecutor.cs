@@ -1,13 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
+using System.IO;
 using task1.TaskInterfaces;
 
 namespace task1.FileTaskExecutors 
 {
     abstract class AbstractFileExecutor : ITaskExecutor
     {
-        public CustomFileHandler cstFile;
+        protected CustomFileHandler cstFile;
         public TextHolder cstTextHolder;
         protected AbstractFileExecutor(TextHolder textHolder)
         {
@@ -16,5 +15,7 @@ namespace task1.FileTaskExecutors
            
         }
         public abstract void Execute(params string[] args);
+
+       
     }
 }

@@ -13,13 +13,12 @@ namespace task1
 {
     class Program
     {
-        public TextHolder txtHolder;
-        public CustomDirectorySelector dirSelector;
         public ITaskExecutor taskExecutor;
+        public TextHolder txtHolder;
+
         public Program()
         {
-            txtHolder = new TextHolder();
-            dirSelector = null;
+            txtHolder    = new TextHolder();
             taskExecutor = null;
         }
 
@@ -63,31 +62,25 @@ namespace task1
         }
 
         /// <summary>
-        /// Method <c>ProcessArgs</c> is used for processing arguments and executing corresponding functions cpecified in task1 of altex fost lab course.
+        /// Method <c>ProcessArgs</c> is used for processing arguments and executing corresponding functions specified in task1 of altex soft lab course.
         /// </summary>
         private void ProcessArgs(string[] args)
         {
-            string path = null;
-            string secondParam = null;
+            string path        = args.Length > 1 ? args[1] : "";
+            string secondParam = args.Length > 2 ? args[2] : "";
+            
             switch (args[0])
             {
                 case "func1":
-                    path = args.Length > 1 ? args[1] : null;
-                    secondParam = args.Length > 2 ? args[2] : null;
                     taskExecutor = new FirstTaskFileExecutor(txtHolder);
                     break;
                 case "func2":
-                    path = args.Length > 1 ? args[1] : "";
                     taskExecutor = new SecondTaskFileExecutor(txtHolder);
-                    
                     break;
                 case "func3":
-                    path = args.Length > 1 ? args[1] : "";
-                    secondParam = args.Length > 2 ? args[2] : "3";
                     taskExecutor = new ThirdTaskFileExecutor(txtHolder);
                     break;
                 case "func4":
-                    path = args.Length > 1 ? args[1] : "";
                     taskExecutor = new FourthTaskDirectoryExecutor();
                     break;
                 default:

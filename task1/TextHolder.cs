@@ -36,13 +36,13 @@ namespace task1
         }
 
         /// <summary>
-        /// Method <c>TextToSentences</c> is used for transforming Text string into a list strings (Sentences),
+        /// Method <c>TextToSentences</c> is used for transforming Text string into a list of strings (Sentences),
         /// By using Regex engine text is split in cases where sequence of characters ends with sentence ending symbol or also a Quotation mark, 
         /// has white space after that AND the first char after white space is in the upper case.
         /// </summary>
         public void TextToSentences()
         {
-            Sentences = new List<string>(Regex.Split(TextInFile, @"(?<=[\.!\?]|[\.!\?\”?])\s+(?=[A-Z])").Select(x => x.Trim()));
+            Sentences = new List<string>(Regex.Split(TextInFile, "(?<=[.!?]\\\"*)\\s+(?=[A-Z])").Select(x => x.Trim()));
         }
 
         public void ClearTextHolder()
@@ -76,7 +76,5 @@ namespace task1
         {
             TextInFile = Regex.Replace(TextInFile, wordToDelete, "");  //Replace symbol/word used for deletion with zero length string
         }
-
-        
     }
 }

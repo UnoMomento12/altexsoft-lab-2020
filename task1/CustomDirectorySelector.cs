@@ -7,25 +7,25 @@ namespace task1
 {
     class CustomDirectorySelector
     {
-        private string dirPath;
-        
-        private List<string> directoryNames;
+        private List<string> _directoryNames;
 
-        private List<string> fileList;
+        private List<string> _fileList;
 
-        public CustomDirectorySelector(string dirPath)
+        public string DirPath { get; set; }
+
+        public CustomDirectorySelector()
         {
-            this.dirPath = dirPath;
+            DirPath = null;
             
-            this.directoryNames = GetDirNames(dirPath);
+            _directoryNames = new List<string>();
             
-            this.fileList = GetFileNames( dirPath);
+            _fileList = new List<string>();
         }
 
-        private List<string> GetDirNames(string dirPath)
+        private List<string> GetDirNames()
         {
             List<string> result = new List<string>();
-            foreach (string fullName in Directory.GetDirectories(dirPath))
+            foreach (string fullName in Directory.GetDirectories(DirPath))
             {
                 string name = new DirectoryInfo(fullName).Name;
                 result.Add(name);
@@ -34,10 +34,10 @@ namespace task1
             return result;
         }
 
-        private List<string> GetFileNames(string dirPath)
+        private List<string> GetFileNames()
         {
             List<string> result = new List<string>();
-            foreach (string fullName in Directory.GetFiles(dirPath))
+            foreach (string fullName in Directory.GetFiles(DirPath))
             {
                 string name = new FileInfo(fullName).Name;
                 result.Add(name);
@@ -52,21 +52,21 @@ namespace task1
 
             if (id == -1)
             {
-                if (dirPath.Equals(Directory.GetDirectoryRoot(dirPath))) return;
-                dirPath = Directory.GetParent(dirPath).FullName;
+                if (DirPath.Equals(Directory.GetDirectoryRoot(DirPath))) return;
+                DirPath = Directory.GetParent(DirPath).FullName;
             }
-            else if (directoryNames.Count == 0 || directoryNames.Count <= id || id < -1)
+            else if (_directoryNames.Count == 0 || _directoryNames.Count <= id || id < -1)
             {
                 return;
             } 
             else
             {
-                dirPath = dirPath + "\\" + directoryNames[id];
+                DirPath = DirPath + "\\" + _directoryNames[id];
             }
-            directoryNames.Clear();
-            directoryNames.AddRange(GetDirNames(dirPath));
-            fileList.Clear();
-            fileList.AddRange(GetFileNames(dirPath));
+            _directoryNames.Clear();
+            _directoryNames.AddRange(GetDirNames());
+            _fileList.Clear();
+            _fileList.AddRange(GetFileNames());
             
         }
 
@@ -75,20 +75,36 @@ namespace task1
             Console.WriteLine("Directories:");
             Console.WriteLine("{0, 5} | {1,40}", "Id", "Name");
 
-            for( int i = 0; i < directoryNames.Count; i++)
+            for( int i = 0; i < _directoryNames.Count; i++)
             {
-                Console.WriteLine("{0, 5} | {1,40}", i, directoryNames[i]);
+                Console.WriteLine("{0, 5} | {1,40}", i, _directoryNames[i]);
             }
             Console.WriteLine("Files:");
             Console.WriteLine("{0, 5} | {1,40}", "Id", "Name");
-            for (int i = 0; i < fileList.Count; i++)
+            for (int i = 0; i < _fileList.Count; i++)
             {
-                Console.WriteLine("{0, 5} | {1,40}", i, fileList[i] );
+                Console.WriteLine("{0, 5} | {1,40}", i, _fileList[i] );
             }
-
         }
 
+        public void SetValidDirectoryPath(string dirPath)
+        {
+            DirPath = dirPath.Replace("\"", ""); // get directory path
 
-
+            while (true)
+            {
+                if (!Directory.Exists(DirPath)) // If path doesn't direct to existing directory:
+                {
+                    Console.WriteLine("Please enter correct directory path!"); // enter new path
+                    DirPath = Console.ReadLine().Replace("\"", "");
+                }
+                else
+                {
+                    break; //exit cycle
+                }
+            }
+            _directoryNames = GetDirNames();
+            _fileList = GetFileNames();
+        }
     }
 }
