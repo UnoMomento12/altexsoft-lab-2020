@@ -60,9 +60,11 @@ namespace task2
             //}
 
             navig.WriteNavigator();
-            navig.MoveToCategory(0);
+            navig.MoveTo(0);
             navig.WriteNavigator();
-
+            int idC;
+            Int32.TryParse(Console.ReadLine(), out idC);
+            navig.MoveTo(idC);
             unitOfWork.Save();
             Console.ReadKey();
             Console.WriteLine("Hello World!");
