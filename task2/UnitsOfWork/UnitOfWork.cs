@@ -8,9 +8,9 @@ namespace task2.UnitsOfWork
     class UnitOfWork 
     {
         private IDataManager _dataManager;
-        public IRepository<Recipe> Recipes { get; set; }
-        public IRepository<Ingredient> Ingredients { get; set; }
-        public IRepository<Category> Categories { get; set; }
+        public IRepository<Recipe> Recipes { get; }
+        public IRepository<Ingredient> Ingredients { get;  }
+        public IRepository<Category> Categories { get; }
         public UnitOfWork()
         {
             _dataManager = new JsonDataManager();

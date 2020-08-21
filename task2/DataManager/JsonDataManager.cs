@@ -15,9 +15,9 @@ namespace task2.DataManager
             }
             else
             {
+                File.Create(fileName);
                 return new List<T>();                
             }
-            
         }
 
         public void SaveToFile<T>(IEnumerable<T> ts) where T : class
@@ -26,8 +26,8 @@ namespace task2.DataManager
             if (!File.Exists(fileName)) File.Create(fileName);
             File.WriteAllText(
                 fileName,
-                JsonConvert.SerializeObject(ts, Formatting.Indented)
-                    , Encoding.UTF8); 
+                JsonConvert.SerializeObject(ts, Formatting.Indented),
+                Encoding.UTF8); 
         }
     }
 }
