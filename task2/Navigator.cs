@@ -155,5 +155,10 @@ namespace task2
             _recipesStart = _subItems.Count;
             _current?.Recipes.ForEach(x => _subItems.Add(x));
         }
+
+        public int GetSubItemsCount()
+        {
+            return _subItems.Count;
+        }
     }
 }

@@ -1,5 +1,4 @@
-﻿using Newtonsoft.Json;
-
+﻿
 namespace task2.Models
 {
     class IngredientDetail

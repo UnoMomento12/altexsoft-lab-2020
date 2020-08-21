@@ -1,19 +1,21 @@
 ﻿using System;
 using task2.UnitsOfWork;
-using task2.DataManager;
 using task2.Models;
 using System.Collections.Generic;
 using task2.Controllers;
-using System.Linq;
 
 namespace task2
 {
+    enum NavigatorItem
+    {
+        Category = 1,
+        Recipe = 2
+    }
     class Program
     {
         static void Main(string[] args)
         {
             UnitOfWork unitOfWork = new UnitOfWork();
-            IngredientController ingCont = new IngredientController(unitOfWork);
             RecipeController recCont = new RecipeController(unitOfWork);
             CategoryController catCont = new CategoryController(unitOfWork);
             Navigator navig = new Navigator(unitOfWork);
@@ -47,7 +49,7 @@ namespace task2
 
         private static void ProcessRecipe(RecipeController recCont, CategoryController catCont, Navigator navig)
         {
-            string item = "recipe";
+            NavigatorItem item = NavigatorItem.Recipe;
             Category targetCategory = null;
             targetCategory =  SetTargetCategory(navig, item);
             Recipe recipeToAdd = FormRecipe();
@@ -116,7 +118,7 @@ namespace task2
 
         private static void ProcessCategory(CategoryController catCont, Navigator navig)
         {
-            string item = "category";
+            NavigatorItem item = NavigatorItem.Category;
             Category targetCategory = null;
             targetCategory= SetTargetCategory(navig, item);
             Console.Write("Enter Category Name:");
@@ -140,13 +142,22 @@ namespace task2
             Console.WriteLine("addcategory - to create an additional category;");
             Console.WriteLine("addrecipe - to create recipe in the category;");
         }
-        private static Category SetTargetCategory(Navigator navig , string item)
+        private static Category SetTargetCategory(Navigator navig , NavigatorItem item)
         {
+            string itemName = GetNavigatorItemName(item);
             Category result = null;
             Category Current = navig.GetCurrent();
+
+            if (navig.GetSubItemsCount() == 0)
+            {
+                Console.WriteLine("This category doesn't have subcategories!");
+                result = Current;
+                return result;
+            }
+
             int categoryID;
             bool choice = false;
-            if (item == "category" || (Current != null && item == "recipe"))
+            if (item == NavigatorItem.Category || (Current != null && item == NavigatorItem.Recipe))
             {
                 Console.WriteLine("Do you want to add " + item + " to current " + Current?.Name + " category? Y/N");
                 
@@ -181,6 +192,18 @@ namespace task2
                 result = navig.GetCategory(categoryID);
             }
             return result;
+        }
+
+        private static string GetNavigatorItemName(NavigatorItem item)
+        {
+            switch (item)
+            {
+                case NavigatorItem.Category:
+                    return "category";
+                case NavigatorItem.Recipe:
+                    return "recipe";
+                default: return null;
+            }
         }
     }
 }

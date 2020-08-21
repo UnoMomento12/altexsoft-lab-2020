@@ -1,6 +1,4 @@
-﻿
-using System.Collections.Generic;
-using task2.UnitsOfWork;
+﻿using task2.UnitsOfWork;
 using task2.Models;
 using System;
 using System.Linq;

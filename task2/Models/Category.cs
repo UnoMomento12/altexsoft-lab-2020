@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
 using Newtonsoft.Json;
-using System.Linq;
 namespace task2.Models
 {
     class Category : BaseModel
