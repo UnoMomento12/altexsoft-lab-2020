@@ -10,15 +10,7 @@ namespace task2.Controllers
     {
         public RecipeController(UnitOfWork unitOfWork) : base(unitOfWork) { }
 
-        public void Add(Recipe recipe)
-        {
-            recipe = CreateRecipe(recipe);
-        }
-        public Recipe CreateRecipe(string name, string description, List<string> steps)
-        {
-            return CreateRecipe(new Recipe() { ID = Guid.NewGuid().ToString(), Name = name, Description = description, Steps = steps });
-        }
-        public Recipe CreateRecipe(Recipe recipe) // returns reference for future adding to category
+        public Recipe CreateAndGetRecipe(Recipe recipe) // returns reference for future adding to category
         {
             var checker = _unitOfWork.Recipes.SingleOrDefault(x => string.Equals(x.Name, recipe.Name, StringComparison.OrdinalIgnoreCase));
             if (checker != null)
@@ -38,35 +30,17 @@ namespace task2.Controllers
             return recipe;
         }
 
-        public void RemoveRecipe(string recipeId)
-        {
-            var item = _unitOfWork.Recipes.Get(recipeId);
-            if (item == null)
-            {
-                Console.WriteLine("Recipe " + recipeId + " has not been found");
-                return;
-            }
-            _unitOfWork.Recipes.Remove(item);
-            _unitOfWork.Save();
-        }
-
-
-        public Recipe GetRecipe(string guid)
-        {
-            var recipe = _unitOfWork.Recipes.Get(guid);
-            return recipe;
-        }
-        public void AddIngredientToRecipe(Recipe recipe, string ingredientName, double amount)
+        public void AddIngredientToRecipe(Recipe recipe, string ingredientName, string denomination, double amount)
         {
             var ingred = _unitOfWork.Ingredients.SingleOrDefault(x => String.Equals(x.Name, ingredientName, StringComparison.OrdinalIgnoreCase));
             if (ingred == null)
             {
-                ingred = new Ingredient { ID = Guid.NewGuid().ToString(), Name = ingredientName };
+                ingred = new Ingredient { ID = Guid.NewGuid().ToString(), Name = ingredientName, Denomination = denomination };
                 _unitOfWork.Ingredients.Add(ingred);
             }
             var ingDetail = new IngredientDetail(ingred, amount);
 
-            var checkerDetail = recipe.Ingredients.SingleOrDefault(x => x.Ingredient.ID == ingDetail.Ingredient.ID);
+            var checkerDetail = recipe.Ingredients.SingleOrDefault(x => x.Ingredient == ingDetail.Ingredient);
             if (checkerDetail != null)
             {
                 checkerDetail.Amount += ingDetail.Amount;
@@ -80,10 +54,37 @@ namespace task2.Controllers
             _unitOfWork.Save();
         }
 
-        public void AddSteps(Recipe recipe, List<string> steps)
-        {
-            recipe.Steps.AddRange(steps);
-            _unitOfWork.Save();
-        }
+        //public void AddSteps(Recipe recipe, List<string> steps)
+        //{
+        //    recipe.Steps.AddRange(steps);
+        //    _unitOfWork.Save();
+        //}
+
+        //public void RemoveRecipe(string recipeId)
+        //{
+        //    var item = _unitOfWork.Recipes.Get(recipeId);
+        //    if (item == null)
+        //    {
+        //        Console.WriteLine("Recipe " + recipeId + " has not been found");
+        //        return;
+        //    }
+        //    _unitOfWork.Recipes.Remove(item);
+        //    _unitOfWork.Save();
+        //}
+
+        //public Recipe GetRecipe(string guid)
+        //{
+        //    var recipe = _unitOfWork.Recipes.Get(guid);
+        //    return recipe;
+        //}
+
+        //public void Add(Recipe recipe)
+        //{
+        //    recipe = CreateAndGetRecipe(recipe);
+        //}
+        //public Recipe CreateAndGetRecipe(string name, string description, List<string> steps)
+        //{
+        //    return CreateAndGetRecipe(new Recipe() { ID = Guid.NewGuid().ToString(), Name = name, Description = description, Steps = steps });
+        //}
     }
 }

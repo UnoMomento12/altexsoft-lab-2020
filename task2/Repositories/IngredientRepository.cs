@@ -4,9 +4,9 @@ namespace task2.Repositories
 {
     class IngredientRepository :Repository<Ingredient>
     {
-        public IngredientRepository(IDataManager dataManager, Entities ent) : base(dataManager) 
+        public IngredientRepository(IDataManager dataManager) : base(dataManager) 
         {
-            ent.Ingredients = _items;
+           
         }
 
         

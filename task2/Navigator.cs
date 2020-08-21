@@ -1,38 +1,47 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using task2.Models;
 using task2.UnitsOfWork;
 namespace task2
 {
     class Navigator
     {
-        private UnitOfWork unitOfWork { get; set; }
-        public Category Root { get; set; }
-        public Category Current { get; set; } 
-        public List<BaseModel> SubItems { get; set; }
+        private UnitOfWork _unitOfWork;
+        private Category _root;
+        private Category _current;
+        private List<BaseModel> _subItems;
+
+        private int _recipesStart { get; set; }
         
 
         public Navigator(UnitOfWork unit)
         {
-            unitOfWork = unit;
-            Current = null;
-            Root = null;
-            SubItems = new List<BaseModel>();
-            unitOfWork.Categories.Where(x => x.ParentID == null).ToList().ForEach(x=> SubItems.Add(x));
+            _unitOfWork = unit;
+            _current = null;
+            _root = null;
+            _subItems = new List<BaseModel>();
+            _unitOfWork.Categories.Where(x => x.ParentID == null).ToList().ForEach(x=> _subItems.Add(x));
+            _recipesStart = _subItems.Count;
         }
 
         public void MoveTo(int id)
         {
-            BaseModel retr = SubItems[id];
+            bool inBounds = id > -1 && id < _subItems.Count;
+            if (!inBounds)
+            {
+                Console.WriteLine("No category/recipe with such an id");
+                return;
+            }
+            BaseModel retr = _subItems[id];
             if (retr is Category)
             {
-                Current = retr as Category;
-                Root = Current.Parent;
-                SubItems.Clear();
-                unitOfWork.Categories.Where(x => x.ParentID == Current.ID).ToList().ForEach(x => SubItems.Add(x));
-                Current.Recipes.ForEach(x => SubItems.Add(x));
+                _root = _current;
+                _current = retr as Category;
+                _subItems.Clear();
+                _unitOfWork.Categories.Where(x => x.Parent == _current).ToList().ForEach(x => _subItems.Add(x));
+                _recipesStart = _subItems.Count;
+                _current.Recipes.ForEach(x => _subItems.Add(x));
             }
             else if ( retr is Recipe) 
             {
@@ -41,55 +50,110 @@ namespace task2
         }
 
         public void WriteRecipe(Recipe recipe)
-        {
-            Console.Clear();
-            Console.WriteLine("Recipe name: " + recipe.Name);
+        { 
+            Console.WriteLine("-------------------------------------------");
+            PrintColored("Recipe name: " + recipe.Name , ConsoleColor.Green);
             Console.WriteLine("Ingredients:");
             foreach (var a in recipe.Ingredients)
             {
-                Console.WriteLine(a.Ingredient.Name + " : " + a.Amount);
+                Console.WriteLine(a.Ingredient.Name + " : " + a.Amount + " " + a.Ingredient.Denomination);
             }
             Console.WriteLine("Steps to cook:");
-            foreach(var a in recipe.Steps)
+            for(int i=0; i< recipe.Steps.Count; i++)
             {
-                Console.WriteLine(a);
+                PrintColored( (i+1) + ". " + recipe.Steps[i] , ConsoleColor.Cyan);
             }
-            Console.WriteLine("Description: " + recipe.Description);
+            PrintColored("Description: " + recipe.Description , ConsoleColor.Yellow);
+            Console.WriteLine("-------------------------------------------");
+            Console.WriteLine("Press any button to close recipe!");
+            Console.ReadKey();
         }
         
         public void WriteNavigator()
         {
             Console.Clear();
             Console.WriteLine("Navigator!");
-            
-            if (Current == null)
+            if (_current == null)
             {
-                WriteNav();
+                WriteNavNull();
             }
             else
             {
-                Console.WriteLine("Subcategories and recipes in " + Current.Name + " category:");
                 WriteNav();
             }
         }
 
-        public void WriteNav()
+        private void WriteNav()
+        {
+            if (_subItems.Count == 0)
+            {
+                Console.WriteLine("Category " + _current.Name + " is empty!");
+                return;
+            }
+            Console.WriteLine("Subcategories and recipes in " + _current.Name + " category.");
+            Console.WriteLine("Categories:");
+            int i;
+            for(i = 0; i< _recipesStart; i++)
+            {
+                Console.WriteLine(i + ". " + _subItems[i].Name);
+            }
+            Console.WriteLine("Recipes:");
+            for( int b = i; b < _subItems?.Count; b++) 
+            {
+                Console.WriteLine("    "+ b +". "+ _subItems[b].Name);
+            }
+
+        }
+        private void WriteNavNull()
         {
             Console.WriteLine("Categories:");
-            for( int i = 0; i< SubItems?.Count; i++)
+            for (int i = 0; i < _subItems?.Count; i++)
             {
-                Console.WriteLine(i + ". " + SubItems[i].Name);
+                Console.WriteLine(i + ". " + _subItems[i].Name);
             }
         }
         
 
         public void GoBack()
         {
-
+            _current = _root;
+            _root = _current?.Parent;
+            _subItems.Clear();
+            _unitOfWork.Categories.Where(x => x.Parent == _current).ToList().ForEach(x => _subItems.Add(x));
+            _recipesStart = _subItems.Count;
+            _current?.Recipes.ForEach(x => _subItems.Add(x));
         }
-        public void ShowAllCategories()
+        
+        public Category GetCurrent()
         {
+            return _current;
+        }
+        public Category GetCategory(int id)
+        {
+            bool inBounds = id > -1 && id < _subItems.Count;
+            if(inBounds && _subItems[id] is Category )
+            {
+                return _subItems[id] as Category;
+            }
+            else
+            {
+                return null;
+            }
+        }
 
+        private void PrintColored(string message, ConsoleColor consoleColor)
+        {
+            Console.ForegroundColor = consoleColor;
+            Console.WriteLine(message);
+            Console.ForegroundColor = ConsoleColor.White;
+        }
+
+        public void UpdateSubItems()
+        {
+            _subItems.Clear();
+            _unitOfWork.Categories.Where(x => x.Parent == _current).ToList().ForEach(x => _subItems.Add(x));
+            _recipesStart = _subItems.Count;
+            _current?.Recipes.ForEach(x => _subItems.Add(x));
         }
     }
 }

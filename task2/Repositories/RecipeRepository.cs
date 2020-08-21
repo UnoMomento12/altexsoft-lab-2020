@@ -4,9 +4,9 @@ namespace task2.Repositories
 {
     class RecipeRepository : Repository<Recipe>
     {
-        public RecipeRepository(IDataManager dataManager, Entities ent) : base(dataManager) 
+        public RecipeRepository(IDataManager dataManager) : base(dataManager) 
         {
-            ent.Recipes = _items;
+            
         }
         
         public override void Add(Recipe recipe)

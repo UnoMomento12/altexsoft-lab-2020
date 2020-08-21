@@ -9,20 +9,7 @@ namespace task2.Controllers
     {
         public CategoryController(UnitOfWork unitOfWork) : base(unitOfWork) { }
 
-        public void Add(Category category)
-        {
-            CreateCategory(category);
-        }
-        public Category GetCategory(string guid)
-        {
-            return _unitOfWork.Categories.Get(guid);
-        }
-
-        public List<Category> GetCategories(string parentId)
-        {
-            return _unitOfWork.Categories.Where(x => x.ParentID == parentId).ToList();
-        }
-        public Category CreateCategory(Category category)
+        public Category CreateAndGetCategory(Category category)
         {
             var item = _unitOfWork.Categories.SingleOrDefault(x => String.Equals(x.Name, category.Name, StringComparison.OrdinalIgnoreCase) && x.ParentID == category.ParentID);
             if (item != null) return item;
@@ -34,25 +21,10 @@ namespace task2.Controllers
             _unitOfWork.Save();
             return category;
         }
-
-        public Category CreateCategory(string categoryName, string parentId = null)
+        public Category CreateAndGetCategory(string categoryName, string parentId = null)
         {
-            return CreateCategory(new Category { Name = categoryName, ParentID = parentId });
+            return CreateAndGetCategory(new Category { Name = categoryName, ParentID = parentId });
         }
-
-        public void RemoveCategory(string categoryId)
-        {
-            var item = _unitOfWork.Categories.SingleOrDefault(x => x.ID == categoryId);
-            if (item == null)
-            {
-                Console.WriteLine("Category " + categoryId + " has not been found");
-                return;
-            }
-
-            _unitOfWork.Categories.Remove(item);
-            _unitOfWork.Save();
-        }
-
         public void AddRecipeToCategory(Category category, Recipe recipe)
         {
             var recip = category.Recipes.SingleOrDefault(x => x.ID == recipe.ID);
@@ -65,5 +37,33 @@ namespace task2.Controllers
             category.RecipeIds.Add(recipe.ID);
             _unitOfWork.Save();
         }
+
+        //public void Add(Category category)
+        //{
+        //    CreateAndGetCategory(category);
+        //}
+        //public Category GetCategory(string guid)
+        //{
+        //    return _unitOfWork.Categories.Get(guid);
+        //}
+
+        //public List<Category> GetCategories(string parentId)
+        //{
+        //    return _unitOfWork.Categories.Where(x => x.ParentID == parentId).ToList();
+        //}
+
+        //public void RemoveCategory(string categoryId)
+        //{
+        //    var item = _unitOfWork.Categories.SingleOrDefault(x => x.ID == categoryId);
+        //    if (item == null)
+        //    {
+        //        Console.WriteLine("Category " + categoryId + " has not been found");
+        //        return;
+        //    }
+
+        //    _unitOfWork.Categories.Remove(item);
+        //    _unitOfWork.Save();
+        //}
+
     }
 }

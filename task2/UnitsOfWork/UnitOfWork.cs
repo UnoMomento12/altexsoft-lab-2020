@@ -9,21 +9,16 @@ namespace task2.UnitsOfWork
     class UnitOfWork 
     {
         private IDataManager _dataManager;
-        private Entities _entities;
         public IRepository<Recipe> Recipes { get; set; }
         public IRepository<Ingredient> Ingredients { get; set; }
         public IRepository<Category> Categories { get; set; }
-        
-
-
-        public UnitOfWork() : this(new Entities()) { }
-        public UnitOfWork(Entities entities)
+        public UnitOfWork()
         {
             _dataManager = new JsonDataManager();
-            _entities = entities;
-            Ingredients = new IngredientRepository(_dataManager,_entities);
-            Recipes = new RecipeRepository(_dataManager,_entities);
-            Categories = new CategoryRepository(_dataManager,_entities);
+            
+            Ingredients = new IngredientRepository(_dataManager);
+            Recipes = new RecipeRepository(_dataManager);
+            Categories = new CategoryRepository(_dataManager);
             
 
             foreach (var recipe in Recipes.GetItems())
@@ -35,10 +30,8 @@ namespace task2.UnitsOfWork
                 cat.Recipes = RestoreRecipesInCategory(cat);
                 cat.Parent = RestoreParent(cat);
             }
-
         }
         
-
         public void Save()
         {
             Ingredients.Save();

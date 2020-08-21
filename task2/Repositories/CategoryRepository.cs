@@ -6,9 +6,9 @@ namespace task2.Repositories
 {
     class CategoryRepository : Repository<Category>
     {
-        public CategoryRepository(IDataManager dataManager , Entities ent) : base(dataManager)
+        public CategoryRepository(IDataManager dataManager ) : base(dataManager)
         {
-            ent.Categories = _items;
+           
         }
         
         public override void Add(Category category)
