@@ -100,7 +100,7 @@ namespace task2
             Console.WriteLine("Recipes:");
             for( int b = i; b < _subItems?.Count; b++) 
             {
-                Console.WriteLine("    "+ b +". "+ _subItems[b].Name);
+                Console.WriteLine("    "+ b +". "+ _subItems[b]?.Name);
             }
 
         }

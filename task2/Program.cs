@@ -144,7 +144,6 @@ namespace task2
         }
         private static Category SetTargetCategory(Navigator navig , NavigatorItem item)
         {
-            string itemName = GetNavigatorItemName(item);
             Category result = null;
             Category Current = navig.GetCurrent();
 
@@ -194,16 +193,5 @@ namespace task2
             return result;
         }
 
-        private static string GetNavigatorItemName(NavigatorItem item)
-        {
-            switch (item)
-            {
-                case NavigatorItem.Category:
-                    return "category";
-                case NavigatorItem.Recipe:
-                    return "recipe";
-                default: return null;
-            }
-        }
     }
 }

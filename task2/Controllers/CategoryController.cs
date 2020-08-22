@@ -10,20 +10,31 @@ namespace task2.Controllers
 
         public Category CreateAndGetCategory(Category category)
         {
-            var item = _unitOfWork.Categories.SingleOrDefault(x => String.Equals(x.Name, category.Name, StringComparison.OrdinalIgnoreCase) && x.ParentID == category.ParentID);
-            if (item != null) return item;
-            if (string.IsNullOrEmpty(category.ID))
-                category.ID = Guid.NewGuid().ToString();
-            if (category.Parent == null)
-                category.Parent = _unitOfWork.Categories.SingleOrDefault(x => x.ID == category.ParentID);
-            _unitOfWork.Categories.Add(category);
-            _unitOfWork.Save();
+            CreateCategory(category);
             return category;
         }
         public Category CreateAndGetCategory(string categoryName, string parentId = null)
         {
             return CreateAndGetCategory(new Category { Name = categoryName, ParentID = parentId });
         }
+
+        public void CreateCategory(Category category)
+        {
+            var item = _unitOfWork.Categories.SingleOrDefault(x => String.Equals(x.Name, category.Name, StringComparison.OrdinalIgnoreCase) && x.ParentID == category.ParentID);
+            if (item != null)
+            {
+                category = item;
+                return;
+            }
+            if (string.IsNullOrEmpty(category.ID))
+                category.ID = Guid.NewGuid().ToString();
+            if (category.Parent == null)
+                category.Parent = _unitOfWork.Categories.SingleOrDefault(x => x.ID == category.ParentID);
+            _unitOfWork.Categories.Add(category);
+            _unitOfWork.Save();
+        }
+
+
         public void AddRecipeToCategory(Category category, Recipe recipe)
         {
             var recip = category.Recipes.SingleOrDefault(x => x.ID == recipe.ID);

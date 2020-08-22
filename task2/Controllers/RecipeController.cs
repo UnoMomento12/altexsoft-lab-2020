@@ -10,27 +10,32 @@ namespace task2.Controllers
 
         public Recipe CreateAndGetRecipe(Recipe recipe) // returns reference for future adding to category
         {
+            CreateRecipe(recipe);
+            return recipe;
+        }
+
+        public void CreateRecipe(Recipe recipe)
+        {
             var checker = _unitOfWork.Recipes.SingleOrDefault(x => string.Equals(x.Name, recipe.Name, StringComparison.OrdinalIgnoreCase));
             if (checker != null)
             {
                 Console.WriteLine("Recipe " + checker.Name + " : " + checker.ID + " already exists");
-                return checker;
+                recipe = checker;
+                return;
             }
-                
             if (string.IsNullOrEmpty(recipe.ID))
             {
                 recipe.ID = Guid.NewGuid().ToString();
             }
-                
-
             _unitOfWork.Recipes.Add(recipe);
             _unitOfWork.Save();
-            return recipe;
         }
+
 
         public void AddIngredientToRecipe(Recipe recipe, string ingredientName, string denomination, double amount)
         {
-            var ingred = _unitOfWork.Ingredients.SingleOrDefault(x => String.Equals(x.Name, ingredientName, StringComparison.OrdinalIgnoreCase));
+            var ingred = _unitOfWork.Ingredients.SingleOrDefault(x => String.Equals(x.Name, ingredientName, StringComparison.OrdinalIgnoreCase) && 
+                                                                      String.Equals(x.Denomination, denomination, StringComparison.OrdinalIgnoreCase));
             if (ingred == null)
             {
                 ingred = new Ingredient { ID = Guid.NewGuid().ToString(), Name = ingredientName, Denomination = denomination };

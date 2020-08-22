@@ -8,13 +8,15 @@ namespace task2.UnitsOfWork
     class UnitOfWork 
     {
         private IDataManager _dataManager;
+        private bool _refDeleted;
         public IRepository<Recipe> Recipes { get; }
         public IRepository<Ingredient> Ingredients { get;  }
         public IRepository<Category> Categories { get; }
+        
         public UnitOfWork()
         {
             _dataManager = new JsonDataManager();
-            
+            _refDeleted = false;
             Ingredients = new IngredientRepository(_dataManager);
             Recipes = new RecipeRepository(_dataManager);
             Categories = new CategoryRepository(_dataManager);
@@ -29,6 +31,7 @@ namespace task2.UnitsOfWork
                 cat.Recipes = RestoreRecipesInCategory(cat);
                 cat.Parent = RestoreParent(cat);
             }
+            if (_refDeleted) Save();
         }
         
         public void Save()
@@ -54,11 +57,30 @@ namespace task2.UnitsOfWork
         private List<Recipe> RestoreRecipesInCategory(Category category)
         {
             List<Recipe> result = new List<Recipe>();
-            foreach (var val in category.RecipeIds)
+            Recipe a;
+            List<string> toDeleteInCategory = new List<string>();
+            for (int i= 0; i < category.RecipeIds.Count;i++)
             {
-                result.Add(Recipes.Get(val));
+                a = Recipes.Get(category.RecipeIds[i]);
+                if (a == null)
+                {
+                    _refDeleted = true;
+                    toDeleteInCategory.Add(category.RecipeIds[i]);
+                }
+                else
+                {
+                    result.Add(a);
+                }
             }
+            if (_refDeleted) { DeleteDeadReferences(category, toDeleteInCategory); }
             return result;
+        }
+        private void DeleteDeadReferences(Category category, List<string> toDeleteInCategory)
+        {
+            foreach(var val in toDeleteInCategory)
+            {
+                category.RecipeIds.Remove(val);
+            }
         }
     }
 }
