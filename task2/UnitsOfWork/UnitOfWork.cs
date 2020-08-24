@@ -52,7 +52,7 @@ namespace task2.UnitsOfWork
         }
         private Category RestoreParent(Category category)
         {
-            return Categories.SingleOrDefault(x=> x.ID == category.ParentID);
+            return Categories.SingleOrDefault(x=> x.Id == category.ParentId);
         }
         private List<Recipe> RestoreRecipesInCategory(Category category)
         {

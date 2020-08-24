@@ -61,7 +61,7 @@ namespace task2
 
         private static void FormIngredientList(Recipe recipeToAdd, RecipeController recCont)
         {
-            Console.WriteLine("Enter ingredients for recipe " + recipeToAdd.Name + " below:");
+            Console.WriteLine($"Enter ingredients for recipe {recipeToAdd.Name} below:");
             Console.WriteLine("Or enter -1 in any field to stop adding ingredients");
             
             while (true)
@@ -123,7 +123,7 @@ namespace task2
             targetCategory= SetTargetCategory(navig, item);
             Console.Write("Enter Category Name:");
             string name = Console.ReadLine().Trim();
-            catCont.CreateAndGetCategory(name, targetCategory?.ID);
+            catCont.CreateAndGetCategory(name, targetCategory?.Id);
             navig.UpdateSubItems();
         }
 
@@ -158,7 +158,7 @@ namespace task2
             bool choice = false;
             if (item == NavigatorItem.Category || (Current != null && item == NavigatorItem.Recipe))
             {
-                Console.WriteLine("Do you want to add " + item + " to current " + Current?.Name + " category? Y/N");
+                Console.WriteLine($"Do you want to add {item} to current {Current?.Name} category? Y/N");
                 
                 string answer;
                 while (true)
@@ -183,7 +183,7 @@ namespace task2
             }
             if(choice == false)
             {
-                Console.Write("Please enter an id of a category where created " + item + " will be stored:");
+                Console.Write($"Please enter an id of a category where created {item} will be stored:");
                 while (Int32.TryParse(Console.ReadLine().Trim(), out categoryID) == false || navig.GetCategory(categoryID) == null)
                 {
                     Console.Write("Wrong category id, please enter id again:");

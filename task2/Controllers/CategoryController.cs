@@ -15,21 +15,21 @@ namespace task2.Controllers
         }
         public Category CreateAndGetCategory(string categoryName, string parentId = null)
         {
-            return CreateAndGetCategory(new Category { Name = categoryName, ParentID = parentId });
+            return CreateAndGetCategory(new Category { Name = categoryName, ParentId = parentId });
         }
 
         public void CreateCategory(Category category)
         {
-            var item = _unitOfWork.Categories.SingleOrDefault(x => String.Equals(x.Name, category.Name, StringComparison.OrdinalIgnoreCase) && x.ParentID == category.ParentID);
+            var item = _unitOfWork.Categories.SingleOrDefault(x => String.Equals(x.Name, category.Name, StringComparison.OrdinalIgnoreCase) && x.ParentId == category.ParentId);
             if (item != null)
             {
                 category = item;
                 return;
             }
-            if (string.IsNullOrEmpty(category.ID))
-                category.ID = Guid.NewGuid().ToString();
+            if (string.IsNullOrEmpty(category.Id))
+                category.Id = Guid.NewGuid().ToString();
             if (category.Parent == null)
-                category.Parent = _unitOfWork.Categories.SingleOrDefault(x => x.ID == category.ParentID);
+                category.Parent = _unitOfWork.Categories.SingleOrDefault(x => x.Id == category.ParentId);
             _unitOfWork.Categories.Add(category);
             _unitOfWork.Save();
         }
@@ -37,14 +37,14 @@ namespace task2.Controllers
 
         public void AddRecipeToCategory(Category category, Recipe recipe)
         {
-            var recip = category.Recipes.SingleOrDefault(x => x.ID == recipe.ID);
+            var recip = category.Recipes.SingleOrDefault(x => x.Id == recipe.Id);
             if(recip != null)
             {
                 Console.WriteLine("Recipe is already in category");
                 return;
             }
             category.Recipes.Add(recipe);
-            category.RecipeIds.Add(recipe.ID);
+            category.RecipeIds.Add(recipe.Id);
             _unitOfWork.Save();
         }
 

@@ -21,7 +21,7 @@ namespace task2
             _current = null;
             _root = null;
             _subItems = new List<BaseModel>();
-            _unitOfWork.Categories.Where(x => x.ParentID == null).ToList().ForEach(x=> _subItems.Add(x));
+            _unitOfWork.Categories.Where(x => x.ParentId == null).ToList().ForEach(x=> _subItems.Add(x));
             _recipesStart = _subItems.Count;
         }
 
@@ -52,7 +52,7 @@ namespace task2
         public void WriteRecipe(Recipe recipe)
         { 
             Console.WriteLine("-------------------------------------------");
-            PrintColored("Recipe name: " + recipe.Name , ConsoleColor.Green);
+            PrintColored($"Recipe name: {recipe.Name}", ConsoleColor.Green);
             Console.WriteLine("Ingredients:");
             foreach (var a in recipe.Ingredients)
             {
@@ -63,7 +63,7 @@ namespace task2
             {
                 PrintColored( (i+1) + ". " + recipe.Steps[i] , ConsoleColor.Cyan);
             }
-            PrintColored("Description: " + recipe.Description , ConsoleColor.Yellow);
+            PrintColored($"Description: {recipe.Description}" , ConsoleColor.Yellow);
             Console.WriteLine("-------------------------------------------");
             Console.WriteLine("Press any button to close recipe!");
             Console.ReadKey();
@@ -87,10 +87,10 @@ namespace task2
         {
             if (_subItems.Count == 0)
             {
-                Console.WriteLine("Category " + _current.Name + " is empty!");
+                Console.WriteLine($"Category {_current.Name} is empty!");
                 return;
             }
-            Console.WriteLine("Subcategories and recipes in " + _current.Name + " category.");
+            Console.WriteLine($"Subcategories and recipes in {_current.Name} category.");
             Console.WriteLine("Categories:");
             int i;
             for(i = 0; i< _recipesStart; i++)

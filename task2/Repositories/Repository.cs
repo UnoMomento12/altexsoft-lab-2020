@@ -31,7 +31,7 @@ namespace task2.Repositories
 
         public T Get(string guid)
         {
-            return SingleOrDefault(x => x.ID == guid );
+            return SingleOrDefault(x => x.Id == guid );
         }
 
         public virtual void Remove(T item)

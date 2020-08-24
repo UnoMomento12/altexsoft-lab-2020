@@ -14,9 +14,9 @@ namespace task2.Repositories
         {
             foreach (var a in category.Recipes)
             {
-                category.RecipeIds.Add(a.ID);
+                category.RecipeIds.Add(a.Id);
             }
-            category.ParentID = category.Parent?.ID;
+            category.ParentId = category.Parent?.Id;
             _items.Add(category);
         }
     }

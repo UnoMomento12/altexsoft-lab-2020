@@ -13,7 +13,7 @@ namespace task2.Repositories
         {
             foreach(var a in recipe.Ingredients)
             {
-                recipe.IngIdAndAmount.Add(a.Ingredient.ID, a.Amount );
+                recipe.IngIdAndAmount.Add(a.Ingredient.Id, a.Amount );
             }
             _items.Add(recipe);
         }
