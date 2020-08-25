@@ -46,7 +46,7 @@ namespace task2.UnitsOfWork
             List<IngredientDetail> result = new List<IngredientDetail>();
             foreach(var item in recipe.IngIdAndAmount)
             {
-                result.Add(new IngredientDetail(Ingredients.Get(item.Key) ,item.Value));
+                result.Add(new IngredientDetail() { Ingredient = Ingredients.Get(item.Key), Amount = item.Value });
             }
             return result;
         }

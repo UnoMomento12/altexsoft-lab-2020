@@ -5,7 +5,7 @@ namespace task2.Models
 {
     class Recipe : BaseModel
     {
-        public string Description { get; set; }
+        public string Description { get; set; } = default;
         public List<string> Steps { get; set; } = new List<string>();
         public Dictionary<string, double> IngIdAndAmount { get; set; } = new Dictionary<string, double>(); // ingredient id and amount of it
 

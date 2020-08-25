@@ -17,8 +17,6 @@ namespace task2
         public Navigator(UnitOfWork unit)
         {
             _unitOfWork = unit;
-            _current = null;
-            _root = null;
             _subItems = new List<BaseModel>();
             _unitOfWork.Categories.Where(x => x.ParentId == null).ToList().ForEach(x=> _subItems.Add(x));
             _recipesStart = _subItems.Count;

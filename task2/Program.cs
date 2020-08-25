@@ -53,7 +53,16 @@ namespace task2
             Category targetCategory = null;
             targetCategory =  SetTargetCategory(navig, item);
             Recipe recipeToAdd = FormRecipe();
-            recipeToAdd = recCont.CreateAndGetRecipe(recipeToAdd);
+            if(recCont.TryCreateRecipe(recipeToAdd))
+            {
+                Console.WriteLine("Recipe created succesfully!");
+            }
+            else
+            {
+                Console.WriteLine("Creating recipe is not possible!");
+                Console.ReadKey();
+                return;
+            }
             FormIngredientList(recipeToAdd ,recCont);
             catCont.AddRecipeToCategory(targetCategory, recipeToAdd);
             navig.UpdateSubItems();
@@ -123,7 +132,16 @@ namespace task2
             targetCategory= SetTargetCategory(navig, item);
             Console.Write("Enter Category Name:");
             string name = Console.ReadLine().Trim();
-            catCont.CreateAndGetCategory(name, targetCategory?.Id);
+            if (catCont.TryCreateCategory(name, targetCategory?.Id))
+            {
+                Console.WriteLine("Category created succesfully!");
+            }
+            else
+            {
+                Console.WriteLine("Creating category is not possible!");
+                Console.ReadKey();
+                return;
+            }
             navig.UpdateSubItems();
         }
 

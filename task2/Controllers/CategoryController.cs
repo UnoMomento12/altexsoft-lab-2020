@@ -8,14 +8,15 @@ namespace task2.Controllers
     {
         public CategoryController(UnitOfWork unitOfWork) : base(unitOfWork) { }
 
-        public Category CreateAndGetCategory(Category category)
+        public bool TryCreateCategory(Category category)
         {
             CreateCategory(category);
-            return category;
+            bool result = _unitOfWork.Categories.Get(category.Id) != null ? true : false;
+            return result;
         }
-        public Category CreateAndGetCategory(string categoryName, string parentId = null)
+        public bool TryCreateCategory(string categoryName, string parentId = null)
         {
-            return CreateAndGetCategory(new Category { Name = categoryName, ParentId = parentId });
+            return TryCreateCategory(new Category { Name = categoryName, ParentId = parentId });
         }
 
         public void CreateCategory(Category category)
@@ -47,33 +48,5 @@ namespace task2.Controllers
             category.RecipeIds.Add(recipe.Id);
             _unitOfWork.Save();
         }
-
-        //public void Add(Category category)
-        //{
-        //    CreateAndGetCategory(category);
-        //}
-        //public Category GetCategory(string guid)
-        //{
-        //    return _unitOfWork.Categories.Get(guid);
-        //}
-
-        //public List<Category> GetCategories(string parentId)
-        //{
-        //    return _unitOfWork.Categories.Where(x => x.ParentID == parentId).ToList();
-        //}
-
-        //public void RemoveCategory(string categoryId)
-        //{
-        //    var item = _unitOfWork.Categories.SingleOrDefault(x => x.ID == categoryId);
-        //    if (item == null)
-        //    {
-        //        Console.WriteLine("Category " + categoryId + " has not been found");
-        //        return;
-        //    }
-
-        //    _unitOfWork.Categories.Remove(item);
-        //    _unitOfWork.Save();
-        //}
-
     }
 }

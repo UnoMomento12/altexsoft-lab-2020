@@ -8,10 +8,11 @@ namespace task2.Controllers
     {
         public RecipeController(UnitOfWork unitOfWork) : base(unitOfWork) { }
 
-        public Recipe CreateAndGetRecipe(Recipe recipe) // returns reference for future adding to category
+        public bool TryCreateRecipe(Recipe recipe) // returns reference for future adding to category
         {
             CreateRecipe(recipe);
-            return recipe;
+            bool result = _unitOfWork.Recipes.Get(recipe.Id) != null ? true :  false;
+            return result;
         }
 
         public void CreateRecipe(Recipe recipe)
@@ -41,7 +42,7 @@ namespace task2.Controllers
                 ingred = new Ingredient { Id = Guid.NewGuid().ToString(), Name = ingredientName, Denomination = denomination };
                 _unitOfWork.Ingredients.Add(ingred);
             }
-            var ingDetail = new IngredientDetail(ingred, amount);
+            var ingDetail = new IngredientDetail() { Ingredient = ingred, Amount = amount };
 
             var checkerDetail = recipe.Ingredients.SingleOrDefault(x => x.Ingredient == ingDetail.Ingredient);
             if (checkerDetail != null)
@@ -56,38 +57,5 @@ namespace task2.Controllers
             }
             _unitOfWork.Save();
         }
-
-        //public void AddSteps(Recipe recipe, List<string> steps)
-        //{
-        //    recipe.Steps.AddRange(steps);
-        //    _unitOfWork.Save();
-        //}
-
-        //public void RemoveRecipe(string recipeId)
-        //{
-        //    var item = _unitOfWork.Recipes.Get(recipeId);
-        //    if (item == null)
-        //    {
-        //        Console.WriteLine("Recipe " + recipeId + " has not been found");
-        //        return;
-        //    }
-        //    _unitOfWork.Recipes.Remove(item);
-        //    _unitOfWork.Save();
-        //}
-
-        //public Recipe GetRecipe(string guid)
-        //{
-        //    var recipe = _unitOfWork.Recipes.Get(guid);
-        //    return recipe;
-        //}
-
-        //public void Add(Recipe recipe)
-        //{
-        //    recipe = CreateAndGetRecipe(recipe);
-        //}
-        //public Recipe CreateAndGetRecipe(string name, string description, List<string> steps)
-        //{
-        //    return CreateAndGetRecipe(new Recipe() { ID = Guid.NewGuid().ToString(), Name = name, Description = description, Steps = steps });
-        //}
     }
 }

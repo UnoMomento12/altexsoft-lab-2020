@@ -5,7 +5,7 @@ namespace task2.Models
     class Category : BaseModel
     {
 
-        public string ParentId { get; set; } = null;
+        public string ParentId { get; set; } = default;
         public List<string> RecipeIds { get; set; } = new List<string>();
 
         [JsonIgnore]
