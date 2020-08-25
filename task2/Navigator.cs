@@ -11,8 +11,7 @@ namespace task2
         private Category _root;
         private Category _current;
         private List<BaseModel> _subItems;
-
-        private int _recipesStart { get; set; }
+        private int _recipesStart;
         
 
         public Navigator(UnitOfWork unit)
@@ -75,15 +74,15 @@ namespace task2
             Console.WriteLine("Navigator!");
             if (_current == null)
             {
-                WriteNavNull();
+                WriteRootNavigator();
             }
             else
             {
-                WriteNav();
+                WriteFullNavigator();
             }
         }
 
-        private void WriteNav()
+        private void WriteFullNavigator()
         {
             if (_subItems.Count == 0)
             {
@@ -91,23 +90,18 @@ namespace task2
                 return;
             }
             Console.WriteLine($"Subcategories and recipes in {_current.Name} category.");
-            Console.WriteLine("Categories:");
-            int i;
-            for(i = 0; i< _recipesStart; i++)
-            {
-                Console.WriteLine(i + ". " + _subItems[i].Name);
-            }
+            WriteRootNavigator();
             Console.WriteLine("Recipes:");
-            for( int b = i; b < _subItems?.Count; b++) 
+            for( int b = _recipesStart; b < _subItems?.Count; b++) 
             {
                 Console.WriteLine("    "+ b +". "+ _subItems[b]?.Name);
             }
 
         }
-        private void WriteNavNull()
+        private void WriteRootNavigator()
         {
             Console.WriteLine("Categories:");
-            for (int i = 0; i < _subItems?.Count; i++)
+            for (int i = 0; i < _recipesStart; i++)
             {
                 Console.WriteLine(i + ". " + _subItems[i].Name);
             }
