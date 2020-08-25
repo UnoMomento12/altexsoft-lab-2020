@@ -1,0 +1,69 @@
+﻿[
+  {
+    "ParentId": null,
+    "RecipeIds": [
+      "3b451da7-4cb6-4c50-a592-bc59d9320a3d",
+      "faa367e4-9e47-4e57-9c3b-21beaa6e7150"
+    ],
+    "Id": "40a196b8-cd43-4766-a818-f45ebfc2e863",
+    "Name": "Cakes"
+  },
+  {
+    "ParentId": "40a196b8-cd43-4766-a818-f45ebfc2e863",
+    "RecipeIds": [],
+    "Id": "97a4ef33-3f9f-49bf-8110-2a71c74049e2",
+    "Name": "Small cakes"
+  },
+  {
+    "ParentId": "97a4ef33-3f9f-49bf-8110-2a71c74049e2",
+    "RecipeIds": [
+      "e49e5418-7aa4-4122-9bfd-b250f2d476dc"
+    ],
+    "Id": "134a5f8e-e092-4c1a-84d1-633eef72ecad",
+    "Name": "Muffins"
+  },
+  {
+    "ParentId": null,
+    "RecipeIds": [
+      "734fc359-524c-4c1a-97c3-647e46085936"
+    ],
+    "Id": "5ca826f6-e60c-4a3e-935e-bb1f552b7098",
+    "Name": "Soups"
+  },
+  {
+    "ParentId": "5ca826f6-e60c-4a3e-935e-bb1f552b7098",
+    "RecipeIds": [
+      "0e9fe439-ca9b-47ff-af3c-b6a5648d24fe"
+    ],
+    "Id": "56a0256a-4497-443d-b550-852c0dd8cc03",
+    "Name": "Breakfast soups"
+  },
+  {
+    "ParentId": "5ca826f6-e60c-4a3e-935e-bb1f552b7098",
+    "RecipeIds": [],
+    "Id": "3724a0be-ce03-43c9-afee-4771c3f4476a",
+    "Name": "Supper Soups"
+  },
+  {
+    "ParentId": null,
+    "RecipeIds": [],
+    "Id": "8e6cf127-3414-445e-938a-805e3b55cc26",
+    "Name": "Meat dishes"
+  },
+  {
+    "ParentId": "8e6cf127-3414-445e-938a-805e3b55cc26",
+    "RecipeIds": [
+      "baa6c4b0-5e9e-488a-9046-e9473f451e32"
+    ],
+    "Id": "e3b44692-fab9-4ad6-a8d0-bc36a1768da0",
+    "Name": "Grilled meat"
+  },
+  {
+    "ParentId": "8e6cf127-3414-445e-938a-805e3b55cc26",
+    "RecipeIds": [
+      "ea6a1261-0da6-4cf6-9f39-7bd0b12d07fe"
+    ],
+    "Id": "eec4ad1d-f12c-4642-8a43-94366c7e5c26",
+    "Name": "Steamed meat"
+  }
+]

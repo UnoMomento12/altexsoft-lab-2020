@@ -1,0 +1,122 @@
+﻿[
+  {
+    "Description": "Receipt of fuagra",
+    "Steps": [
+      "Boil water",
+      "Salt the water",
+      "Throw in mushrooms"
+    ],
+    "IngIdAndAmount": {
+      "ac9aa23d-14cc-4fbe-8b7a-544cba16c29b": 2000.0,
+      "748ccd18-0261-4b00-ab77-b48de71a3035": 140.0
+    },
+    "Id": "3b451da7-4cb6-4c50-a592-bc59d9320a3d",
+    "Name": "Fuagra"
+  },
+  {
+    "Description": "Some cake in Cakes category, done with dough and sugar or smth.",
+    "Steps": [
+      "Prepare the dough",
+      "break eggs",
+      "some step",
+      "and another step"
+    ],
+    "IngIdAndAmount": {
+      "d673ce56-d7cc-4f30-bb1d-c23ae8814246": 6.0,
+      "ac9aa23d-14cc-4fbe-8b7a-544cba16c29b": 1000.0
+    },
+    "Id": "faa367e4-9e47-4e57-9c3b-21beaa6e7150",
+    "Name": "Some cake"
+  },
+  {
+    "Description": "Small muffin in Muffins category.",
+    "Steps": [
+      "Prepare the dough",
+      "Break and stir up the eggs.",
+      "Add suggar to eggs."
+    ],
+    "IngIdAndAmount": {
+      "d88cf75e-1910-4cac-91a4-4019ccad337d": 8.0,
+      "ac9aa23d-14cc-4fbe-8b7a-544cba16c29b": 2000.0
+    },
+    "Id": "e49e5418-7aa4-4122-9bfd-b250f2d476dc",
+    "Name": "Small muffin"
+  },
+  {
+    "Description": "Refreshing soup",
+    "Steps": [
+      "Boil water",
+      "some step",
+      "another step",
+      "final step"
+    ],
+    "IngIdAndAmount": {
+      "ac9aa23d-14cc-4fbe-8b7a-544cba16c29b": 1000.0,
+      "b4e3b197-7193-41ad-90e6-9963ee9ab250": 3.0,
+      "df058291-9f3f-4133-be2d-cb9168f80142": 1.2
+    },
+    "Id": "0e9fe439-ca9b-47ff-af3c-b6a5648d24fe",
+    "Name": "Vegetable soup"
+  },
+  {
+    "Description": "cdsvnnrtbhnldindli uji hievh kdsyvh ksb ",
+    "Steps": [
+      "jka rk",
+      "jakn l",
+      "k ajvkler ue"
+    ],
+    "IngIdAndAmount": {},
+    "Id": "d3c1fd82-92bc-4c41-859a-20d4590bde54",
+    "Name": "kknsvakj"
+  },
+  {
+    "Description": " hksefiaebkrk ",
+    "Steps": [
+      "ksa ajb k",
+      "asdkh b skj",
+      "asdkbajkd bkajs"
+    ],
+    "IngIdAndAmount": {},
+    "Id": "ef49e26e-18f7-4570-9113-5def8fae0ab7",
+    "Name": "khs bkh"
+  },
+  {
+    "Description": "aks hbckjhb",
+    "Steps": [
+      "k basckasbh",
+      "kas hdbcklb",
+      "kl absvklas ekn"
+    ],
+    "IngIdAndAmount": {
+      "52153ca1-bc29-4b4d-ab3e-cf00991cd3d7": 98329.0
+    },
+    "Id": "734fc359-524c-4c1a-97c3-647e46085936",
+    "Name": "khasb kjh"
+  },
+  {
+    "Description": "meat grilled on file",
+    "Steps": [
+      "step1",
+      "step2",
+      "step3"
+    ],
+    "IngIdAndAmount": {
+      "44519632-52c9-4932-80d5-df5535a2ad08": 2.0,
+      "254a8af6-67e4-4549-bbfe-eca2a726f8f7": 60.0
+    },
+    "Id": "baa6c4b0-5e9e-488a-9046-e9473f451e32",
+    "Name": "barbeque"
+  },
+  {
+    "Description": "pork stew desc",
+    "Steps": [
+      "salt and pepper the meat",
+      "add scipes to boiling water"
+    ],
+    "IngIdAndAmount": {
+      "9cb79951-4aa8-4718-85d9-695c2250fee2": 2.0
+    },
+    "Id": "ea6a1261-0da6-4cf6-9f39-7bd0b12d07fe",
+    "Name": "Pork stew"
+  }
+]
