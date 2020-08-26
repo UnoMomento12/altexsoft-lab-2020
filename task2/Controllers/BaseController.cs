@@ -3,9 +3,9 @@ namespace task2.Controllers
 {
     abstract class BaseController : IController
     {
-        protected UnitOfWork _unitOfWork;
+        protected IUnitOfWork _unitOfWork;
 
-        protected BaseController(UnitOfWork unitOfWork)
+        protected BaseController(IUnitOfWork unitOfWork)
         {
             _unitOfWork = unitOfWork;
         }

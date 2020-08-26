@@ -6,7 +6,7 @@ namespace task2.Controllers
 {
     class CategoryController : BaseController
     {
-        public CategoryController(UnitOfWork unitOfWork) : base(unitOfWork) { }
+        public CategoryController(IUnitOfWork unitOfWork) : base(unitOfWork) { }
 
         public bool TryCreateCategory(Category category)
         {
@@ -21,7 +21,7 @@ namespace task2.Controllers
 
         public void CreateCategory(Category category)
         {
-            var item = _unitOfWork.Categories.SingleOrDefault(x => String.Equals(x.Name, category.Name, StringComparison.OrdinalIgnoreCase) && x.ParentId == category.ParentId);
+            var item = _unitOfWork.Categories.SingleOrDefault(x => string.Equals(x.Name, category.Name, StringComparison.OrdinalIgnoreCase) && x.ParentId == category.ParentId);
             if (item != null)
             {
                 category = item;

@@ -6,7 +6,7 @@ namespace task2.Controllers
 {
     class RecipeController : BaseController
     {
-        public RecipeController(UnitOfWork unitOfWork) : base(unitOfWork) { }
+        public RecipeController(IUnitOfWork unitOfWork) : base(unitOfWork) { }
 
         public bool TryCreateRecipe(Recipe recipe) // returns reference for future adding to category
         {
@@ -35,8 +35,8 @@ namespace task2.Controllers
 
         public void AddIngredientToRecipe(Recipe recipe, string ingredientName, string denomination, double amount)
         {
-            var ingred = _unitOfWork.Ingredients.SingleOrDefault(x => String.Equals(x.Name, ingredientName, StringComparison.OrdinalIgnoreCase) && 
-                                                                      String.Equals(x.Denomination, denomination, StringComparison.OrdinalIgnoreCase));
+            var ingred = _unitOfWork.Ingredients.SingleOrDefault(x => string.Equals(x.Name, ingredientName, StringComparison.OrdinalIgnoreCase) &&
+                                                                      string.Equals(x.Denomination, denomination, StringComparison.OrdinalIgnoreCase));
             if (ingred == null)
             {
                 ingred = new Ingredient { Id = Guid.NewGuid().ToString(), Name = ingredientName, Denomination = denomination };

@@ -7,14 +7,14 @@ namespace task2
 {
     class Navigator
     {
-        private UnitOfWork _unitOfWork;
+        private IUnitOfWork _unitOfWork;
         private Category _root;
         private Category _current;
         private List<BaseModel> _subItems;
         private int _recipesStart;
         
 
-        public Navigator(UnitOfWork unit)
+        public Navigator(IUnitOfWork unit)
         {
             _unitOfWork = unit;
             _subItems = new List<BaseModel>();
@@ -30,19 +30,19 @@ namespace task2
                 Console.WriteLine("No category/recipe with such an id");
                 return;
             }
-            BaseModel retr = _subItems[id];
-            if (retr is Category)
+            BaseModel retrieved = _subItems[id];
+            if(retrieved is Category check) //one cast like this?
             {
                 _root = _current;
-                _current = retr as Category;
+                _current = check;
                 _subItems.Clear();
                 _unitOfWork.Categories.Where(x => x.Parent == _current).ToList().ForEach(x => _subItems.Add(x));
                 _recipesStart = _subItems.Count;
-                _current.Recipes.ForEach(x => _subItems.Add(x));
-            }
-            else if ( retr is Recipe) 
+                _current?.Recipes.ForEach(x => _subItems.Add(x));
+            }    
+            else  
             {
-                WriteRecipe(retr as Recipe);
+                WriteRecipe((Recipe) retrieved);
             }
         }
 

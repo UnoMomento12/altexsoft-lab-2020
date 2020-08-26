@@ -4,7 +4,7 @@ namespace task2.Controllers
 {
     class IngredientController : BaseController // turned out it wasn't needed
     {
-        public IngredientController(UnitOfWork unitOfWork) : base(unitOfWork)
+        public IngredientController(IUnitOfWork unitOfWork) : base(unitOfWork)
         {
         }
     }

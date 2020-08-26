@@ -5,14 +5,13 @@ using System.Collections.Generic;
 
 namespace task2.UnitsOfWork
 {
-    class UnitOfWork 
+    class UnitOfWork : IUnitOfWork
     {
         private IDataManager _dataManager;
         private bool _refDeleted;
         public IRepository<Recipe> Recipes { get; }
-        public IRepository<Ingredient> Ingredients { get;  }
+        public IRepository<Ingredient> Ingredients { get; }
         public IRepository<Category> Categories { get; }
-        
         public UnitOfWork()
         {
             _dataManager = new JsonDataManager();
@@ -20,18 +19,11 @@ namespace task2.UnitsOfWork
             Ingredients = new IngredientRepository(_dataManager);
             Recipes = new RecipeRepository(_dataManager);
             Categories = new CategoryRepository(_dataManager);
-            
 
-            foreach (var recipe in Recipes.GetItems())
-            {
-                recipe.Ingredients = RestoreIngredients(recipe);
-            }
-            foreach (var cat in Categories.GetItems())
-            {
-                cat.Recipes = RestoreRecipesInCategory(cat);
-                cat.Parent = RestoreParent(cat);
-            }
-            if (_refDeleted) Save();
+            RestoreIngredientsInRecipes();
+            RestoreRecipesInCategories();
+
+            if (_refDeleted) Categories.Save();
         }
         
         public void Save()
@@ -39,6 +31,22 @@ namespace task2.UnitsOfWork
             Ingredients.Save();
             Recipes.Save();
             Categories.Save();
+        }
+
+        private void RestoreIngredientsInRecipes()
+        {
+            foreach (var recipe in Recipes.GetItems())
+            {
+                recipe.Ingredients = RestoreIngredients(recipe);
+            }
+        }
+        private void RestoreRecipesInCategories()
+        {
+            foreach (var category in Categories.GetItems())
+            {
+                category.Recipes = RestoreRecipesInCategory(category);
+                category.Parent = RestoreParent(category);
+            }
         }
         
         private List<IngredientDetail> RestoreIngredients(Recipe recipe)
@@ -77,9 +85,9 @@ namespace task2.UnitsOfWork
         }
         private void DeleteDeadReferences(Category category, List<string> toDeleteInCategory)
         {
-            foreach(var val in toDeleteInCategory)
+            foreach(var id in toDeleteInCategory)
             {
-                category.RecipeIds.Remove(val);
+                category.RecipeIds.Remove(id);
             }
         }
     }
