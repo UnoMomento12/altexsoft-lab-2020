@@ -10,12 +10,12 @@ namespace task2.EntityList
         public readonly List<Recipe> RecipeList;
         public readonly List<Category> CategoryList;
 
-        public Entities()
+        public Entities(IDataManager dataManager)
         {
-            _dataManager = new JsonDataManager();
-            IngredientList = (List<Ingredient>) _dataManager.LoadAndDeserialize<Ingredient>() ?? new List<Ingredient>();
-            RecipeList = (List<Recipe>)_dataManager.LoadAndDeserialize<Recipe>() ?? new List<Recipe>();
-            CategoryList = (List<Category>)_dataManager.LoadAndDeserialize<Category>() ?? new List<Category>();
+            _dataManager = dataManager;
+            IngredientList = (List<Ingredient>) _dataManager.LoadAndDeserialize<Ingredient>();
+            RecipeList = (List<Recipe>)_dataManager.LoadAndDeserialize<Recipe>();
+            CategoryList = (List<Category>)_dataManager.LoadAndDeserialize<Category>();
         }
 
         public void Save()
