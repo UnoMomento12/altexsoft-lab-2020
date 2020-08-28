@@ -1,12 +1,12 @@
-﻿using task2.DataManager;
+﻿using task2.EntityList;
 using task2.Models;
 namespace task2.Repositories
 {
     class RecipeRepository : Repository<Recipe>
     {
-        public RecipeRepository(IDataManager dataManager) : base(dataManager) 
+        public RecipeRepository(Entities entities) : base(entities) 
         {
-            
+            ItemsInRepository = entities.RecipeList;
         }
         
         public override void Add(Recipe recipe)

@@ -8,7 +8,6 @@ namespace task2.Repositories
     {
         void Add(T item);
         void Remove(T item);
-        void Save();
         T GetById(string guid);
         IEnumerable<T> GetAll();
        

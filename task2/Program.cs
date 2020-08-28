@@ -16,8 +16,7 @@ namespace task2
     {
         static void Main(string[] args)
         {
-            IDataManager dataManager = new JsonDataManager();
-            IUnitOfWork unitOfWork = new UnitOfWork(dataManager);
+            IUnitOfWork unitOfWork = new UnitOfWork(); 
             RecipeController recCont = new RecipeController(unitOfWork);
             CategoryController catCont = new CategoryController(unitOfWork);
             Navigator navig = new Navigator(unitOfWork);

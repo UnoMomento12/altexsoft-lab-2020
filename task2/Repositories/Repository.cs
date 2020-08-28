@@ -1,21 +1,16 @@
 ﻿using System.Linq;
 using System.Collections.Generic;
-using task2.DataManager;
 using task2.Models;
+using task2.EntityList;
 namespace task2.Repositories
 {
     abstract class Repository<T> : IRepository<T> where T: BaseModel, new()
     {
-        private IDataManager _dataManager;
+        private Entities _entities;
         protected List<T> ItemsInRepository;
-        protected Repository(IDataManager dataManager)
+        protected Repository(Entities entities)
         {
-            _dataManager = dataManager;
-            ItemsInRepository = (List<T>)_dataManager.LoadAndDeserialize<T>() ?? new List<T>();
-        }
-        public void Save()
-        {
-            _dataManager.SaveToFile<T>(ItemsInRepository);
+            _entities = entities;
         }
 
         public virtual void Add(T item)
