@@ -9,7 +9,7 @@ namespace task2.Repositories
         void Add(T item);
         void Remove(T item);
         void Save();
-        T Get(string guid);
+        T GetById(string guid);
         IEnumerable<T> GetItems();
         IEnumerable<T> Where(Func<T, bool> predicate);
         T SingleOrDefault(Func<T, bool> predicate);

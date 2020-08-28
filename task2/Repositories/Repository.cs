@@ -29,7 +29,7 @@ namespace task2.Repositories
             return ItemsInRepository.Where(predicate);
         }
 
-        public T Get(string guid)
+        public T GetById(string guid)
         {
             return SingleOrDefault(x => x.Id == guid );
         }

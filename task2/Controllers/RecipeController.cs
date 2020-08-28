@@ -25,7 +25,7 @@ namespace task2.Controllers
             List<IngredientDetail> result = new List<IngredientDetail>();
             foreach (var item in recipe.IngIdAndAmount)
             {
-                result.Add(new IngredientDetail() { Ingredient = WorkingUnit.Ingredients.Get(item.Key), Amount = item.Value });
+                result.Add(new IngredientDetail() { Ingredient = WorkingUnit.Ingredients.GetById(item.Key), Amount = item.Value });
             }
             return result;
         }
@@ -44,7 +44,7 @@ namespace task2.Controllers
         public bool TryCreateRecipe(Recipe recipe) // returns reference for future adding to category
         {
             CreateRecipe(recipe);
-            bool result = WorkingUnit.Recipes.Get(recipe.Id) != null ? true :  false;
+            bool result = WorkingUnit.Recipes.GetById(recipe.Id) != null ? true :  false;
             return result;
         }
 

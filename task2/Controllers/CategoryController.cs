@@ -25,7 +25,7 @@ namespace task2.Controllers
         public bool TryCreateCategory(Category category)
         {
             CreateCategory(category);
-            bool result = WorkingUnit.Categories.Get(category.Id) != null ? true : false;
+            bool result = WorkingUnit.Categories.GetById(category.Id) != null ? true : false;
             return result;
         }
         public bool TryCreateCategory(string categoryName, string parentId = null)
