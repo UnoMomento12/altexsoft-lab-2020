@@ -9,6 +9,5 @@ namespace task2.Repositories
         {
            
         }
-        
     }
 }

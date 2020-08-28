@@ -110,10 +110,7 @@ namespace task2
         {
             _current = _root;
             _root = _current?.Parent;
-            _subItems.Clear();
-            _unitOfWork.Categories.Where(x => x.Parent == _current).ToList().ForEach(x => _subItems.Add(x));
-            _recipesStart = _subItems.Count;
-            if(_current!=null) _unitOfWork.Recipes.Where(x => x.CategoryId == _current.Id).ToList().ForEach(x => _subItems.Add(x));
+            UpdateSubItems();
         }
         
         public Category GetCurrent()
