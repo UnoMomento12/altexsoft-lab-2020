@@ -15,7 +15,7 @@ namespace task2.Controllers
         }
         private void RestoreIngredientsInRecipes()
         {
-            foreach (var recipe in WorkingUnit.Recipes.GetItems())
+            foreach (var recipe in WorkingUnit.Recipes.GetAll())
             {
                 recipe.Ingredients = RestoreIngredients(recipe);
             }
@@ -31,14 +31,14 @@ namespace task2.Controllers
         }
         private void RestoreCategoriesInRecipes()
         {
-            foreach(var a in WorkingUnit.Recipes.GetItems())
+            foreach(var a in WorkingUnit.Recipes.GetAll())
             {
                 a.Category = RestoreCategory(a);
             }
         }
         private Category RestoreCategory(Recipe recipe)
         {
-            return WorkingUnit.Categories.SingleOrDefault(x => x.Id == recipe.CategoryId);
+            return WorkingUnit.Categories.GetAll().SingleOrDefault(x => x.Id == recipe.CategoryId);
         }
 
         public bool TryCreateRecipe(Recipe recipe) // returns reference for future adding to category
@@ -50,7 +50,7 @@ namespace task2.Controllers
 
         public void CreateRecipe(Recipe recipe)
         {
-            var checker = WorkingUnit.Recipes.SingleOrDefault(x => string.Equals(x.Name, recipe.Name, StringComparison.OrdinalIgnoreCase));
+            var checker = WorkingUnit.Recipes.GetAll().SingleOrDefault(x => string.Equals(x.Name, recipe.Name, StringComparison.OrdinalIgnoreCase));
             if (checker != null)
             {
                 Console.WriteLine($"Recipe {checker.Name} : {checker.Id} already exists");
@@ -70,7 +70,7 @@ namespace task2.Controllers
         }
         public void AddIngredientToRecipe(Recipe recipe, string ingredientName, string denomination, double amount)
         {
-            var ingred = WorkingUnit.Ingredients.SingleOrDefault(x => string.Equals(x.Name, ingredientName, StringComparison.OrdinalIgnoreCase) &&
+            var ingred = WorkingUnit.Ingredients.GetAll().SingleOrDefault(x => string.Equals(x.Name, ingredientName, StringComparison.OrdinalIgnoreCase) &&
                                                                       string.Equals(x.Denomination, denomination, StringComparison.OrdinalIgnoreCase));
             if (ingred == null)
             {
@@ -95,7 +95,7 @@ namespace task2.Controllers
 
         public void SetCategoryInRecipe(Category category, Recipe recipe)
         {
-            var retrieved = WorkingUnit.Recipes.SingleOrDefault(x => x.CategoryId == recipe.CategoryId);
+            var retrieved = WorkingUnit.Recipes.GetAll().SingleOrDefault(x => x.CategoryId == recipe.CategoryId);
             if (retrieved != null)
             {
                 Console.WriteLine($"Recipe {recipe.Name} is already in category");

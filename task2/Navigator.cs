@@ -18,7 +18,7 @@ namespace task2
         {
             _unitOfWork = unit;
             _subItems = new List<BaseModel>();
-            _unitOfWork.Categories.Where(x => x.ParentId == null).ToList().ForEach(x=> _subItems.Add(x));
+            _unitOfWork.Categories.GetAll().Where(x => x.ParentId == null).ToList().ForEach(x=> _subItems.Add(x));
             _recipesStart = _subItems.Count;
         }
 
@@ -36,9 +36,9 @@ namespace task2
                 _root = _current;
                 _current = check;
                 _subItems.Clear();
-                _unitOfWork.Categories.Where(x => x.Parent == _current).ToList().ForEach(x => _subItems.Add(x));
+                _unitOfWork.Categories.GetAll().Where(x => x.Parent == _current).ToList().ForEach(x => _subItems.Add(x));
                 _recipesStart = _subItems.Count;
-                _unitOfWork.Recipes.Where(x => x.CategoryId == _current.Id).ToList().ForEach(x => _subItems.Add(x));
+                _unitOfWork.Recipes.GetAll().Where(x => x.CategoryId == _current.Id).ToList().ForEach(x => _subItems.Add(x));
             }    
             else  
             {
@@ -140,9 +140,9 @@ namespace task2
         public void UpdateSubItems()
         {
             _subItems.Clear();
-            _unitOfWork.Categories.Where(x => x.Parent == _current).ToList().ForEach(x => _subItems.Add(x));
+            _unitOfWork.Categories.GetAll().Where(x => x.Parent == _current).ToList().ForEach(x => _subItems.Add(x));
             _recipesStart = _subItems.Count;
-            if (_current != null) _unitOfWork.Recipes.Where(x => x.CategoryId == _current.Id).ToList().ForEach(x => _subItems.Add(x));
+            if (_current != null) _unitOfWork.Recipes.GetAll().Where(x => x.CategoryId == _current.Id).ToList().ForEach(x => _subItems.Add(x));
         }
 
         public int GetSubItemsCount()

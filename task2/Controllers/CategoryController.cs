@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using task2.Models;
 using task2.UnitsOfWork;
 namespace task2.Controllers
@@ -12,14 +13,14 @@ namespace task2.Controllers
 
         private void RestoreReferencesInCategories()
         {
-            foreach (var category in WorkingUnit.Categories.GetItems())
+            foreach (var category in WorkingUnit.Categories.GetAll())
             {
                 category.Parent = RestoreParent(category);
             }
         }
         private Category RestoreParent(Category category)
         {
-            return WorkingUnit.Categories.SingleOrDefault(x => x.Id == category.ParentId);
+            return WorkingUnit.Categories.GetAll().SingleOrDefault(x => x.Id == category.ParentId);
         }
         
         public bool TryCreateCategory(Category category)
@@ -35,7 +36,7 @@ namespace task2.Controllers
 
         public void CreateCategory(Category category)
         {
-            var item = WorkingUnit.Categories.SingleOrDefault(x => string.Equals(x.Name, category.Name, StringComparison.OrdinalIgnoreCase) && x.ParentId == category.ParentId);
+            var item = WorkingUnit.Categories.GetAll().SingleOrDefault(x => string.Equals(x.Name, category.Name, StringComparison.OrdinalIgnoreCase) && x.ParentId == category.ParentId);
             if (item != null)
             {
                 Console.WriteLine($"Category {item.Name} already exists!");
@@ -44,7 +45,7 @@ namespace task2.Controllers
             if (string.IsNullOrEmpty(category.Id))
                 category.Id = Guid.NewGuid().ToString();
             if (category.Parent == null)
-                category.Parent = WorkingUnit.Categories.SingleOrDefault(x => x.Id == category.ParentId);
+                category.Parent = WorkingUnit.Categories.GetAll().SingleOrDefault(x => x.Id == category.ParentId);
             WorkingUnit.Categories.Add(category);
             WorkingUnit.Save();
         }

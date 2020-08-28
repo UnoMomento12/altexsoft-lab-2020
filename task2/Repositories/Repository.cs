@@ -1,5 +1,4 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using System.Collections.Generic;
 using task2.DataManager;
 using task2.Models;
@@ -24,14 +23,10 @@ namespace task2.Repositories
             ItemsInRepository.Add(item);
         }
 
-        public IEnumerable<T> Where(Func<T, bool> predicate)
-        {
-            return ItemsInRepository.Where(predicate);
-        }
 
         public T GetById(string guid)
         {
-            return SingleOrDefault(x => x.Id == guid );
+            return ItemsInRepository.SingleOrDefault(x => x.Id == guid );
         }
 
         public virtual void Remove(T item)
@@ -39,11 +34,7 @@ namespace task2.Repositories
             ItemsInRepository.Remove(item);
         }
 
-        public T SingleOrDefault(Func<T, bool> predicate)
-        {
-            return ItemsInRepository.SingleOrDefault(predicate);
-        }
-        public IEnumerable<T> GetItems()
+        public IEnumerable<T> GetAll()
         {
             return ItemsInRepository;
         }

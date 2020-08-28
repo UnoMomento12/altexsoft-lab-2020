@@ -10,9 +10,7 @@ namespace task2.Repositories
         void Remove(T item);
         void Save();
         T GetById(string guid);
-        IEnumerable<T> GetItems();
-        IEnumerable<T> Where(Func<T, bool> predicate);
-        T SingleOrDefault(Func<T, bool> predicate);
+        IEnumerable<T> GetAll();
        
     }
 }
