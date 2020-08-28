@@ -1,13 +1,13 @@
 ﻿using task2.UnitsOfWork;
 namespace task2.Controllers
 {
-    abstract class BaseController : IController
+    abstract class BaseController 
     {
-        protected IUnitOfWork _unitOfWork;
+        protected IUnitOfWork WorkingUnit;
 
         protected BaseController(IUnitOfWork unitOfWork)
         {
-            _unitOfWork = unitOfWork;
+            WorkingUnit = unitOfWork;
         }
     }
 }

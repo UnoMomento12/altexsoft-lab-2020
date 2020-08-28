@@ -53,5 +53,20 @@
     "Denomination": "liters",
     "Id": "9cb79951-4aa8-4718-85d9-695c2250fee2",
     "Name": "water"
+  },
+  {
+    "Denomination": "килограмм",
+    "Id": "ea3c79af-bdf5-43b2-9800-699dd88cc33e",
+    "Name": "Мясо"
+  },
+  {
+    "Denomination": "kg",
+    "Id": "88d600cb-8165-4a56-8134-fc119d5d5694",
+    "Name": "Dough"
+  },
+  {
+    "Denomination": "grams",
+    "Id": "1a6ead84-161e-49c4-b78f-346bfa1eeea0",
+    "Name": "chocolate"
   }
 ]

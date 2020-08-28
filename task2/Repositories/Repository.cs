@@ -8,25 +8,25 @@ namespace task2.Repositories
     abstract class Repository<T> : IRepository<T> where T: BaseModel, new()
     {
         private IDataManager _dataManager;
-        protected List<T> _items;
+        protected List<T> ItemsInRepository;
         protected Repository(IDataManager dataManager)
         {
             _dataManager = dataManager;
-            _items = (List<T>)_dataManager.LoadAndDeserialize<T>() ?? new List<T>();
+            ItemsInRepository = (List<T>)_dataManager.LoadAndDeserialize<T>() ?? new List<T>();
         }
         public void Save()
         {
-            _dataManager.SaveToFile<T>(_items);
+            _dataManager.SaveToFile<T>(ItemsInRepository);
         }
 
         public virtual void Add(T item)
         {
-            _items.Add(item);
+            ItemsInRepository.Add(item);
         }
 
         public IEnumerable<T> Where(Func<T, bool> predicate)
         {
-            return _items.Where(predicate);
+            return ItemsInRepository.Where(predicate);
         }
 
         public T Get(string guid)
@@ -36,17 +36,16 @@ namespace task2.Repositories
 
         public virtual void Remove(T item)
         {
-            _items.Remove(item);
+            ItemsInRepository.Remove(item);
         }
 
         public T SingleOrDefault(Func<T, bool> predicate)
         {
-            return _items.SingleOrDefault(predicate);
+            return ItemsInRepository.SingleOrDefault(predicate);
         }
         public IEnumerable<T> GetItems()
         {
-            return _items;
+            return ItemsInRepository;
         }
-        
     }
 }

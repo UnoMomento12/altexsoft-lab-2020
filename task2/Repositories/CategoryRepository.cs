@@ -10,14 +10,5 @@ namespace task2.Repositories
            
         }
         
-        public override void Add(Category category)
-        {
-            foreach (var a in category.Recipes)
-            {
-                category.RecipeIds.Add(a.Id);
-            }
-            category.ParentId = category.Parent?.Id;
-            _items.Add(category);
-        }
     }
 }

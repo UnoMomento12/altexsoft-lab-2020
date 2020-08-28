@@ -1,19 +1,6 @@
 ﻿[
   {
-    "Description": "Receipt of fuagra",
-    "Steps": [
-      "Boil water",
-      "Salt the water",
-      "Throw in mushrooms"
-    ],
-    "IngIdAndAmount": {
-      "ac9aa23d-14cc-4fbe-8b7a-544cba16c29b": 2000.0,
-      "748ccd18-0261-4b00-ab77-b48de71a3035": 140.0
-    },
-    "Id": "3b451da7-4cb6-4c50-a592-bc59d9320a3d",
-    "Name": "Fuagra"
-  },
-  {
+    "CategoryId": "40a196b8-cd43-4766-a818-f45ebfc2e863",
     "Description": "Some cake in Cakes category, done with dough and sugar or smth.",
     "Steps": [
       "Prepare the dough",
@@ -29,6 +16,7 @@
     "Name": "Some cake"
   },
   {
+    "CategoryId": "134a5f8e-e092-4c1a-84d1-633eef72ecad",
     "Description": "Small muffin in Muffins category.",
     "Steps": [
       "Prepare the dough",
@@ -43,6 +31,21 @@
     "Name": "Small muffin"
   },
   {
+    "CategoryId": "5ca826f6-e60c-4a3e-935e-bb1f552b7098",
+    "Description": "aks hbckjhb",
+    "Steps": [
+      "k basckasbh",
+      "kas hdbcklb",
+      "kl absvklas ekn"
+    ],
+    "IngIdAndAmount": {
+      "52153ca1-bc29-4b4d-ab3e-cf00991cd3d7": 98329.0
+    },
+    "Id": "734fc359-524c-4c1a-97c3-647e46085936",
+    "Name": "khasb kjh"
+  },
+  {
+    "CategoryId": "56a0256a-4497-443d-b550-852c0dd8cc03",
     "Description": "Refreshing soup",
     "Steps": [
       "Boil water",
@@ -59,41 +62,7 @@
     "Name": "Vegetable soup"
   },
   {
-    "Description": "cdsvnnrtbhnldindli uji hievh kdsyvh ksb ",
-    "Steps": [
-      "jka rk",
-      "jakn l",
-      "k ajvkler ue"
-    ],
-    "IngIdAndAmount": {},
-    "Id": "d3c1fd82-92bc-4c41-859a-20d4590bde54",
-    "Name": "kknsvakj"
-  },
-  {
-    "Description": " hksefiaebkrk ",
-    "Steps": [
-      "ksa ajb k",
-      "asdkh b skj",
-      "asdkbajkd bkajs"
-    ],
-    "IngIdAndAmount": {},
-    "Id": "ef49e26e-18f7-4570-9113-5def8fae0ab7",
-    "Name": "khs bkh"
-  },
-  {
-    "Description": "aks hbckjhb",
-    "Steps": [
-      "k basckasbh",
-      "kas hdbcklb",
-      "kl absvklas ekn"
-    ],
-    "IngIdAndAmount": {
-      "52153ca1-bc29-4b4d-ab3e-cf00991cd3d7": 98329.0
-    },
-    "Id": "734fc359-524c-4c1a-97c3-647e46085936",
-    "Name": "khasb kjh"
-  },
-  {
+    "CategoryId": "e3b44692-fab9-4ad6-a8d0-bc36a1768da0",
     "Description": "meat grilled on file",
     "Steps": [
       "step1",
@@ -108,6 +77,7 @@
     "Name": "barbeque"
   },
   {
+    "CategoryId": "eec4ad1d-f12c-4642-8a43-94366c7e5c26",
     "Description": "pork stew desc",
     "Steps": [
       "salt and pepper the meat",
@@ -118,5 +88,37 @@
     },
     "Id": "ea6a1261-0da6-4cf6-9f39-7bd0b12d07fe",
     "Name": "Pork stew"
+  },
+  {
+    "CategoryId": "01b8d54c-6920-41ae-932f-26dd094b21a7",
+    "Description": "Котлеты из фарша",
+    "Steps": [
+      "Сделать фарш",
+      "добавить специи",
+      "нагреть сковороду с маслом",
+      "жарить"
+    ],
+    "IngIdAndAmount": {
+      "ea3c79af-bdf5-43b2-9800-699dd88cc33e": 2.0
+    },
+    "Id": "a631fc38-b133-4f19-8a8f-f754dbec8c45",
+    "Name": "Cutlets"
+  },
+  {
+    "CategoryId": "3b5ca008-9a14-43f3-8101-d4cc3affa892",
+    "Description": "Chocolate cake in chocolate cakes category",
+    "Steps": [
+      "make cake base",
+      "melt chocolate",
+      "sprinkle base with liquor",
+      "add some canned fruits"
+    ],
+    "IngIdAndAmount": {
+      "88d600cb-8165-4a56-8134-fc119d5d5694": 3.0,
+      "9cb79951-4aa8-4718-85d9-695c2250fee2": 2.0,
+      "1a6ead84-161e-49c4-b78f-346bfa1eeea0": 300.0
+    },
+    "Id": "ae1f0566-9d5f-4bc5-98f5-b1b95eaf7a15",
+    "Name": "Napoleon"
   }
 ]

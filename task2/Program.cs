@@ -3,6 +3,7 @@ using task2.UnitsOfWork;
 using task2.Models;
 using System.Collections.Generic;
 using task2.Controllers;
+using task2.DataManager;
 
 namespace task2
 {
@@ -15,7 +16,8 @@ namespace task2
     {
         static void Main(string[] args)
         {
-            IUnitOfWork unitOfWork = new UnitOfWork();
+            IDataManager dataManager = new JsonDataManager();
+            IUnitOfWork unitOfWork = new UnitOfWork(dataManager);
             RecipeController recCont = new RecipeController(unitOfWork);
             CategoryController catCont = new CategoryController(unitOfWork);
             Navigator navig = new Navigator(unitOfWork);
@@ -27,16 +29,17 @@ namespace task2
                 string input = Console.ReadLine().ToLower().Trim();
                 if (input == "exit") break;
                 int option;
-                bool isNumber = Int32.TryParse(input, out option);
+                bool isNumber = int.TryParse(input, out option);
                 if (isNumber)
                 {
                     ProcessNumber(option, navig);
                 }
-                else if (input == "addrecipe" )
+                else if (input == "addrecipe")
                 {
-                    ProcessRecipe(recCont, catCont , navig);
+                    ProcessRecipe(recCont, catCont, navig);
                 }
-                else if( input == "addcategory"){
+                else if (input == "addcategory")
+                {
                     ProcessCategory(catCont, navig);
                 }
                 else
@@ -47,12 +50,18 @@ namespace task2
             }
         }
 
+        private static void ProcessNumber(int option, Navigator a)
+        {
+            if (option < 0) a.GoBack();
+            a.MoveTo(option);
+        }
+
         private static void ProcessRecipe(RecipeController recCont, CategoryController catCont, Navigator navig)
         {
             NavigatorItem item = NavigatorItem.Recipe;
-            Category targetCategory = null;
-            targetCategory =  SetTargetCategory(navig, item);
-            Recipe recipeToAdd = FormRecipe();
+            Category targetCategory = SetTargetCategory(navig, item);
+            Recipe recipeToAdd = FormRecipe(recCont);
+            recCont.SetCategoryInRecipe(targetCategory, recipeToAdd);
             if(recCont.TryCreateRecipe(recipeToAdd))
             {
                 Console.WriteLine("Recipe created succesfully!");
@@ -63,11 +72,25 @@ namespace task2
                 Console.ReadKey();
                 return;
             }
-            FormIngredientList(recipeToAdd ,recCont);
-            catCont.AddRecipeToCategory(targetCategory, recipeToAdd);
+            FormIngredientList(recipeToAdd , recCont);
             navig.UpdateSubItems();
         }
-
+        private static Recipe FormRecipe(RecipeController recCont)
+        {
+            Console.Write("Enter recipe name:");
+            string name = Console.ReadLine();
+            Console.Write("Enter recipe description:");
+            string description = Console.ReadLine();
+            List<string> steps = new List<string>();
+            Console.WriteLine("Enter sequence of recipe steps or \"-1\" to stop recording ");
+            while (true)
+            {
+                string step = Console.ReadLine().Trim();
+                if (step == "-1") break;
+                steps.Add(step);
+            }
+            return recCont.PrepareRecipe(name, description, steps);
+        }
         private static void FormIngredientList(Recipe recipeToAdd, RecipeController recCont)
         {
             Console.WriteLine($"Enter ingredients for recipe {recipeToAdd.Name} below:");
@@ -85,7 +108,7 @@ namespace task2
                 while (true)
                 {
                     Console.Write("Amount:");
-                    parsed = Double.TryParse(Console.ReadLine(), out amount);
+                    parsed = double.TryParse(Console.ReadLine(), out amount);
                     if (parsed && amount == -1)
                     {
                         wasBreaked = true;
@@ -94,9 +117,6 @@ namespace task2
                     else if (parsed)
                     {
                         break;
-                    } else
-                    {
-
                     }
                 }
                 if (wasBreaked) break;
@@ -106,30 +126,11 @@ namespace task2
                 recCont.AddIngredientToRecipe(recipeToAdd, name, denomination, amount);
             }
         }
-
-        private static Recipe FormRecipe()
-        {
-            Console.Write("Enter recipe name:");
-            string name = Console.ReadLine();
-            Console.Write("Enter recipe description:");
-            string description = Console.ReadLine();
-            List<string> steps = new List<string>();
-            Console.WriteLine("Enter sequence of recipe steps or \"-1\" to stop recording ");
-            bool recording = true;
-            while (recording)
-            {
-                string step = Console.ReadLine().Trim();
-                if (step == "-1") break;
-                steps.Add(step);
-            }
-            return new Recipe() { Name = name, Description = description, Steps = steps };
-        }
-
         private static void ProcessCategory(CategoryController catCont, Navigator navig)
         {
             NavigatorItem item = NavigatorItem.Category;
-            Category targetCategory = null;
-            targetCategory= SetTargetCategory(navig, item);
+            Category targetCategory = SetTargetCategory(navig, item);
+
             Console.Write("Enter Category Name:");
             string name = Console.ReadLine().Trim();
             if (catCont.TryCreateCategory(name, targetCategory?.Id))
@@ -143,22 +144,6 @@ namespace task2
                 return;
             }
             navig.UpdateSubItems();
-        }
-
-        private static void ProcessNumber(int option , Navigator a)
-        {
-            if (option < 0 ) a.GoBack();
-            a.MoveTo(option);
-        }
-        private static void MenuStart()
-        {
-            Console.WriteLine("-----------------------------------------");
-            Console.WriteLine("Caution: trying recipes in this cook book may bring harm to your body!");
-            Console.WriteLine("Please enter id of an item in navigator.");
-            Console.WriteLine("Or negative number to go to the root category");
-            Console.WriteLine("Or enter one of the commands below: ");
-            Console.WriteLine("addcategory - to create an additional category;");
-            Console.WriteLine("addrecipe - to create recipe in the category;");
         }
         private static Category SetTargetCategory(Navigator navig , NavigatorItem item)
         {
@@ -174,21 +159,22 @@ namespace task2
 
             int categoryID;
             bool choice = false;
+
             if (item == NavigatorItem.Category || (Current != null && item == NavigatorItem.Recipe))
             {
                 Console.WriteLine($"Do you want to add {item} to current {Current?.Name} category? Y/N");
-                
-                string answer;
+
+                System.ConsoleKey answer;
                 while (true)
                 {
-                    answer = Console.ReadLine().Trim().ToLower();
-                    if (answer == "y")
+                    answer = Console.ReadKey().Key;
+                    if (answer == ConsoleKey.Y)
                     {
                         choice = true;
                         result = Current;
                         break;
                     }
-                    else if (answer == "n")
+                    else if (answer == ConsoleKey.N)
                     {
                         choice = false;
                         break;
@@ -199,16 +185,26 @@ namespace task2
                     }
                 }
             }
-            if(choice == false)
+            if(!choice)
             {
                 Console.Write($"Please enter an id of a category where created {item} will be stored:");
-                while (Int32.TryParse(Console.ReadLine().Trim(), out categoryID) == false || navig.GetCategory(categoryID) == null)
+                while (int.TryParse(Console.ReadLine().Trim(), out categoryID) == false || navig.GetCategory(categoryID) == null)
                 {
                     Console.Write("Wrong category id, please enter id again:");
                 }
                 result = navig.GetCategory(categoryID);
             }
             return result;
+        }
+        private static void MenuStart()
+        {
+            Console.WriteLine("-----------------------------------------");
+            Console.WriteLine("Caution: trying recipes in this cook book may bring harm to your body!");
+            Console.WriteLine("Please enter id of an item in navigator.");
+            Console.WriteLine("Or negative number to go to the root category");
+            Console.WriteLine("Or enter one of the commands below: ");
+            Console.WriteLine("addcategory - to create an additional category;");
+            Console.WriteLine("addrecipe - to create recipe in the category;");
         }
 
     }

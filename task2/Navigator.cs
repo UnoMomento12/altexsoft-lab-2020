@@ -38,7 +38,7 @@ namespace task2
                 _subItems.Clear();
                 _unitOfWork.Categories.Where(x => x.Parent == _current).ToList().ForEach(x => _subItems.Add(x));
                 _recipesStart = _subItems.Count;
-                _current?.Recipes.ForEach(x => _subItems.Add(x));
+                _unitOfWork.Recipes.Where(x => x.CategoryId == _current.Id).ToList().ForEach(x => _subItems.Add(x));
             }    
             else  
             {
@@ -90,7 +90,7 @@ namespace task2
             Console.WriteLine($"Subcategories and recipes in {_current.Name} category.");
             WriteRootNavigator();
             Console.WriteLine("Recipes:");
-            for( int b = _recipesStart; b < _subItems?.Count; b++) 
+            for( int b = _recipesStart; b < _subItems.Count; b++) 
             {
                 Console.WriteLine("    "+ b +". "+ _subItems[b]?.Name);
             }
@@ -113,7 +113,7 @@ namespace task2
             _subItems.Clear();
             _unitOfWork.Categories.Where(x => x.Parent == _current).ToList().ForEach(x => _subItems.Add(x));
             _recipesStart = _subItems.Count;
-            _current?.Recipes.ForEach(x => _subItems.Add(x));
+            if(_current!=null) _unitOfWork.Recipes.Where(x => x.CategoryId == _current.Id).ToList().ForEach(x => _subItems.Add(x));
         }
         
         public Category GetCurrent()
@@ -122,8 +122,8 @@ namespace task2
         }
         public Category GetCategory(int id)
         {
-            bool inBounds = id > -1 && id < _subItems.Count;
-            if(inBounds && _subItems[id] is Category )
+            bool inBounds = id > -1 && id < _recipesStart;
+            if(inBounds)
             {
                 return _subItems[id] as Category;
             }
@@ -145,7 +145,7 @@ namespace task2
             _subItems.Clear();
             _unitOfWork.Categories.Where(x => x.Parent == _current).ToList().ForEach(x => _subItems.Add(x));
             _recipesStart = _subItems.Count;
-            _current?.Recipes.ForEach(x => _subItems.Add(x));
+            if (_current != null) _unitOfWork.Recipes.Where(x => x.CategoryId == _current.Id).ToList().ForEach(x => _subItems.Add(x));
         }
 
         public int GetSubItemsCount()

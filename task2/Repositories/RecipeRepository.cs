@@ -15,7 +15,7 @@ namespace task2.Repositories
             {
                 recipe.IngIdAndAmount.Add(a.Ingredient.Id, a.Amount );
             }
-            _items.Add(recipe);
+            ItemsInRepository.Add(recipe);
         }
     }
 }
