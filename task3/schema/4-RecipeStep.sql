@@ -1,4 +1,4 @@
-/****** Object:  Table [dbo].[RecipeStep]    Script Date: 18-Sep-20 18:07:16 ******/
+/****** Object:  Table [dbo].[RecipeStep]    Script Date: 18-Sep-20 20:14:21 ******/
 SET ANSI_NULLS ON
 GO
 
@@ -7,7 +7,7 @@ GO
 
 CREATE TABLE [dbo].[RecipeStep](
 	[Id] [int] IDENTITY(1,1) NOT NULL,
-	[StepDescription] [ntext] NOT NULL,
+	[StepDescription] [nvarchar](max) NOT NULL,
 	[RecipeId] [int] NOT NULL,
 	[StepNumber] [tinyint] NOT NULL,
  CONSTRAINT [PK_RecipeStep] PRIMARY KEY CLUSTERED 
@@ -23,5 +23,3 @@ GO
 
 ALTER TABLE [dbo].[RecipeStep] CHECK CONSTRAINT [FK_RecipeStep_Recipe]
 GO
-
-

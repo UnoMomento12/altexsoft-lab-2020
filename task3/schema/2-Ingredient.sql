@@ -1,4 +1,4 @@
-/****** Object:  Table [dbo].[Ingredient]    Script Date: 18-Sep-20 18:06:11 ******/
+/****** Object:  Table [dbo].[Ingredient]    Script Date: 18-Sep-20 20:13:22 ******/
 SET ANSI_NULLS ON
 GO
 
@@ -7,7 +7,7 @@ GO
 
 CREATE TABLE [dbo].[Ingredient](
 	[Id] [int] IDENTITY(1,1) NOT NULL,
-	[Name] [nchar](24) NOT NULL,
+	[Name] [nvarchar](30) NOT NULL,
  CONSTRAINT [PK_Ingredient] PRIMARY KEY CLUSTERED 
 (
 	[Id] ASC
@@ -15,4 +15,12 @@ CREATE TABLE [dbo].[Ingredient](
 ) ON [PRIMARY]
 GO
 
+SET ANSI_PADDING ON
+GO
 
+/****** Object:  Index [IX_Ingredient]    Script Date: 18-Sep-20 20:13:22 ******/
+CREATE UNIQUE NONCLUSTERED INDEX [IX_Ingredient] ON [dbo].[Ingredient]
+(
+	[Name] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, IGNORE_DUP_KEY = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+GO

@@ -1,4 +1,4 @@
-/****** Object:  Table [dbo].[IngredientDetail]    Script Date: 18-Sep-20 18:08:31 ******/
+/****** Object:  Table [dbo].[IngredientDetail]    Script Date: 18-Sep-20 20:13:39 ******/
 SET ANSI_NULLS ON
 GO
 
@@ -6,14 +6,14 @@ SET QUOTED_IDENTIFIER ON
 GO
 
 CREATE TABLE [dbo].[IngredientDetail](
-	[Id] [int] IDENTITY(1,1) NOT NULL,
 	[RecipeId] [int] NOT NULL,
 	[IngredientId] [int] NOT NULL,
 	[DenominationId] [int] NOT NULL,
 	[Amount] [float] NOT NULL,
- CONSTRAINT [PK_IngredientDetail] PRIMARY KEY CLUSTERED 
+ CONSTRAINT [PK_IngredientDetail_1] PRIMARY KEY CLUSTERED 
 (
-	[Id] ASC
+	[RecipeId] ASC,
+	[IngredientId] ASC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ) ON [PRIMARY]
 GO

@@ -1,4 +1,4 @@
-/****** Object:  Table [dbo].[Recipe]    Script Date: 18-Sep-20 18:06:52 ******/
+/****** Object:  Table [dbo].[Recipe]    Script Date: 18-Sep-20 20:14:05 ******/
 SET ANSI_NULLS ON
 GO
 
@@ -7,14 +7,24 @@ GO
 
 CREATE TABLE [dbo].[Recipe](
 	[Id] [int] IDENTITY(1,1) NOT NULL,
-	[Name] [nchar](24) NOT NULL,
+	[Name] [nvarchar](30) NOT NULL,
 	[CategoryId] [int] NOT NULL,
-	[Description] [ntext] NULL,
+	[Description] [nvarchar](max) NULL,
  CONSTRAINT [PK_Recipe] PRIMARY KEY CLUSTERED 
 (
 	[Id] ASC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
+GO
+
+SET ANSI_PADDING ON
+GO
+
+/****** Object:  Index [IX_Recipe]    Script Date: 18-Sep-20 20:14:05 ******/
+CREATE UNIQUE NONCLUSTERED INDEX [IX_Recipe] ON [dbo].[Recipe]
+(
+	[Name] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, IGNORE_DUP_KEY = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 GO
 
 ALTER TABLE [dbo].[Recipe]  WITH CHECK ADD  CONSTRAINT [FK_Recipe_Category] FOREIGN KEY([CategoryId])
@@ -23,5 +33,3 @@ GO
 
 ALTER TABLE [dbo].[Recipe] CHECK CONSTRAINT [FK_Recipe_Category]
 GO
-
-
