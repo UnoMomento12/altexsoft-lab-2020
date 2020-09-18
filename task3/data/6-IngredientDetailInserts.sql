@@ -14,4 +14,4 @@ insert into dbo.IngredientDetail (Id, RecipeId, IngredientId, DenominationId, Am
 insert into dbo.IngredientDetail (Id, RecipeId, IngredientId, DenominationId, Amount) values (13, 3, 5, 2, 23.0);
 insert into dbo.IngredientDetail (Id, RecipeId, IngredientId, DenominationId, Amount) values (14, 3, 7, 3, 16.0);
 insert into dbo.IngredientDetail (Id, RecipeId, IngredientId, DenominationId, Amount) values (15, 3, 9, 6, 11.0);
-SET IDENTITY_INSERT dbo.Denomination OFF;
+SET IDENTITY_INSERT dbo.IngredientDetail OFF;
