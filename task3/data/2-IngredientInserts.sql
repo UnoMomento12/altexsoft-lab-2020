@@ -1,0 +1,14 @@
+SET IDENTITY_INSERT dbo.Ingredient ON;
+INSERT INTO dbo.Ingredient (Id, Name) VALUES (1, 'Flour');
+INSERT INTO dbo.Ingredient (Id, Name) VALUES (2, 'Milk');
+INSERT INTO dbo.Ingredient (Id, Name) VALUES (3, 'Egg');
+INSERT INTO dbo.Ingredient (Id, Name) VALUES (4, 'Potassium');
+INSERT INTO dbo.Ingredient (Id, Name) VALUES (5, 'Salt');
+INSERT INTO dbo.Ingredient (Id, Name) VALUES (6, 'Potatoes');
+INSERT INTO dbo.Ingredient (Id, Name) VALUES (7, 'Cabbage');
+INSERT INTO dbo.Ingredient (Id, Name) VALUES (8, 'Tomato');
+INSERT INTO dbo.Ingredient (Id, Name) VALUES (9, 'Pepper');
+INSERT INTO dbo.Ingredient (Id, Name) VALUES (10, 'Honey');
+INSERT INTO dbo.Ingredient (Id, Name) VALUES (11, 'Chocolate');
+INSERT INTO dbo.Ingredient (Id, Name) VALUES (12, 'Mint');
+SET IDENTITY_INSERT dbo.Ingredient OFF;
