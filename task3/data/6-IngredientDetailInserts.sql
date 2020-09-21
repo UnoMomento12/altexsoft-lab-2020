@@ -1,0 +1,17 @@
+SET IDENTITY_INSERT dbo.IngredientDetail ON;
+insert into dbo.IngredientDetail (RecipeId, IngredientId, DenominationId, Amount) values (1, 1, 1, 50.0);
+insert into dbo.IngredientDetail (RecipeId, IngredientId, DenominationId, Amount) values (1, 2, 4, 7.0);
+insert into dbo.IngredientDetail (RecipeId, IngredientId, DenominationId, Amount) values (1, 3, 2, 23.0);
+insert into dbo.IngredientDetail (RecipeId, IngredientId, DenominationId, Amount) values (1, 4, 3, 16.0);
+insert into dbo.IngredientDetail (RecipeId, IngredientId, DenominationId, Amount) values (1, 5, 6, 11.0);
+insert into dbo.IngredientDetail (RecipeId, IngredientId, DenominationId, Amount) values (2, 5, 1, 50.0);
+insert into dbo.IngredientDetail (RecipeId, IngredientId, DenominationId, Amount) values (2, 3, 4, 7.0);
+insert into dbo.IngredientDetail (RecipeId, IngredientId, DenominationId, Amount) values (2, 2, 2, 23.0);
+insert into dbo.IngredientDetail (RecipeId, IngredientId, DenominationId, Amount) values (2, 8, 3, 16.0);
+insert into dbo.IngredientDetail (RecipeId, IngredientId, DenominationId, Amount) values (2, 11, 6, 11.0);
+insert into dbo.IngredientDetail (RecipeId, IngredientId, DenominationId, Amount) values (3, 2, 1, 50.0);
+insert into dbo.IngredientDetail (RecipeId, IngredientId, DenominationId, Amount) values (3, 4, 4, 7.0);
+insert into dbo.IngredientDetail (RecipeId, IngredientId, DenominationId, Amount) values (3, 5, 2, 23.0);
+insert into dbo.IngredientDetail (RecipeId, IngredientId, DenominationId, Amount) values (3, 7, 3, 16.0);
+insert into dbo.IngredientDetail (RecipeId, IngredientId, DenominationId, Amount) values (3, 9, 6, 11.0);
+SET IDENTITY_INSERT dbo.IngredientDetail OFF;
