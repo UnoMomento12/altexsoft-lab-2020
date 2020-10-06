@@ -10,12 +10,4 @@ namespace HomeTask4.SharedKernel.Interfaces
         Task UpdateAsync<T>(T entity) where T : BaseEntity;
         Task DeleteAsync<T>(T entity) where T : BaseEntity;
     }
-    //public interface IRepository<T> : IRepository where T : BaseEntity
-    //{
-    //    Task<T> GetByIdAsync(int id);
-    //    Task<List<T>> GetAllAsync();
-    //    Task AddAsync(T entity);
-    //    Task UpdateAsync(T entity);
-    //    Task DeleteAsync(T entity);
-    //}
 }

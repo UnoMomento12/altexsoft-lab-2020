@@ -33,7 +33,6 @@ namespace HomeTask4.Cmd
             await navig.StartNavigator();
             while (true)
             {
-                await navig.UpdateSubItems();
                 navig.WriteNavigator();
                 MenuStart();
                 string input = Console.ReadLine().ToLower().Trim();
@@ -42,15 +41,15 @@ namespace HomeTask4.Cmd
                 bool isNumber = int.TryParse(input, out option);
                 if (isNumber)
                 {
-                    await ProcessNumber(option, navig);
+                    await ProcessNumberAsync(option, navig);
                 }
                 else if (input == "addrecipe")
                 {
-                    await ProcessRecipe(recCont, rsCont, navig);
+                    await ProcessRecipeAsync(recCont, rsCont, navig);
                 }
                 else if (input == "addcategory")
                 {
-                    ProcessCategory(catCont, navig);
+                    await ProcessCategoryAsync(catCont, navig);
                 }
                 else
                 {
@@ -60,13 +59,13 @@ namespace HomeTask4.Cmd
             }
         }
 
-        private static Task ProcessNumber(int option, Navigator a)
+        private static async Task ProcessNumberAsync(int option, Navigator a)
         {
-            if (option < 0) a.GoBack();
-            return a.MoveToAsync(option);
+            if (option < 0) await a.GoBack();
+                else await a.MoveToAsync(option);
         }
 
-        private static async Task ProcessRecipe(RecipeController recCont, RecipeStepController rsCont, Navigator navig)
+        private static async Task ProcessRecipeAsync(RecipeController recCont, RecipeStepController rsCont, Navigator navig)
         {
             NavigatorItem item = NavigatorItem.Recipe;
             Category targetCategory = SetTargetCategory(navig, item);
@@ -83,8 +82,8 @@ namespace HomeTask4.Cmd
                 return;
             }
             await rsCont.AddStepsAsync(GatherSteps(recipeToAdd.Id));
-            await FormIngredientList(recipeToAdd, recCont);
-            navig.UpdateSubItems();
+            await FormIngredientListAsync(recipeToAdd, recCont);
+            await navig.UpdateSubItems();
         }
         private static Recipe FormRecipe(RecipeController recCont)
         {
@@ -110,7 +109,7 @@ namespace HomeTask4.Cmd
         }
 
 
-        private static async Task FormIngredientList(Recipe recipeToAdd, RecipeController recCont)
+        private static async Task FormIngredientListAsync(Recipe recipeToAdd, RecipeController recCont)
         {
             Console.WriteLine($"Enter ingredients for recipe {recipeToAdd.Name} below:");
             Console.WriteLine("Or enter -1 in any field to stop adding ingredients");
@@ -145,7 +144,7 @@ namespace HomeTask4.Cmd
                 await recCont.AddIngredientToRecipe(recipeToAdd, name, measure, amount);
             }
         }
-        private static async void ProcessCategory(CategoryController catCont, Navigator navig)
+        private static async Task ProcessCategoryAsync(CategoryController catCont, Navigator navig)
         {
             NavigatorItem item = NavigatorItem.Category;
             Category targetCategory = SetTargetCategory(navig, item);
@@ -162,7 +161,7 @@ namespace HomeTask4.Cmd
                 Console.ReadKey();
                 return;
             }
-            navig.UpdateSubItems();
+            await navig.UpdateSubItems();
         }
         private static Category SetTargetCategory(Navigator navig, NavigatorItem item)
         {
@@ -225,6 +224,7 @@ namespace HomeTask4.Cmd
             Console.WriteLine("addcategory - to create an additional category;");
             Console.WriteLine("addrecipe - to create recipe in the category;");
         }
+
         /// <summary>
         /// This method should be separate to support EF command-line tools in design time
         /// https://docs.microsoft.com/en-us/ef/core/miscellaneous/cli/dbcontext-creation

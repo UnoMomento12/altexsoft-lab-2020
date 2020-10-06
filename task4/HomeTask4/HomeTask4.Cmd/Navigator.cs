@@ -1,5 +1,4 @@
 ﻿using HomeTask4.Core.Entities;
-using HomeTask4.Infrastructure.Data;
 using HomeTask4.SharedKernel;
 using HomeTask4.SharedKernel.Interfaces;
 using System;
@@ -17,7 +16,6 @@ namespace HomeTask4.Cmd
         private List<BaseEntity> _subItems;
         private int _recipesStart;
         
-
         public Navigator(IUnitOfWork unit)
         {
             _unitOfWork = unit;
@@ -37,14 +35,11 @@ namespace HomeTask4.Cmd
                 return;
             }
             BaseEntity retrieved = _subItems[id];
-            if(retrieved is Category check) //one cast like this?
+            if(retrieved is Category check) 
             {
                 _root = _current;
                 _current = check;
-                _subItems.Clear();
-                (await _unitOfWork.Repository.ListAsync<Category>()).Where(x => x.Parent == _current).ToList().ForEach(x => _subItems.Add(x));
-                _recipesStart = _subItems.Count;
-                (await _unitOfWork.Repository.ListAsync<Recipe>()).Where(x => x.CategoryId == _current.Id).ToList().ForEach(x => _subItems.Add(x));
+                await UpdateSubItems();
             }    
             else  
             {
@@ -100,10 +95,6 @@ namespace HomeTask4.Cmd
             {
                 Console.WriteLine("    " + b + ". " + (_subItems[b] as Recipe)?.Name);
             }
-            //foreach( Recipe b in _subItems)
-            //{
-            //    Console.WriteLine("    " + _subItems.IndexOf(b) + ". " + b?.Name);
-            //}
         }
         private void WriteRootNavigator()
         {
@@ -112,17 +103,14 @@ namespace HomeTask4.Cmd
             {
                 Console.WriteLine(i + ". " + (_subItems[i] as Category)?.Name);
             }
-            //foreach (Category c in _subItems)
-            //{
-            //    Console.WriteLine("    " + _subItems.IndexOf(c) + ". " + c?.Name);
-            //}
         }
         
 
-        public void GoBack()
+        public async Task GoBack()
         {
             _current = _root;
             _root = _current?.Parent;
+            await UpdateSubItems();
         }
         
         public Category GetCurrent()
