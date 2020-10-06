@@ -26,7 +26,7 @@ namespace HomeTask4.Cmd
              (await _unitOfWork.Repository.ListAsync<Category>()).Where(x => x.ParentId == null).ToList().ForEach(x => _subItems.Add(x));
             _recipesStart = _subItems.Count;
         }
-        public async Task MoveToAsync(int id)
+        public void MoveTo(int id)
         {
             bool inBounds = id > -1 && id < _subItems.Count;
             if (!inBounds)
@@ -37,9 +37,12 @@ namespace HomeTask4.Cmd
             BaseEntity retrieved = _subItems[id];
             if(retrieved is Category check) 
             {
+                _subItems.Clear();
+                _subItems.AddRange(check.Categories);
+                _recipesStart = _subItems.Count();
+                _subItems.AddRange(check.Recipes);
                 _root = _current;
                 _current = check;
-                await UpdateSubItems();
             }    
             else  
             {
@@ -110,7 +113,13 @@ namespace HomeTask4.Cmd
         {
             _current = _root;
             _root = _current?.Parent;
-            await UpdateSubItems();
+            if(_root == null) await UpdateSubItems();
+            else
+            {
+                _subItems.Clear();
+                _subItems.AddRange(_current.Categories);
+                _subItems.AddRange(_current.Recipes);
+            }
         }
         
         public Category GetCurrent()
@@ -144,7 +153,8 @@ namespace HomeTask4.Cmd
             _recipesStart = _subItems.Count;
             if (_current != null)
             {
-                (await _unitOfWork.Repository.ListAsync<Recipe>()).Where(x => x.CategoryId == _current.Id).ToList().ForEach(x => _subItems.Add(x));
+                _subItems.AddRange(_current.Recipes);
+                //(await _unitOfWork.Repository.ListAsync<Recipe>()).Where(x => x.CategoryId == _current.Id).ToList().ForEach(x => _subItems.Add(x));
             }
         }
 

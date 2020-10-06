@@ -61,7 +61,7 @@ namespace HomeTask4.Cmd
         private static async Task ProcessNumberAsync(int option, Navigator a)
         {
             if (option < 0) await a.GoBack();
-                else await a.MoveToAsync(option);
+                else a.MoveTo(option);
         }
 
         private static async Task ProcessRecipeAsync(RecipeController recCont, RecipeStepController rsCont, Navigator navig)
