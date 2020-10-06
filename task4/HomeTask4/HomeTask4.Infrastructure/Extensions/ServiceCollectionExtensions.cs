@@ -1,5 +1,4 @@
 using HomeTask4.Core.Controllers;
-using HomeTask4.Core.Entities;
 using HomeTask4.Infrastructure.Data;
 using HomeTask4.Infrastructure.Data.Repositories;
 using HomeTask4.SharedKernel.Interfaces;

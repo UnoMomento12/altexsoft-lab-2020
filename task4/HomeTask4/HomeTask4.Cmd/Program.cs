@@ -9,7 +9,6 @@ using Microsoft.Extensions.Logging;
 using HomeTask4.Core.Controllers;
 using System.Collections.Generic;
 using HomeTask4.SharedKernel.Interfaces;
-using HomeTask4.Infrastructure.Data.Repositories;
 using System.Threading.Tasks;
 
 namespace HomeTask4.Cmd
