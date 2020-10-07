@@ -58,28 +58,33 @@ namespace HomeTask4.Cmd
         private static async Task ProcessNumberAsync(int option, Navigator a)
         {
             if (option < 0) await a.GoBack();
-                else a.MoveTo(option);
+                else  await a.MoveTo(option);
         }
 
         private static async Task ProcessRecipeAsync(RecipeController recCont, RecipeStepController rsCont, Navigator navig)
         {
             NavigatorItem item = NavigatorItem.Recipe;
             Category targetCategory = SetTargetCategory(navig, item);
-            Recipe recipeToAdd = FormRecipe(recCont);
-            recCont.SetCategoryInRecipe(targetCategory, recipeToAdd);
-            if (await recCont.TryCreateRecipe(recipeToAdd))
+            Recipe recipeToAdd = null;
+            bool result;
+            try
             {
-                Console.WriteLine("Recipe created succesfully!");
-            }
-            else
+                recipeToAdd = FormRecipe(recCont);
+                recCont.SetCategoryInRecipe(targetCategory, recipeToAdd);
+                result = await recCont.TryCreateRecipeAsync(recipeToAdd);
+            } catch (Exception)
             {
                 Console.WriteLine("Creating recipe is not possible!");
                 Console.ReadKey();
                 return;
             }
-            await rsCont.AddStepsAsync(GatherSteps(recipeToAdd.Id));
-            await FormIngredientListAsync(recipeToAdd, recCont);
-            await navig.UpdateSubItems();
+            if (result)
+            {
+                await rsCont.AddStepsAsync(GatherSteps(recipeToAdd.Id));
+                await FormIngredientListAsync(recipeToAdd, recCont);
+                await navig.UpdateSubItems();
+                Console.WriteLine("Recipe created succesfully!");
+            }
         }
         private static Recipe FormRecipe(RecipeController recCont)
         {
@@ -137,7 +142,7 @@ namespace HomeTask4.Cmd
                 Console.Write("Measured in:");
                 string measure = Console.ReadLine().Trim();
                 if (measure == "-1") break;
-                await recCont.AddIngredientToRecipe(recipeToAdd, name, measure, amount);
+                await recCont.AddIngredientToRecipeAsync(recipeToAdd, name, measure, amount);
             }
         }
         private static async Task ProcessCategoryAsync(CategoryController catCont, Navigator navig)
@@ -147,17 +152,21 @@ namespace HomeTask4.Cmd
 
             Console.Write("Enter Category Name:");
             string name = Console.ReadLine().Trim();
-            if (await catCont.TryCreateCategoryAsync(name, targetCategory?.Id))
+            bool result;
+            try
             {
-                Console.WriteLine("Category created succesfully!");
-            }
-            else
+                result = await catCont.TryCreateCategoryAsync(name, targetCategory?.Id);
+            } catch (Exception)
             {
                 Console.WriteLine("Creating category is not possible!");
                 Console.ReadKey();
                 return;
             }
-            await navig.UpdateSubItems();
+            if (result)
+            {
+                Console.WriteLine("Category created succesfully!");
+                await navig.UpdateSubItems();
+            }
         }
         private static Category SetTargetCategory(Navigator navig, NavigatorItem item)
         {
@@ -236,6 +245,7 @@ namespace HomeTask4.Cmd
                .ConfigureLogging(config =>
                {
                    config.ClearProviders();
+                   config.AddDebug();
                });
 
     }

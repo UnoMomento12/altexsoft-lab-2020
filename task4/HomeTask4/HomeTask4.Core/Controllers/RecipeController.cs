@@ -5,6 +5,7 @@ using HomeTask4.Core.Entities;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using System.Security.Cryptography;
+using Castle.Core.Internal;
 
 namespace HomeTask4.Core.Controllers
 {
@@ -14,36 +15,52 @@ namespace HomeTask4.Core.Controllers
         {
             _logger = logger;
         }
-        public async Task<bool> TryCreateRecipe(Recipe recipe) 
+
+
+        public async Task<bool> TryCreateRecipeAsync(string name, string description, int? categoryId)
+        {
+            if (name.IsNullOrEmpty() || description.IsNullOrEmpty() || categoryId == null)
+            {
+                throw new ArgumentException("One of the fields is null or empty.");
+            }
+
+            return await TryCreateRecipeAsync(new Recipe { Name = name, Description = description, CategoryId = categoryId });
+        }
+        public async Task<bool> TryCreateRecipeAsync(Recipe recipe) 
         {
             try
             {
-                await CreateRecipe(recipe);
+                await CreateRecipeAsync(recipe);
             } catch (Exception e)
             {
                 _logger.LogInformation(e.Message, e);
                 return false;
             }
             
-            bool result = await _unitOfWork.Repository.GetByIdAsync<Recipe>(recipe.Id) != null ? true :  false;
+            bool result = await _unitOfWork.Repository.GetByIdAsync<Recipe>(recipe.Id) != null;
             return result;
         }
 
-        public async Task CreateRecipe(Recipe recipe)
+        public async Task CreateRecipeAsync(Recipe recipe)
         {
+            if (recipe == null) throw new ArgumentNullException("Recipe reference is null.");
             var checker = (await _unitOfWork.Repository.ListAsync<Recipe>()).SingleOrDefault(x => string.Equals(x.Name, recipe.Name, StringComparison.OrdinalIgnoreCase) && x.CategoryId == recipe.CategoryId);
             if (checker != null)
             {
-                throw new Exception($"Recipe {checker.Name} : {checker.Id} already exists");
+                throw new ArgumentException($"Recipe {checker.Name} : {checker.Id} already exists");
             }
             await _unitOfWork.Repository.AddAsync<Recipe>(recipe);
         }
 
         public Recipe PrepareRecipe(string name, string description)
         {
+            if(name.IsNullOrEmpty() || description.IsNullOrEmpty())
+            {
+                throw new ArgumentException("Name or description is empty");
+            }
             return new Recipe() { Name = name, Description = description};
         }
-        public async Task AddIngredientToRecipe(Recipe recipe, string ingredientName, string measure, double amount)
+        public async Task AddIngredientToRecipeAsync(Recipe recipe, string ingredientName, string measure, double amount)
         {
             var ingred = (await _unitOfWork.Repository.ListAsync<Ingredient>()).SingleOrDefault(x => string.Equals(x.Name, ingredientName, StringComparison.OrdinalIgnoreCase));
             if (ingred == null)

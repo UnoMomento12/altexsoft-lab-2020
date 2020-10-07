@@ -3,13 +3,15 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.29519.87
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HomeTask4.Cmd", "HomeTask4.Cmd\HomeTask4.Cmd.csproj", "{9E4AC0F6-F542-4B33-8307-FAF75A708FF6}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HomeTask4.Cmd", "HomeTask4.Cmd\HomeTask4.Cmd.csproj", "{9E4AC0F6-F542-4B33-8307-FAF75A708FF6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HomeTask4.SharedKernel", "HomeTask4.SharedKernel\HomeTask4.SharedKernel.csproj", "{792ED5A5-9573-46A3-9E68-C5200343FB7E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HomeTask4.SharedKernel", "HomeTask4.SharedKernel\HomeTask4.SharedKernel.csproj", "{792ED5A5-9573-46A3-9E68-C5200343FB7E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HomeTask4.Infrastructure", "HomeTask4.Infrastructure\HomeTask4.Infrastructure.csproj", "{9F232734-350D-4900-A659-3A43268276DD}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HomeTask4.Infrastructure", "HomeTask4.Infrastructure\HomeTask4.Infrastructure.csproj", "{9F232734-350D-4900-A659-3A43268276DD}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HomeTask4.Core", "HomeTask4.Core\HomeTask4.Core.csproj", "{F0AF25DB-C648-42BD-9267-1AD5829C21AA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HomeTask4.Core", "HomeTask4.Core\HomeTask4.Core.csproj", "{F0AF25DB-C648-42BD-9267-1AD5829C21AA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HomeTask4.Core.Tests", "HomeTask4.Core.Tests\HomeTask4.Core.Tests.csproj", "{3A009202-4BFD-4A05-A8E8-07E79E34666C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,6 +35,10 @@ Global
 		{F0AF25DB-C648-42BD-9267-1AD5829C21AA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F0AF25DB-C648-42BD-9267-1AD5829C21AA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F0AF25DB-C648-42BD-9267-1AD5829C21AA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3A009202-4BFD-4A05-A8E8-07E79E34666C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3A009202-4BFD-4A05-A8E8-07E79E34666C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3A009202-4BFD-4A05-A8E8-07E79E34666C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3A009202-4BFD-4A05-A8E8-07E79E34666C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

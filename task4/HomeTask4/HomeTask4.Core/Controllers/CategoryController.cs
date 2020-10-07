@@ -1,5 +1,7 @@
-﻿using HomeTask4.Core.Entities;
+﻿using Castle.Core.Internal;
+using HomeTask4.Core.Entities;
 using HomeTask4.SharedKernel.Interfaces;
+using Microsoft.EntityFrameworkCore.Query.SqlExpressions;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Linq;
@@ -19,31 +21,32 @@ namespace HomeTask4.Core.Controllers
         {
             try
             {
-                await CreateCategory(category);
+                await CreateCategoryAsync(category);
             } catch (Exception e)
             {
                 _logger.LogInformation(e.Message , e);
                 return false;
             }
-            bool result = await _unitOfWork.Repository.GetByIdAsync<Category>(category.Id) != null ? true : false;
+            bool result = await _unitOfWork.Repository.GetByIdAsync<Category>(category.Id) != null;
             return result;
         }
         public async Task<bool> TryCreateCategoryAsync(string categoryName, int? parentId)
         {
             if (String.IsNullOrEmpty(categoryName))
             {
-                _logger.LogInformation("Failed to create a category, name is empty");
-                return false;
+                throw new ArgumentException("Name is null or empty.");
             }
             return await TryCreateCategoryAsync(new Category { Name = categoryName, ParentId = parentId });
         }
 
-        public async Task CreateCategory(Category category) 
+        public async Task CreateCategoryAsync(Category category) 
         {
+            if (category == null) throw new ArgumentNullException($"Category reference is null.");
+            if (category.Name.IsNullOrEmpty()) throw new ArgumentException("Category name is empty!");
             var item = (await _unitOfWork.Repository.ListAsync<Category>()).SingleOrDefault(x => string.Equals(x.Name, category.Name, StringComparison.OrdinalIgnoreCase) && x.ParentId == category.ParentId);
             if (item != null)
             {
-                throw new Exception("This category already exists !");
+                throw new ArgumentException("This category already exists !");
             }
             if (category.ParentId != null)
             {
