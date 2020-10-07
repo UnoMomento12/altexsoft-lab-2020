@@ -1,4 +1,6 @@
+using Castle.Core.Logging;
 using HomeTask4.Core.Controllers;
+using HomeTask4.Core.Navigator;
 using HomeTask4.Infrastructure.Data;
 using HomeTask4.Infrastructure.Data.Repositories;
 using HomeTask4.SharedKernel.Interfaces;
@@ -12,14 +14,13 @@ namespace HomeTask4.Infrastructure.Extensions
         public static IServiceCollection AddInfrastructure(this IServiceCollection services, string connectionString)
         {
             services.AddDbContext<Task4DBContext>(opts => opts.UseSqlServer(connectionString).UseLazyLoadingProxies());
-
             services.AddScoped<IRepository, Repository>();
             services.AddScoped<IUnitOfWork,UnitOfWork>();
-            services.AddScoped<UnitOfWork>();
 
             services.AddScoped<CategoryController>();
             services.AddScoped<RecipeController>();
             services.AddScoped<RecipeStepController>();
+            services.AddScoped<Navigator>();
 
             return services;
         }

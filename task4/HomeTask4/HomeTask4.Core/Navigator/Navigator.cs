@@ -6,9 +6,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace HomeTask4.Cmd
+namespace HomeTask4.Core.Navigator
 {
-    class Navigator
+    public class Navigator
     {
         private IUnitOfWork _unitOfWork;
         private Category _root;
@@ -154,7 +154,6 @@ namespace HomeTask4.Cmd
             if (_current != null)
             {
                 _subItems.AddRange(_current.Recipes);
-                //(await _unitOfWork.Repository.ListAsync<Recipe>()).Where(x => x.CategoryId == _current.Id).ToList().ForEach(x => _subItems.Add(x));
             }
         }
 

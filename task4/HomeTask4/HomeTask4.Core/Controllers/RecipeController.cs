@@ -1,20 +1,30 @@
 ﻿using System;
 using System.Linq;
-using System.Collections.Generic;
 using HomeTask4.SharedKernel.Interfaces;
 using HomeTask4.Core.Entities;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
+using System.Security.Cryptography;
 
 namespace HomeTask4.Core.Controllers
 {
     public class RecipeController : BaseController
     {
-        public RecipeController(IUnitOfWork unitOfWork) : base(unitOfWork)
+        public RecipeController(IUnitOfWork unitOfWork, ILogger<RecipeController> logger) : base(unitOfWork)
         {
+            _logger = logger;
         }
         public async Task<bool> TryCreateRecipe(Recipe recipe) 
         {
-            await CreateRecipe(recipe);
+            try
+            {
+                await CreateRecipe(recipe);
+            } catch (Exception e)
+            {
+                _logger.LogInformation(e.Message, e);
+                return false;
+            }
+            
             bool result = await _unitOfWork.Repository.GetByIdAsync<Recipe>(recipe.Id) != null ? true :  false;
             return result;
         }
@@ -24,8 +34,7 @@ namespace HomeTask4.Core.Controllers
             var checker = (await _unitOfWork.Repository.ListAsync<Recipe>()).SingleOrDefault(x => string.Equals(x.Name, recipe.Name, StringComparison.OrdinalIgnoreCase) && x.CategoryId == recipe.CategoryId);
             if (checker != null)
             {
-                Console.WriteLine($"Recipe {checker.Name} : {checker.Id} already exists");
-                return;
+                throw new Exception($"Recipe {checker.Name} : {checker.Id} already exists");
             }
             await _unitOfWork.Repository.AddAsync<Recipe>(recipe);
         }

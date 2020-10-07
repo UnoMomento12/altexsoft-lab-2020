@@ -10,7 +10,7 @@ using HomeTask4.Core.Controllers;
 using System.Collections.Generic;
 using HomeTask4.SharedKernel.Interfaces;
 using System.Threading.Tasks;
-
+using HomeTask4.Core.Navigator;
 namespace HomeTask4.Cmd
 {
     enum NavigatorItem
@@ -23,12 +23,10 @@ namespace HomeTask4.Cmd
         static async Task Main(string[] args)
         {
             var host = CreateHostBuilder(args).Build();
-            var logger = host.Services.GetRequiredService<ILogger<Program>>();
-            IUnitOfWork unitOfWork = host.Services.GetRequiredService<UnitOfWork>();
             RecipeController recCont = host.Services.GetRequiredService<RecipeController>();
             CategoryController catCont = host.Services.GetRequiredService<CategoryController>();
             RecipeStepController rsCont = host.Services.GetRequiredService<RecipeStepController>();
-            Navigator navig = new Navigator(unitOfWork);
+            Navigator navig = host.Services.GetRequiredService<Navigator>();
             await navig.StartNavigator();
             while (true)
             {
@@ -37,8 +35,7 @@ namespace HomeTask4.Cmd
                 string input = Console.ReadLine().ToLower().Trim();
                 if (input == "exit") break;
                 int option;
-                bool isNumber = int.TryParse(input, out option);
-                if (isNumber)
+                if (int.TryParse(input, out option))
                 {
                     await ProcessNumberAsync(option, navig);
                 }
@@ -150,7 +147,7 @@ namespace HomeTask4.Cmd
 
             Console.Write("Enter Category Name:");
             string name = Console.ReadLine().Trim();
-            if ( await catCont.TryCreateCategory(name, targetCategory?.Id))
+            if (await catCont.TryCreateCategoryAsync(name, targetCategory?.Id))
             {
                 Console.WriteLine("Category created succesfully!");
             }
@@ -239,7 +236,6 @@ namespace HomeTask4.Cmd
                .ConfigureLogging(config =>
                {
                    config.ClearProviders();
-                   //config.AddConsole();
                });
 
     }
