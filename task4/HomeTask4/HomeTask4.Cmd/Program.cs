@@ -80,7 +80,7 @@ namespace HomeTask4.Cmd
             }
             if (result)
             {
-                await rsCont.AddStepsAsync(GatherSteps(recipeToAdd.Id));
+                await rsCont.AddStepsAsync(GatherSteps(recipeToAdd));
                 await FormIngredientListAsync(recipeToAdd, recCont);
                 await navig.UpdateSubItems();
                 Console.WriteLine("Recipe created succesfully!");
@@ -94,7 +94,7 @@ namespace HomeTask4.Cmd
             string description = Console.ReadLine();
             return recCont.PrepareRecipe(name, description);
         }
-        private static List<RecipeStep> GatherSteps(int recipeId)
+        private static List<RecipeStep> GatherSteps(Recipe targetRecipe)
         {
             List<RecipeStep> steps = new List<RecipeStep>();
             Console.WriteLine("Enter sequence of recipe steps or \"-1\" to stop recording ");
@@ -103,7 +103,7 @@ namespace HomeTask4.Cmd
             {
                 string step = Console.ReadLine().Trim();
                 if (step == "-1") break;
-                steps.Add(new RecipeStep { StepNumber = index, Description = step, RecipeId = recipeId });
+                steps.Add(new RecipeStep { StepNumber = index, Description = step, RecipeId = targetRecipe.Id });
                 index++;
             }
             return steps;
@@ -127,7 +127,7 @@ namespace HomeTask4.Cmd
                 while (true)
                 {
                     Console.Write("Amount:");
-                    parsed = double.TryParse(Console.ReadLine(), out amount);
+                    parsed = double.TryParse(Console.ReadLine().Trim(), out amount);
                     if (parsed && amount == -1)
                     {
                         wasBreaked = true;
@@ -142,7 +142,14 @@ namespace HomeTask4.Cmd
                 Console.Write("Measured in:");
                 string measure = Console.ReadLine().Trim();
                 if (measure == "-1") break;
-                await recCont.AddIngredientToRecipeAsync(recipeToAdd, name, measure, amount);
+                try
+                {
+                    await recCont.AddIngredientToRecipeAsync(recipeToAdd, name, measure, amount);
+                } catch (ArgumentException)
+                {
+                    Console.WriteLine("Ingredient wasn't added to recipe, please try again");
+                }
+                
             }
         }
         private static async Task ProcessCategoryAsync(CategoryController catCont, Navigator navig)

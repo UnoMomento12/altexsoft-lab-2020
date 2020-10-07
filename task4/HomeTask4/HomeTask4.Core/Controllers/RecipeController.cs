@@ -44,6 +44,7 @@ namespace HomeTask4.Core.Controllers
         public async Task CreateRecipeAsync(Recipe recipe)
         {
             if (recipe == null) throw new ArgumentNullException("Recipe reference is null.");
+            if (recipe.Name.IsNullOrEmpty()) throw new ArgumentException("Name is empty.");
             var checker = (await _unitOfWork.Repository.ListAsync<Recipe>()).SingleOrDefault(x => string.Equals(x.Name, recipe.Name, StringComparison.OrdinalIgnoreCase) && x.CategoryId == recipe.CategoryId);
             if (checker != null)
             {
@@ -62,13 +63,21 @@ namespace HomeTask4.Core.Controllers
         }
         public async Task AddIngredientToRecipeAsync(Recipe recipe, string ingredientName, string measure, double amount)
         {
+            if (ingredientName.IsNullOrEmpty()) throw new ArgumentException("IngredientName is empty.");
+
+            var checkRecipe = (await _unitOfWork.Repository.ListAsync<Recipe>()).SingleOrDefault(x => string.Equals(x.Name, recipe.Name, StringComparison.OrdinalIgnoreCase) && x.CategoryId == recipe.CategoryId && x.Id == recipe.Id);
+            if (checkRecipe == null)
+            {
+                throw new ArgumentException($"Recipe {recipe.Name} : {recipe.Id} doesn't exist in Database.");
+            }
+
             var ingred = (await _unitOfWork.Repository.ListAsync<Ingredient>()).SingleOrDefault(x => string.Equals(x.Name, ingredientName, StringComparison.OrdinalIgnoreCase));
             if (ingred == null)
             {
                 ingred = new Ingredient { Name = ingredientName};
                 await _unitOfWork.Repository.AddAsync<Ingredient>(ingred);
             }
-
+            
             var measuredIn = (await _unitOfWork.Repository.ListAsync<Measure>()).SingleOrDefault(x => string.Equals(x.Name, measure, StringComparison.OrdinalIgnoreCase));
             if( measuredIn == null)
             {
@@ -76,10 +85,9 @@ namespace HomeTask4.Core.Controllers
                 await _unitOfWork.Repository.AddAsync<Measure>(measuredIn);
             }
 
-
             var ingDetail = new IngredientDetail() { RecipeId = recipe.Id, IngredientId = ingred.Id, Amount = amount , MeasureId = measuredIn.Id };
 
-            var checkerDetail = (await _unitOfWork.Repository.ListAsync<IngredientDetail>()).FirstOrDefault(x => x.RecipeId == ingDetail.RecipeId && x.IngredientId == ingDetail.IngredientId);
+            var checkerDetail = (await _unitOfWork.Repository.ListAsync<IngredientDetail>()).SingleOrDefault(x => x.RecipeId == ingDetail.RecipeId && x.IngredientId == ingDetail.IngredientId);
             if (checkerDetail != null)
             {
                 checkerDetail.Amount += ingDetail.Amount;
@@ -89,7 +97,6 @@ namespace HomeTask4.Core.Controllers
             {
                 await _unitOfWork.Repository.AddAsync<IngredientDetail>(ingDetail);
             }
-            await _unitOfWork.SaveChangesAsync();
         }
 
         public void SetCategoryInRecipe(Category category, Recipe recipe)

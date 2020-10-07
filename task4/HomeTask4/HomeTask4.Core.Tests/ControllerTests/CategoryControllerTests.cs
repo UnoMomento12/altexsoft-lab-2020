@@ -23,12 +23,20 @@ namespace HomeTask4.Core.Tests.ControllerTests
         }
 
         [Fact ( DisplayName = "TryCreateCategoryAsync method throws ArgumentException") ]
-        public async Task TryCreateCategoryAsyncTest_Throws_Exception_On_Null_Name()
+        public async Task TryCreateCategoryAsyncTest_Throws_Exception_On_Empty_Name()
         {
             //Arange
+            var repos = new Mock<IRepository>();
+            _unitOfWork.Setup(u => u.Repository).Returns(repos.Object);
+            repos.Setup(r => r.ListAsync<Category>());
+            repos.Setup(r => r.GetByIdAsync<Category>(It.IsAny<int>()));
+            repos.Setup(r => r.AddAsync<Category>(It.IsAny<Category>()));
             //Act
             var excep = await Assert.ThrowsAsync<ArgumentException>(async () => await _catCont.TryCreateCategoryAsync("", 1));
             //Assert
+            repos.Verify(repos => repos.GetByIdAsync<Category>(It.IsAny<int>()), Times.Never);
+            repos.Verify(repos => repos.AddAsync<Category>(null), Times.Never);
+            repos.Verify(r => r.ListAsync<Category>(), Times.Never);
             Assert.Contains("null or empty", excep.Message);
         }
 
@@ -46,17 +54,24 @@ namespace HomeTask4.Core.Tests.ControllerTests
             _unitOfWork.Setup(u => u.Repository).Returns(repos.Object);
             repos.Setup(r => r.AddAsync<Category>(It.IsAny<Category>())).Callback((Category some) => mockDB.Add(some));
             repos.Setup(r => r.ListAsync<Category>()).ReturnsAsync(mockDB);
-            repos.Setup(r => r.GetByIdAsync<Category>(It.IsAny<int>())).ReturnsAsync((int a) => mockDB.FirstOrDefault(x => x.Id == a));
+            repos.Setup(r => r.GetByIdAsync<Category>(cat.Id)).ReturnsAsync((int a) => mockDB.FirstOrDefault(x => x.Id == a));
+            repos.Setup(r => r.GetByIdAsync<Category>(cat2.Id)).ReturnsAsync((int a) => mockDB.FirstOrDefault(x => x.Id == a));
             //Act
             var result = await _catCont.TryCreateCategoryAsync(cat);
             var result2 = await _catCont.TryCreateCategoryAsync(cat2);
+
             //Assert
+            repos.Verify(repos => repos.AddAsync<Category>(cat), Times.Once);
+            repos.Verify(repos => repos.AddAsync<Category>(cat2), Times.Never);
+            repos.Verify(repos => repos.GetByIdAsync<Category>(cat.Id), Times.Once);
+            repos.Verify(repos => repos.GetByIdAsync<Category>(cat2.Id), Times.Never);
+            repos.Verify(r => r.ListAsync<Category>(), Times.AtLeastOnce);
             Assert.True(result);
             Assert.False(result2);
         }
 
         [Fact (DisplayName = "CreateCategoryAsync method throws ArgumentNullException")]
-        public async Task CreateCategoryAsyncTest_Throws_Exception()
+        public async Task CreateCategoryAsyncTest_Throws_ArgumentNullException()
         {
             //Arange
             Category cat1 = null;
@@ -69,12 +84,17 @@ namespace HomeTask4.Core.Tests.ControllerTests
             repos.Setup(r => r.AddAsync<Category>(It.IsAny<Category>())).Callback((Category some) => mockDB.Add(some));
             repos.Setup(r => r.ListAsync<Category>()).ReturnsAsync(mockDB);
             repos.Setup(r => r.GetByIdAsync<Category>(It.IsAny<int>())).ReturnsAsync((int a) => mockDB.FirstOrDefault(x => x.Id == a));
-
-            await Assert.ThrowsAsync<ArgumentNullException>( async() => await _catCont.CreateCategoryAsync(cat1));
+            //Act
+            var ex = await Assert.ThrowsAsync<ArgumentNullException>( async() => await _catCont.CreateCategoryAsync(cat1));
+            //Assert
+            repos.Verify(r => r.AddAsync<Category>(cat1), Times.Never);
+            repos.Verify(r => r.ListAsync<Category>(), Times.Never);
+            repos.Verify(repos => repos.GetByIdAsync<Category>(It.IsAny<int>()), Times.Never);
+            Assert.Contains("reference is null", ex.Message);
         }
 
         [Fact(DisplayName = "CreateCategoryAsync method throws ArgumentException")]
-        public async Task CreateCategoryAsyncTest_Throws_ArException()
+        public async Task CreateCategoryAsyncTest_Throws_ArgumentException()
         {
             //Arange
             Category cat1 = new Category { Id = 3, Name = "First set", ParentId = null };
@@ -89,13 +109,12 @@ namespace HomeTask4.Core.Tests.ControllerTests
             repos.Setup(r => r.ListAsync<Category>()).ReturnsAsync(mockDB);
             repos.Setup(r => r.GetByIdAsync<Category>(It.IsAny<int>())).ReturnsAsync((int a) => mockDB.FirstOrDefault(x => x.Id == a));
             //Act + Assert
-            var a = await Assert.ThrowsAsync<ArgumentException>(async () => await _catCont.CreateCategoryAsync(cat1));
-            var b = await Assert.ThrowsAsync<ArgumentException>(async () => await _catCont.CreateCategoryAsync(cat2));
-            Assert.Contains("exists", a.Message);
-            Assert.Contains("empty", b.Message);
+            var aEx = await Assert.ThrowsAsync<ArgumentException>(async () => await _catCont.CreateCategoryAsync(cat1));
+            var bEx = await Assert.ThrowsAsync<ArgumentException>(async () => await _catCont.CreateCategoryAsync(cat2));
+            repos.Verify(repos => repos.GetByIdAsync<Category>(It.IsAny<int>()), Times.Never);
+            repos.Verify(r => r.ListAsync<Category>(), Times.Once);
+            Assert.Contains("exists", aEx.Message);
+            Assert.Contains("empty", bEx.Message);
         }
-
-
-
     }
 }
