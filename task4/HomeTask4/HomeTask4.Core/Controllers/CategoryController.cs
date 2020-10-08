@@ -6,7 +6,6 @@ using Microsoft.Extensions.Logging;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
-
 namespace HomeTask4.Core.Controllers
 {
     public class CategoryController : BaseController
@@ -25,12 +24,10 @@ namespace HomeTask4.Core.Controllers
             catch (ArgumentNullException b)
             {
                 Logger.LogInformation(b.Message, b);
-                throw;
             }
             catch (ArgumentException a)
             {
                 Logger.LogInformation(a.Message, a);
-                throw;
             } 
             bool result = await UnitOfWork.Repository.GetByIdAsync<Category>(category.Id) != null;
             return result;
