@@ -8,6 +8,8 @@ using HomeTask4.Core.Controllers;
 using Microsoft.Extensions.Logging;
 using HomeTask4.Core.Entities;
 using System.Linq;
+using Castle.DynamicProxy.Generators.Emitters.SimpleAST;
+using System.Linq.Expressions;
 namespace HomeTask4.Core.Tests.ControllerTests
 {
     public class RecipeControllerTests
@@ -27,9 +29,9 @@ namespace HomeTask4.Core.Tests.ControllerTests
             //Arange
             var repos = new Mock<IRepository>();
             _unitOfWork.Setup(u => u.Repository).Returns(repos.Object);
-            repos.Setup(r => r.ListAsync<Recipe>());
+            repos.Setup(r => r.SingleOrDefaultAsync<Recipe>(It.IsAny<Expression<Func<Recipe, bool>>>()));
             //Act + Assert
-            repos.Verify(repos => repos.ListAsync<Recipe>(), Times.Never);
+            repos.Verify(r => r.SingleOrDefaultAsync<Recipe>(It.IsAny<Expression<Func<Recipe, bool>>>()), Times.Never);
             await Assert.ThrowsAsync<ArgumentException>(async () => await _recCont.TryCreateRecipeAsync("sadcaaec","",12));
             
         }
@@ -47,14 +49,19 @@ namespace HomeTask4.Core.Tests.ControllerTests
                 new Recipe { Id = 2 , Name = "Recipe 2" , CategoryId = 2}
             };
             _unitOfWork.Setup(u => u.Repository).Returns(repos.Object);
-            repos.Setup(r => r.AddAsync<Recipe>(It.IsAny<Recipe>())).Callback((Recipe some) => mockDB.Add(some));
-            repos.Setup(r => r.ListAsync<Recipe>()).ReturnsAsync(mockDB);
+            repos.Setup(r => r.AddAsync<Recipe>(It.IsAny<Recipe>())).Callback((Recipe some) => mockDB.Add(some)); 
+            repos.Setup(r => r.SingleOrDefaultAsync<Recipe>(x => string.Equals(x.Name, rec1.Name, StringComparison.OrdinalIgnoreCase) && x.CategoryId == rec1.CategoryId))
+                 .ReturnsAsync(() => mockDB.SingleOrDefault(x => string.Equals(x.Name, rec1.Name, StringComparison.OrdinalIgnoreCase) && x.CategoryId == rec1.CategoryId));
+            repos.Setup(r => r.SingleOrDefaultAsync<Recipe>(x => string.Equals(x.Name, rec2.Name, StringComparison.OrdinalIgnoreCase) && x.CategoryId == rec2.CategoryId))
+                 .ReturnsAsync(() => mockDB.SingleOrDefault(x => string.Equals(x.Name, rec2.Name, StringComparison.OrdinalIgnoreCase) && x.CategoryId == rec2.CategoryId));
             repos.Setup(r => r.GetByIdAsync<Recipe>(It.IsAny<int>())).ReturnsAsync((int a) => mockDB.FirstOrDefault(x => x.Id == a));
             //Act
             var result = await _recCont.TryCreateRecipeAsync(rec1);
             var result2 = await _recCont.TryCreateRecipeAsync(rec2);
             var result3 = await _recCont.TryCreateRecipeAsync(rec3);
             //Assert
+            repos.Verify(r => r.SingleOrDefaultAsync<Recipe>(x => string.Equals(x.Name, rec1.Name, StringComparison.OrdinalIgnoreCase) && x.CategoryId == rec1.CategoryId), Times.Once);
+            repos.Verify(r => r.SingleOrDefaultAsync<Recipe>(x => string.Equals(x.Name, rec2.Name, StringComparison.OrdinalIgnoreCase) && x.CategoryId == rec2.CategoryId), Times.Once);
             Assert.True(result);
             Assert.False(result2);
             Assert.False(result3);
@@ -66,15 +73,15 @@ namespace HomeTask4.Core.Tests.ControllerTests
             Recipe rec1 = null;
             var repos = new Mock<IRepository>();
             _unitOfWork.Setup(u => u.Repository).Returns(repos.Object);
-            repos.Setup(r => r.ListAsync<Recipe>());
-            //Assert
-            repos.Verify(repos => repos.ListAsync<Recipe>(), Times.Never);
+            repos.Setup(r => r.SingleOrDefaultAsync<Recipe>(It.IsAny<Expression<Func<Recipe, bool>>>()));
+            //Act + Assert
+            repos.Verify(r => r.SingleOrDefaultAsync<Recipe>(It.IsAny<Expression<Func<Recipe, bool>>>()), Times.Never);
             await Assert.ThrowsAsync<ArgumentNullException>(async () => await _recCont.CreateRecipeAsync(rec1));
 
         }
 
-        [Fact(DisplayName = "CreateCategoryAsync method throws ArgumentException")]
-        public async Task CreateCategoryAsyncTest_Throws_ArgumentException()
+        [Fact(DisplayName = "CreateRecipeAsync method throws ArgumentException")]
+        public async Task CreateRecipeAsyncTest_Throws_ArgumentException()
         {
             //Arange
             var rec1 = new Recipe { Id = 3, Name = "", Description = "Description 3", CategoryId = 1 };
@@ -85,11 +92,11 @@ namespace HomeTask4.Core.Tests.ControllerTests
             };
             _unitOfWork.Setup(u => u.Repository).Returns(repos.Object);
             repos.Setup(r => r.AddAsync<Recipe>(It.IsAny<Recipe>())).Callback((Recipe some) => mockDB.Add(some));
-            repos.Setup(r => r.ListAsync<Recipe>()).ReturnsAsync(mockDB);
+            repos.Setup(r => r.SingleOrDefaultAsync<Recipe>(It.IsAny<Expression<Func<Recipe, bool>>>()));
             repos.Setup(r => r.GetByIdAsync<Recipe>(rec1.Id)).ReturnsAsync((int a) => mockDB.FirstOrDefault(x => x.Id == a));
             //Act + Assert
             var aEx = await Assert.ThrowsAsync<ArgumentException>(async () => await _recCont.CreateRecipeAsync(rec1));
-            repos.Verify(repos => repos.ListAsync<Recipe>(), Times.Never);
+            repos.Verify(r => r.SingleOrDefaultAsync<Recipe>(It.IsAny<Expression<Func<Recipe, bool>>>()), Times.Never);
             repos.Verify(repos => repos.GetByIdAsync<Recipe>(rec1.Id), Times.Never);
             Assert.Contains("Name is empty", aEx.Message);
         }
@@ -105,11 +112,6 @@ namespace HomeTask4.Core.Tests.ControllerTests
             List<IngredientDetail> mockIDDB = GetIngredientDetails();
             var repos = new Mock<IRepository>();
             _unitOfWork.Setup(u => u.Repository).Returns(repos.Object);
-            //----------------------------------------------------------------------------------------------------------------------------------------//
-            repos.Setup(r => r.ListAsync<Recipe>()).ReturnsAsync(mockRecipeDB);
-            repos.Setup(r => r.ListAsync<Measure>()).ReturnsAsync(mockMeasureDB);
-            repos.Setup(r => r.ListAsync<Ingredient>()).ReturnsAsync(mockIngredientDB);
-            repos.Setup(r => r.ListAsync<IngredientDetail>()).ReturnsAsync(mockIDDB);
             //----------------------------------------------------------------------------------------------------------------------------------------//
             repos.Setup(r => r.AddAsync<Measure>(It.IsAny<Measure>()))
                 .Callback((Measure some) => {
@@ -133,17 +135,21 @@ namespace HomeTask4.Core.Tests.ControllerTests
                     mockIDDB.SingleOrDefault(x => x.RecipeId == some.RecipeId && x.IngredientId == x.IngredientId).Amount+=some.Amount;
                 });
             #endregion
+            repos.Setup(r => r.SingleOrDefaultAsync<Recipe>(It.IsAny<Expression<Func<Recipe, bool>>>())).ReturnsAsync((Recipe)null);
+            repos.Setup(r => r.SingleOrDefaultAsync<Measure>(It.IsAny<Expression<Func<Measure, bool>>>()));
+            repos.Setup(r => r.SingleOrDefaultAsync<Ingredient>(It.IsAny<Expression<Func<Ingredient, bool>>>()));
+            repos.Setup(r => r.SingleOrDefaultAsync<IngredientDetail>(It.IsAny<Expression<Func<IngredientDetail, bool>>>()));
 
-            Recipe targerRecipe1 = new Recipe { Name = "Recipe 1", CategoryId = 1 }; // Non-existent in DB recipe
+            Recipe targerRecipe1 = new Recipe {Id = 0, Name = "Recipe 1", CategoryId = 1 }; // Non-existent in DB recipe
             string ingName = "beef";
             double amount = 800;
             string measure = "g";
             //Act + Assert
             var argEx1 = await Assert.ThrowsAsync<ArgumentException>(async () =>await  _recCont.AddIngredientToRecipeAsync(targerRecipe1, ingName, measure, amount));
-            repos.Verify(repos => repos.ListAsync<Recipe>(), Times.Once);
-            repos.Verify(repos => repos.ListAsync<Measure>(), Times.Never);
-            repos.Verify(repos => repos.ListAsync<Ingredient>(), Times.Never);
-            repos.Verify(repos => repos.ListAsync<IngredientDetail>(), Times.Never);
+            repos.Verify(r => r.SingleOrDefaultAsync<Recipe>(It.IsAny<Expression<Func<Recipe, bool>>>()),Times.Once);
+            repos.Verify(r => r.SingleOrDefaultAsync<Measure>(It.IsAny<Expression<Func<Measure, bool>>>()), Times.Never);
+            repos.Verify(r => r.SingleOrDefaultAsync<Ingredient>(It.IsAny<Expression<Func<Ingredient, bool>>>()), Times.Never);
+            repos.Verify(r => r.SingleOrDefaultAsync<IngredientDetail>(It.IsAny<Expression<Func<IngredientDetail, bool>>>()), Times.Never);
             repos.Verify(repos => repos.AddAsync<Measure>(It.IsAny<Measure>()), Times.Never);
             repos.Verify(repos => repos.AddAsync<Ingredient>(It.IsAny<Ingredient>()), Times.Never);
             repos.Verify(repos => repos.AddAsync<IngredientDetail>(It.IsAny<IngredientDetail>()), Times.Never);
@@ -161,11 +167,6 @@ namespace HomeTask4.Core.Tests.ControllerTests
             List<IngredientDetail> mockIDDB = GetIngredientDetails();
             var repos = new Mock<IRepository>();
             _unitOfWork.Setup(u => u.Repository).Returns(repos.Object);
-            //----------------------------------------------------------------------------------------------------------------------------------------//
-            repos.Setup(r => r.ListAsync<Recipe>()).ReturnsAsync(mockRecipeDB);
-            repos.Setup(r => r.ListAsync<Measure>()).ReturnsAsync(mockMeasureDB);
-            repos.Setup(r => r.ListAsync<Ingredient>()).ReturnsAsync(mockIngredientDB);
-            repos.Setup(r => r.ListAsync<IngredientDetail>()).ReturnsAsync(mockIDDB);
             //----------------------------------------------------------------------------------------------------------------------------------------//
             repos.Setup(r => r.AddAsync<Measure>(It.IsAny<Measure>()))
                  .Callback((Measure some) => {
@@ -189,17 +190,20 @@ namespace HomeTask4.Core.Tests.ControllerTests
                     mockIDDB.SingleOrDefault(x => x.RecipeId == some.RecipeId && x.IngredientId == x.IngredientId).Amount += some.Amount;
                 });
             #endregion
-
+            repos.Setup(r => r.SingleOrDefaultAsync<Recipe>(It.IsAny<Expression<Func<Recipe, bool>>>()));
+            repos.Setup(r => r.SingleOrDefaultAsync<Measure>(It.IsAny<Expression<Func<Measure, bool>>>()));
+            repos.Setup(r => r.SingleOrDefaultAsync<Ingredient>(It.IsAny<Expression<Func<Ingredient, bool>>>()));
+            repos.Setup(r => r.SingleOrDefaultAsync<IngredientDetail>(It.IsAny<Expression<Func<IngredientDetail, bool>>>()));
             Recipe targerRecipe1 = new Recipe { Id = 1 , Name = "Recipe 1", CategoryId = 1 }; // Non-existent in DB recipe
             string ingName = "";
             double amount = 800;
             string measure = "g";
             //Act + Assert
             var argEx1 = await Assert.ThrowsAsync<ArgumentException>(async () => await _recCont.AddIngredientToRecipeAsync(targerRecipe1, ingName, measure, amount));
-            repos.Verify(repos => repos.ListAsync<Recipe>(), Times.Never);
-            repos.Verify(repos => repos.ListAsync<Measure>(), Times.Never);
-            repos.Verify(repos => repos.ListAsync<Ingredient>(), Times.Never);
-            repos.Verify(repos => repos.ListAsync<IngredientDetail>(), Times.Never);
+            repos.Verify(r => r.SingleOrDefaultAsync<Recipe>(It.IsAny<Expression<Func<Recipe, bool>>>()), Times.Never);
+            repos.Verify(r => r.SingleOrDefaultAsync<Measure>(It.IsAny<Expression<Func<Measure, bool>>>()), Times.Never);
+            repos.Verify(r => r.SingleOrDefaultAsync<Ingredient>(It.IsAny<Expression<Func<Ingredient, bool>>>()), Times.Never);
+            repos.Verify(r => r.SingleOrDefaultAsync<IngredientDetail>(It.IsAny<Expression<Func<IngredientDetail, bool>>>()), Times.Never);
             repos.Verify(repos => repos.AddAsync<Measure>(It.IsAny<Measure>()), Times.Never);
             repos.Verify(repos => repos.AddAsync<Ingredient>(It.IsAny<Ingredient>()), Times.Never);
             repos.Verify(repos => repos.AddAsync<IngredientDetail>(It.IsAny<IngredientDetail>()), Times.Never);
@@ -217,11 +221,6 @@ namespace HomeTask4.Core.Tests.ControllerTests
             List<IngredientDetail> mockIDDB = GetIngredientDetails();
             var repos = new Mock<IRepository>();
             _unitOfWork.Setup(u => u.Repository).Returns(repos.Object);
-            //----------------------------------------------------------------------------------------------------------------------------------------//
-            repos.Setup(r => r.ListAsync<Recipe>()).ReturnsAsync(mockRecipeDB);
-            repos.Setup(r => r.ListAsync<Measure>()).ReturnsAsync(mockMeasureDB);
-            repos.Setup(r => r.ListAsync<Ingredient>()).ReturnsAsync(mockIngredientDB);
-            repos.Setup(r => r.ListAsync<IngredientDetail>()).ReturnsAsync(mockIDDB);
             //----------------------------------------------------------------------------------------------------------------------------------------//
             repos.Setup(r => r.AddAsync<Measure>(It.IsAny<Measure>()))
                 .Callback((Measure some) => { 
@@ -245,19 +244,28 @@ namespace HomeTask4.Core.Tests.ControllerTests
                     mockIDDB.SingleOrDefault(x => x.RecipeId == some.RecipeId && x.IngredientId == x.IngredientId).Amount += some.Amount;
                 });
             #endregion
-
-            Recipe targerRecipe1 = new Recipe { Id = 1, Name = "Recipe 1", CategoryId = 1 }; // Non-existent in DB recipe
-            string ingName = "Salmon";
+            Recipe targetRecipe1 = new Recipe { Id = 1, Name = "Recipe 1", CategoryId = 1 }; // Non-existent in DB recipe
+            string ingName = "Salmon"; // id = 6
             double amount = 6;
-            string measure = "fille";
+            string measure = "fille"; //id = 5
+            IngredientDetail detail = new IngredientDetail { RecipeId = targetRecipe1.Id, IngredientId = 6, MeasureId = 5 };
+
+            repos.Setup(r => r.SingleOrDefaultAsync<Recipe>(x => string.Equals(x.Name, targetRecipe1.Name, StringComparison.OrdinalIgnoreCase) && x.CategoryId == targetRecipe1.CategoryId && x.Id == targetRecipe1.Id))
+                .ReturnsAsync(() => mockRecipeDB.SingleOrDefault(x => string.Equals(x.Name, targetRecipe1.Name, StringComparison.OrdinalIgnoreCase) && x.CategoryId == targetRecipe1.CategoryId && x.Id == targetRecipe1.Id));
+            repos.Setup(r => r.SingleOrDefaultAsync<Ingredient>(x => string.Equals(x.Name, ingName, StringComparison.OrdinalIgnoreCase)))
+                .ReturnsAsync(() => mockIngredientDB.SingleOrDefault(x => string.Equals(x.Name, ingName, StringComparison.OrdinalIgnoreCase)));
+            repos.Setup(r => r.SingleOrDefaultAsync<Measure>(x => string.Equals(x.Name, measure, StringComparison.OrdinalIgnoreCase)))
+                .ReturnsAsync(() => mockMeasureDB.SingleOrDefault(x => string.Equals(x.Name, measure, StringComparison.OrdinalIgnoreCase)));
+            repos.Setup(r => r.SingleOrDefaultAsync<IngredientDetail>(x => x.RecipeId == detail.RecipeId && x.IngredientId == detail.IngredientId))
+                .ReturnsAsync(() => mockIDDB.SingleOrDefault(x => x.RecipeId == detail.RecipeId && x.IngredientId == detail.IngredientId));
             //Act
-            await _recCont.AddIngredientToRecipeAsync(targerRecipe1, ingName, measure, amount);
-            IngredientDetail retrieved = mockIDDB.SingleOrDefault(x => x.RecipeId == targerRecipe1.Id && x.IngredientId == mockIngredientDB.SingleOrDefault(x => x.Name == ingName)?.Id);
+            await _recCont.AddIngredientToRecipeAsync(targetRecipe1, ingName, measure, amount);
+            IngredientDetail retrieved = mockIDDB.SingleOrDefault(x => x.RecipeId == targetRecipe1.Id && x.IngredientId == mockIngredientDB.SingleOrDefault(x => x.Name == ingName)?.Id);
             //Assert
-            repos.Verify(repos => repos.ListAsync<Recipe>(), Times.Once);
-            repos.Verify(repos => repos.ListAsync<Measure>(), Times.Once);
-            repos.Verify(repos => repos.ListAsync<Ingredient>(), Times.Once);
-            repos.Verify(repos => repos.ListAsync<IngredientDetail>(), Times.Once);
+            repos.Verify(r => r.SingleOrDefaultAsync<Recipe>(It.IsAny<Expression<Func<Recipe, bool>>>()), Times.Once);
+            repos.Verify(r => r.SingleOrDefaultAsync<Measure>(It.IsAny<Expression<Func<Measure, bool>>>()), Times.Once);
+            repos.Verify(r => r.SingleOrDefaultAsync<Ingredient>(It.IsAny<Expression<Func<Ingredient, bool>>>()), Times.Once);
+            repos.Verify(r => r.SingleOrDefaultAsync<IngredientDetail>(It.IsAny<Expression<Func<IngredientDetail, bool>>>()), Times.Once);
             repos.Verify(repos => repos.AddAsync<Measure>(It.IsAny<Measure>()), Times.Once);
             repos.Verify(repos => repos.AddAsync<Ingredient>(It.IsAny<Ingredient>()), Times.Once);
             repos.Verify(repos => repos.AddAsync<IngredientDetail>(It.IsAny<IngredientDetail>()), Times.Once);

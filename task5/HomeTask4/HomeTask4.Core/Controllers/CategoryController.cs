@@ -6,14 +6,12 @@ using Microsoft.Extensions.Logging;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
-
 namespace HomeTask4.Core.Controllers
 {
     public class CategoryController : BaseController
     {
-        public CategoryController(IUnitOfWork unitOfWork, ILogger<CategoryController> logger) : base(unitOfWork)
+        public CategoryController(IUnitOfWork unitOfWork, ILogger<CategoryController> logger) : base(unitOfWork, logger)
         {
-            _logger = logger;
         }
 
         
@@ -22,42 +20,46 @@ namespace HomeTask4.Core.Controllers
             try
             {
                 await CreateCategoryAsync(category);
-            } catch (Exception e)
-            {
-                _logger.LogInformation(e.Message , e);
-                return false;
             }
-            bool result = await _unitOfWork.Repository.GetByIdAsync<Category>(category.Id) != null;
+            catch (ArgumentNullException b)
+            {
+                Logger.LogInformation(b.Message, b);
+            }
+            catch (ArgumentException a)
+            {
+                Logger.LogInformation(a.Message, a);
+            } 
+            bool result = await UnitOfWork.Repository.GetByIdAsync<Category>(category.Id) != null;
             return result;
         }
-        public async Task<bool> TryCreateCategoryAsync(string categoryName, int? parentId)
+        public Task<bool> TryCreateCategoryAsync(string categoryName, int? parentId) 
         {
             if (String.IsNullOrEmpty(categoryName))
             {
                 throw new ArgumentException("Name is null or empty.");
             }
-            return await TryCreateCategoryAsync(new Category { Name = categoryName, ParentId = parentId });
+            return TryCreateCategoryAsync(new Category { Name = categoryName, ParentId = parentId });
         }
 
         public async Task CreateCategoryAsync(Category category) 
         {
             if (category == null) throw new ArgumentNullException($"Category reference is null.");
             if (category.Name.IsNullOrEmpty()) throw new ArgumentException("Category name is empty!");
-            var item = (await _unitOfWork.Repository.ListAsync<Category>()).SingleOrDefault(x => string.Equals(x.Name, category.Name, StringComparison.OrdinalIgnoreCase) && x.ParentId == category.ParentId);
+            var item = (await UnitOfWork.Repository.SingleOrDefaultAsync<Category>(x => string.Equals(x.Name, category.Name, StringComparison.OrdinalIgnoreCase) && x.ParentId == category.ParentId));
             if (item != null)
             {
                 throw new ArgumentException("This category already exists !");
             }
             if (category.ParentId != null)
             {
-                category.Parent = GetParentCategoryAsync(category.ParentId).Result;
+                category.Parent = (await GetParentCategoryAsync(category.ParentId));
             }
-            await _unitOfWork.Repository.AddAsync<Category>(category);
+            await UnitOfWork.Repository.AddAsync<Category>(category);
         }
 
-        private async Task<Category> GetParentCategoryAsync(int? parentId)
+        private Task<Category> GetParentCategoryAsync(int? parentId)
         {
-            return (await _unitOfWork.Repository.ListAsync<Category>()).FirstOrDefault(x => x.Id == parentId);
+            return UnitOfWork.Repository.GetByIdAsync<Category>(parentId.GetValueOrDefault());
         }
     }
 }

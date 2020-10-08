@@ -163,7 +163,7 @@ namespace HomeTask4.Cmd
             try
             {
                 result = await catCont.TryCreateCategoryAsync(name, targetCategory?.Id);
-            } catch (Exception)
+            } catch ( Exception )
             {
                 Console.WriteLine("Creating category is not possible!");
                 Console.ReadKey();

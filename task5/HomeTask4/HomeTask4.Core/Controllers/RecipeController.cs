@@ -11,20 +11,19 @@ namespace HomeTask4.Core.Controllers
 {
     public class RecipeController : BaseController
     {
-        public RecipeController(IUnitOfWork unitOfWork, ILogger<RecipeController> logger) : base(unitOfWork)
+        public RecipeController(IUnitOfWork unitOfWork, ILogger<RecipeController> logger) : base(unitOfWork, logger)
         {
-            _logger = logger;
         }
 
 
-        public async Task<bool> TryCreateRecipeAsync(string name, string description, int? categoryId)
+        public Task<bool> TryCreateRecipeAsync(string name, string description, int? categoryId)
         {
             if (name.IsNullOrEmpty() || description.IsNullOrEmpty() || categoryId == null)
             {
                 throw new ArgumentException("One of the fields is null or empty.");
             }
 
-            return await TryCreateRecipeAsync(new Recipe { Name = name, Description = description, CategoryId = categoryId });
+            return TryCreateRecipeAsync(new Recipe { Name = name, Description = description, CategoryId = categoryId });
         }
         public async Task<bool> TryCreateRecipeAsync(Recipe recipe) 
         {
@@ -33,11 +32,11 @@ namespace HomeTask4.Core.Controllers
                 await CreateRecipeAsync(recipe);
             } catch (Exception e)
             {
-                _logger.LogInformation(e.Message, e);
+                Logger.LogInformation(e.Message, e);
                 return false;
             }
             
-            bool result = await _unitOfWork.Repository.GetByIdAsync<Recipe>(recipe.Id) != null;
+            bool result = await UnitOfWork.Repository.GetByIdAsync<Recipe>(recipe.Id) != null;
             return result;
         }
 
@@ -45,12 +44,12 @@ namespace HomeTask4.Core.Controllers
         {
             if (recipe == null) throw new ArgumentNullException("Recipe reference is null.");
             if (recipe.Name.IsNullOrEmpty()) throw new ArgumentException("Name is empty.");
-            var checker = (await _unitOfWork.Repository.ListAsync<Recipe>()).SingleOrDefault(x => string.Equals(x.Name, recipe.Name, StringComparison.OrdinalIgnoreCase) && x.CategoryId == recipe.CategoryId);
+            var checker = (await UnitOfWork.Repository.SingleOrDefaultAsync<Recipe>(x => string.Equals(x.Name, recipe.Name, StringComparison.OrdinalIgnoreCase) && x.CategoryId == recipe.CategoryId));
             if (checker != null)
             {
                 throw new ArgumentException($"Recipe {checker.Name} : {checker.Id} already exists");
             }
-            await _unitOfWork.Repository.AddAsync<Recipe>(recipe);
+            await UnitOfWork.Repository.AddAsync<Recipe>(recipe);
         }
 
         public Recipe PrepareRecipe(string name, string description)
@@ -65,37 +64,37 @@ namespace HomeTask4.Core.Controllers
         {
             if (ingredientName.IsNullOrEmpty()) throw new ArgumentException("IngredientName is empty.");
 
-            var checkRecipe = (await _unitOfWork.Repository.ListAsync<Recipe>()).SingleOrDefault(x => string.Equals(x.Name, recipe.Name, StringComparison.OrdinalIgnoreCase) && x.CategoryId == recipe.CategoryId && x.Id == recipe.Id);
+            var checkRecipe = (await UnitOfWork.Repository.SingleOrDefaultAsync<Recipe>(x => string.Equals(x.Name, recipe.Name, StringComparison.OrdinalIgnoreCase) && x.CategoryId == recipe.CategoryId && x.Id == recipe.Id));
             if (checkRecipe == null)
             {
                 throw new ArgumentException($"Recipe {recipe.Name} : {recipe.Id} doesn't exist in Database.");
             }
 
-            var ingred = (await _unitOfWork.Repository.ListAsync<Ingredient>()).SingleOrDefault(x => string.Equals(x.Name, ingredientName, StringComparison.OrdinalIgnoreCase));
+            var ingred = (await UnitOfWork.Repository.SingleOrDefaultAsync<Ingredient>(x => string.Equals(x.Name, ingredientName, StringComparison.OrdinalIgnoreCase)));
             if (ingred == null)
             {
                 ingred = new Ingredient { Name = ingredientName};
-                await _unitOfWork.Repository.AddAsync<Ingredient>(ingred);
+                await UnitOfWork.Repository.AddAsync<Ingredient>(ingred);
             }
             
-            var measuredIn = (await _unitOfWork.Repository.ListAsync<Measure>()).SingleOrDefault(x => string.Equals(x.Name, measure, StringComparison.OrdinalIgnoreCase));
+            var measuredIn = (await UnitOfWork.Repository.SingleOrDefaultAsync<Measure>(x => string.Equals(x.Name, measure, StringComparison.OrdinalIgnoreCase)));
             if( measuredIn == null)
             {
                 measuredIn = new Measure { Name = measure };
-                await _unitOfWork.Repository.AddAsync<Measure>(measuredIn);
+                await UnitOfWork.Repository.AddAsync<Measure>(measuredIn);
             }
 
             var ingDetail = new IngredientDetail() { RecipeId = recipe.Id, IngredientId = ingred.Id, Amount = amount , MeasureId = measuredIn.Id };
 
-            var checkerDetail = (await _unitOfWork.Repository.ListAsync<IngredientDetail>()).SingleOrDefault(x => x.RecipeId == ingDetail.RecipeId && x.IngredientId == ingDetail.IngredientId);
+            var checkerDetail = (await UnitOfWork.Repository.SingleOrDefaultAsync<IngredientDetail>(x => x.RecipeId == ingDetail.RecipeId && x.IngredientId == ingDetail.IngredientId));
             if (checkerDetail != null)
             {
                 checkerDetail.Amount += ingDetail.Amount;
-                await _unitOfWork.Repository.UpdateAsync<IngredientDetail>(checkerDetail);
+                await UnitOfWork.Repository.UpdateAsync<IngredientDetail>(checkerDetail);
             }
             else
             {
-                await _unitOfWork.Repository.AddAsync<IngredientDetail>(ingDetail);
+                await UnitOfWork.Repository.AddAsync<IngredientDetail>(ingDetail);
             }
         }
 
