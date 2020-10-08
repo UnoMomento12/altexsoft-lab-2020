@@ -160,17 +160,19 @@ namespace HomeTask4.Cmd
             Console.Write("Enter Category Name:");
             string name = Console.ReadLine().Trim();
             bool result;
-            result = await catCont.TryCreateCategoryAsync(name, targetCategory?.Id);
-            if (result)
+            try
             {
-                Console.WriteLine("Category created succesfully!");
-                await navig.UpdateSubItems();
-            }
-            else
+                result = await catCont.TryCreateCategoryAsync(name, targetCategory?.Id);
+            } catch ( Exception )
             {
                 Console.WriteLine("Creating category is not possible!");
                 Console.ReadKey();
                 return;
+            }
+            if (result)
+            {
+                Console.WriteLine("Category created succesfully!");
+                await navig.UpdateSubItems();
             }
         }
         private static Category SetTargetCategory(Navigator navig, NavigatorItem item)

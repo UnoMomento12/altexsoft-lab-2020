@@ -25,17 +25,17 @@ namespace HomeTask4.Core.Controllers
             catch (ArgumentNullException b)
             {
                 Logger.LogInformation(b.Message, b);
-                throw b;
+                throw;
             }
             catch (ArgumentException a)
             {
                 Logger.LogInformation(a.Message, a);
-                throw a;
+                throw;
             } 
             bool result = await UnitOfWork.Repository.GetByIdAsync<Category>(category.Id) != null;
             return result;
         }
-        public Task<bool> TryCreateCategoryAsync(string categoryName, int? parentId)
+        public Task<bool> TryCreateCategoryAsync(string categoryName, int? parentId) 
         {
             if (String.IsNullOrEmpty(categoryName))
             {
