@@ -23,7 +23,7 @@ namespace HomeTask4.Core.Navigator
         }
         public async Task StartNavigator()
         {
-             (await _unitOfWork.Repository.ListAsync<Category>()).Where(x => x.ParentId == null).ToList().ForEach(x => _subItems.Add(x));
+             (await _unitOfWork.Repository.WhereAsync<Category>(x => x.ParentId == null)).ForEach(x => _subItems.Add(x));
             _recipesStart = _subItems.Count;
         }
         public async Task MoveTo(int id)
@@ -140,11 +140,11 @@ namespace HomeTask4.Core.Navigator
         public async Task UpdateSubItems()
         {
             _subItems.Clear();
-            (await _unitOfWork.Repository.ListAsync<Category>()).Where(x => x.Parent == _current).ToList().ForEach(x => _subItems.Add(x));
+            (await _unitOfWork.Repository.WhereAsync<Category>(x => x.Parent == _current)).ForEach(x => _subItems.Add(x));
             _recipesStart = _subItems.Count;
             if (_current != null)
             {
-                (await _unitOfWork.Repository.ListAsync<Recipe>()).Where(x => x.CategoryId == _current.Id).ToList().ForEach(x => _subItems.Add(x));
+                (await _unitOfWork.Repository.WhereAsync<Recipe>(x => x.CategoryId == _current.Id)).ForEach(x => _subItems.Add(x));
             }
         }
 

@@ -1,9 +1,11 @@
 ﻿using HomeTask4.SharedKernel;
 using HomeTask4.SharedKernel.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-
+using System.Linq.Expressions;
+using System.Linq;
 namespace HomeTask4.Infrastructure.Data.Repositories
 {
     public class Repository : IRepository 
@@ -40,6 +42,16 @@ namespace HomeTask4.Infrastructure.Data.Repositories
         {
             _context.Set<T>().Update(entity);
             return _context.SaveChangesAsync();
+        }
+
+        public async Task<T> SingleOrDefaultAsync<T>(Expression<Func<T, bool>> predicate) where T : BaseEntity
+        {
+            return await _context.Set<T>().SingleOrDefaultAsync(predicate);
+        }
+
+        public Task<List<T>> WhereAsync<T>(Expression<Func<T, bool>> predicate) where T : BaseEntity
+        {
+            return _context.Set<T>().Where(predicate).ToListAsync();
         }
     }
 }

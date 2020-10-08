@@ -7,16 +7,15 @@ namespace HomeTask4.Core.Controllers
 {
     public class RecipeStepController : BaseController
     {
-        public RecipeStepController(IUnitOfWork unitOfWork, ILogger<RecipeStepController> logger) : base(unitOfWork)
+        public RecipeStepController(IUnitOfWork unitOfWork, ILogger<RecipeStepController> logger) : base(unitOfWork, logger)
         {
-            _logger = logger;
         }
         
         public async Task AddStepsAsync(List<RecipeStep> steps)
         {
             foreach( RecipeStep a in steps)
             {
-                await _unitOfWork.Repository.AddAsync<RecipeStep>(a);
+                await UnitOfWork.Repository.AddAsync<RecipeStep>(a);
             }
         }
 

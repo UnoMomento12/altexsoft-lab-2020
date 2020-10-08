@@ -4,9 +4,8 @@ namespace HomeTask4.Core.Controllers
 {
     public class MeasureController : BaseController
     {
-        public MeasureController(IUnitOfWork unitOfWork, ILogger<MeasureController> logger) : base(unitOfWork)
+        public MeasureController(IUnitOfWork unitOfWork, ILogger<MeasureController> logger) : base(unitOfWork, logger)
         {
-            _logger = logger;
         }
     }
 }

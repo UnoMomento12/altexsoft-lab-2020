@@ -4,12 +4,13 @@ namespace HomeTask4.Core.Controllers
 {
     public abstract class BaseController 
     {
-        protected IUnitOfWork _unitOfWork;
-        protected ILogger _logger;
+        protected IUnitOfWork UnitOfWork;
+        protected ILogger Logger;
 
-        protected BaseController(IUnitOfWork unitOfWork)
+        protected BaseController(IUnitOfWork unitOfWork , ILogger<BaseController> logger)
         {
-            _unitOfWork = unitOfWork;
+            UnitOfWork = unitOfWork;
+            Logger = logger;
         }
     }
 }

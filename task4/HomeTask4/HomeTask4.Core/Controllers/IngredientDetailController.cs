@@ -4,9 +4,8 @@ namespace HomeTask4.Core.Controllers
 {
     public class IngredientDetailController : BaseController
     {
-        public IngredientDetailController(IUnitOfWork unitOfWork, ILogger<IngredientDetailController> logger) : base(unitOfWork)
+        public IngredientDetailController(IUnitOfWork unitOfWork, ILogger<IngredientDetailController> logger) : base(unitOfWork, logger)
         {
-            _logger = logger;
         }
     }
 }
