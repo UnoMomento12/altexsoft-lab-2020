@@ -47,10 +47,6 @@ namespace HomeTask4.Core.Controllers
 
         public Recipe PrepareRecipe(string name, string description)
         {
-            if(name.IsNullOrEmpty() || description.IsNullOrEmpty())
-            {
-                throw new ArgumentException("Name or description is empty");
-            }
             return new Recipe() { Name = name, Description = description};
         }
         public async Task AddIngredientToRecipeAsync(Recipe recipe, string ingredientName, string measure, double amount)
