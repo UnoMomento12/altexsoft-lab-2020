@@ -14,36 +14,29 @@ namespace HomeTask4.Core.Controllers
         public RecipeController(IUnitOfWork unitOfWork, ILogger<RecipeController> logger) : base(unitOfWork, logger)
         {
         }
-
-
-        public Task<bool> TryCreateRecipeAsync(string name, string description, int? categoryId)
-        {
-            if (name.IsNullOrEmpty() || description.IsNullOrEmpty() || categoryId == null)
-            {
-                throw new ArgumentException("One of the fields is null or empty.");
-            }
-
-            return TryCreateRecipeAsync(new Recipe { Name = name, Description = description, CategoryId = categoryId });
-        }
         public async Task<bool> TryCreateRecipeAsync(Recipe recipe) 
         {
+            if (recipe == null) return false;
             try
             {
                 await CreateRecipeAsync(recipe);
-            } catch (Exception e)
+            } catch (ArgumentNullException nullException)
             {
-                Logger.LogInformation(e.Message, e);
-                return false;
+                Logger.LogInformation(nullException.Message, nullException.InnerException, nullException.StackTrace);
             }
-            
+            catch (ArgumentException argumentException)
+            {
+                Logger.LogInformation(argumentException.Message, argumentException.InnerException, argumentException.StackTrace);
+            }
             bool result = await UnitOfWork.Repository.GetByIdAsync<Recipe>(recipe.Id) != null;
             return result;
         }
 
-        public async Task CreateRecipeAsync(Recipe recipe)
+        private async Task CreateRecipeAsync(Recipe recipe)// everything is thrown here
         {
             if (recipe == null) throw new ArgumentNullException("Recipe reference is null.");
-            if (recipe.Name.IsNullOrEmpty()) throw new ArgumentException("Name is empty.");
+            if (recipe.Name.IsNullOrEmpty()) throw new ArgumentException("Recipe name is null or empty.");
+            if (recipe.Description.IsNullOrEmpty()) throw new ArgumentException("Recipe description is null or empty.");
             var checker = (await UnitOfWork.Repository.FirstOrDefaultAsync<Recipe>(x => x.Name.ToLower() == recipe.Name.ToLower() && x.CategoryId == recipe.CategoryId));
             if (checker != null)
             {
@@ -62,6 +55,7 @@ namespace HomeTask4.Core.Controllers
         }
         public async Task AddIngredientToRecipeAsync(Recipe recipe, string ingredientName, string measure, double amount)
         {
+            if (recipe == null) throw new ArgumentException("Recipe reference is null.");
             if (ingredientName.IsNullOrEmpty()) throw new ArgumentException("IngredientName is empty.");
 
             var checkRecipe = (await UnitOfWork.Repository.FirstOrDefaultAsync<Recipe>(x => x.Name.ToLower() == recipe.Name.ToLower() && x.CategoryId == recipe.CategoryId && x.Id == recipe.Id));

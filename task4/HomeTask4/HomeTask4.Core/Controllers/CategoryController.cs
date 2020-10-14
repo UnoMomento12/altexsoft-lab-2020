@@ -15,36 +15,31 @@ namespace HomeTask4.Core.Controllers
         }
 
         
-        public async Task<bool> TryCreateCategoryAsync(Category category)
+        private async Task<bool> TryCreateCategoryAsync(Category category)
         {
+            if (category == null) return false;
             try
             {
                 await CreateCategoryAsync(category);
-            }
-            catch (ArgumentNullException b)
+            } catch (ArgumentNullException nullException)
             {
-                Logger.LogInformation(b.Message, b);
-            }
-            catch (ArgumentException a)
+                Logger.LogInformation(nullException.Message, nullException.InnerException, nullException.StackTrace);
+            } catch( ArgumentException argumentException)
             {
-                Logger.LogInformation(a.Message, a);
+                Logger.LogInformation(argumentException.Message, argumentException.InnerException, argumentException.StackTrace);
             } 
             bool result = await UnitOfWork.Repository.GetByIdAsync<Category>(category.Id) != null;
             return result;
         }
         public Task<bool> TryCreateCategoryAsync(string categoryName, int? parentId) 
         {
-            if (String.IsNullOrEmpty(categoryName))
-            {
-                throw new ArgumentException("Name is null or empty.");
-            }
             return TryCreateCategoryAsync(new Category { Name = categoryName, ParentId = parentId });
         }
 
-        public async Task CreateCategoryAsync(Category category) 
+        private async Task CreateCategoryAsync(Category category) //everything is thrown here and moves up
         {
             if (category == null) throw new ArgumentNullException($"Category reference is null.");
-            if (category.Name.IsNullOrEmpty()) throw new ArgumentException("Category name is empty!");
+            if (category.Name.IsNullOrEmpty()) throw new ArgumentException("Category name is null or empty!");
             var item = (await UnitOfWork.Repository.FirstOrDefaultAsync<Category>(x => x.Name.ToLower() == category.Name.ToLower() && x.ParentId == category.ParentId));
             if (item != null)
             {
