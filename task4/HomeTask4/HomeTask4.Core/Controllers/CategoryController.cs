@@ -45,7 +45,7 @@ namespace HomeTask4.Core.Controllers
         {
             if (category == null) throw new ArgumentNullException($"Category reference is null.");
             if (category.Name.IsNullOrEmpty()) throw new ArgumentException("Category name is empty!");
-            var item = (await UnitOfWork.Repository.SingleOrDefaultAsync<Category>(x => string.Equals(x.Name, category.Name, StringComparison.OrdinalIgnoreCase) && x.ParentId == category.ParentId));
+            var item = (await UnitOfWork.Repository.FirstOrDefaultAsync<Category>(x => x.Name.ToLower() == category.Name.ToLower() && x.ParentId == category.ParentId));
             if (item != null)
             {
                 throw new ArgumentException("This category already exists !");

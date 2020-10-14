@@ -13,10 +13,7 @@ namespace HomeTask4.Core.Controllers
         
         public async Task AddStepsAsync(List<RecipeStep> steps)
         {
-            foreach( RecipeStep a in steps)
-            {
-                await UnitOfWork.Repository.AddAsync<RecipeStep>(a);
-            }
+            await UnitOfWork.Repository.AddRangeAsync<RecipeStep>(steps);
         }
 
     }
