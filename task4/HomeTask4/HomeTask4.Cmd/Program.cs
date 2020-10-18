@@ -147,7 +147,7 @@ namespace HomeTask4.Cmd
                     await recCont.AddIngredientToRecipeAsync(recipeToAdd, name, measure, amount);
                 } catch (Exception outer)
                 {
-                    _logger.LogInformation(outer.Message, outer.InnerException.Message, outer.StackTrace);
+                    _logger.LogInformation(outer.Message);
                     Console.WriteLine("Ingredient wasn't added to recipe, please try again");
                 }
                 

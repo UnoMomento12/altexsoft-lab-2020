@@ -22,11 +22,11 @@ namespace HomeTask4.Core.Controllers
                 await CreateRecipeAsync(recipe);
             } catch (ArgumentNullException nullException)
             {
-                Logger.LogInformation(nullException.Message, nullException.InnerException, nullException.StackTrace);
+                Logger.LogInformation(nullException.Message);
             }
             catch (ArgumentException argumentException)
             {
-                Logger.LogInformation(argumentException.Message, argumentException.InnerException, argumentException.StackTrace);
+                Logger.LogInformation(argumentException.Message);
             }
             bool result = await UnitOfWork.Repository.GetByIdAsync<Recipe>(recipe.Id) != null;
             return result;

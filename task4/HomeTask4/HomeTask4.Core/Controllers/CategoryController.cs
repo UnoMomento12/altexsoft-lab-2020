@@ -23,10 +23,10 @@ namespace HomeTask4.Core.Controllers
                 await CreateCategoryAsync(category);
             } catch (ArgumentNullException nullException)
             {
-                Logger.LogInformation(nullException.Message, nullException.InnerException, nullException.StackTrace);
+                Logger.LogInformation(nullException.Message);
             } catch( ArgumentException argumentException)
             {
-                Logger.LogInformation(argumentException.Message, argumentException.InnerException, argumentException.StackTrace);
+                Logger.LogInformation(argumentException.Message);
             } 
             bool result = await UnitOfWork.Repository.GetByIdAsync<Category>(category.Id) != null;
             return result;
