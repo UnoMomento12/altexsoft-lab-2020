@@ -23,10 +23,12 @@ namespace HomeTask4.Core.Controllers
             } catch (ArgumentNullException nullException)
             {
                 Logger.LogInformation(nullException.Message);
+                throw;
             }
             catch (ArgumentException argumentException)
             {
                 Logger.LogInformation(argumentException.Message);
+                throw;
             }
             bool result = await UnitOfWork.Repository.GetByIdAsync<Recipe>(recipe.Id) != null;
             return result;

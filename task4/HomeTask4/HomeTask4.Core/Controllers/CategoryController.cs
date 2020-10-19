@@ -15,7 +15,7 @@ namespace HomeTask4.Core.Controllers
         }
 
         
-        private async Task<bool> TryCreateCategoryAsync(Category category)
+        public async Task<bool> TryCreateCategoryAsync(Category category)
         {
             if (category == null) return false;
             try
@@ -24,9 +24,11 @@ namespace HomeTask4.Core.Controllers
             } catch (ArgumentNullException nullException)
             {
                 Logger.LogInformation(nullException.Message);
+                throw;
             } catch( ArgumentException argumentException)
             {
                 Logger.LogInformation(argumentException.Message);
+                throw;
             } 
             bool result = await UnitOfWork.Repository.GetByIdAsync<Category>(category.Id) != null;
             return result;
@@ -40,7 +42,7 @@ namespace HomeTask4.Core.Controllers
         {
             if (category == null) throw new ArgumentNullException($"Category reference is null.");
             if (category.Name.IsNullOrEmpty()) throw new ArgumentException("Category name is null or empty!");
-            var item = (await UnitOfWork.Repository.FirstOrDefaultAsync<Category>(x => x.Name.ToLower() == category.Name.ToLower() && x.ParentId == category.ParentId));
+            var item = await UnitOfWork.Repository.FirstOrDefaultAsync<Category>(x => x.Name.ToLower() == category.Name.ToLower() && x.ParentId == category.ParentId);
             if (item != null)
             {
                 throw new ArgumentException("This category already exists !");

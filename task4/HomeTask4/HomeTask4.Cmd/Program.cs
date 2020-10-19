@@ -68,22 +68,24 @@ namespace HomeTask4.Cmd
             NavigatorItem item = NavigatorItem.Recipe;
             Category targetCategory = SetTargetCategory(navig, item);
             Recipe recipeToAdd;
-            bool result;
+            bool result = false;
             recipeToAdd = FormRecipe(recCont);
             recCont.SetCategoryInRecipe(targetCategory, recipeToAdd);
-            result = await recCont.TryCreateRecipeAsync(recipeToAdd);
+            try
+            {
+                result = await recCont.TryCreateRecipeAsync(recipeToAdd);
+            } catch (Exception)
+            {
+                Console.WriteLine("Creating recipe is not possible!");
+                Console.ReadKey();
+                return;
+            }
             if (result)
             {
                 await rsCont.AddStepsAsync(GatherSteps(recipeToAdd));
                 await FormIngredientListAsync(recipeToAdd, recCont);
                 await navig.UpdateSubItems();
                 Console.WriteLine("Recipe created succesfully!");
-            }
-            else
-            {
-                Console.WriteLine("Creating recipe is not possible!");
-                Console.ReadKey();
-                return;
             }
         }
         private static Recipe FormRecipe(RecipeController recCont)
@@ -160,17 +162,22 @@ namespace HomeTask4.Cmd
 
             Console.Write("Enter Category Name:");
             string name = Console.ReadLine().Trim();
-            bool result = await catCont.TryCreateCategoryAsync(name, targetCategory?.Id);
-            if (result)
+
+            bool result = false;
+            try
             {
-                Console.WriteLine("Category created succesfully!");
-                await navig.UpdateSubItems();
-            } else
+                result = await catCont.TryCreateCategoryAsync(name, targetCategory?.Id);
+            } catch (Exception)
             {
                 Console.WriteLine("Creating category is not possible!");
                 Console.ReadKey();
                 return;
             }
+            if (result)
+            {
+                Console.WriteLine("Category created succesfully!");
+                await navig.UpdateSubItems();
+            } 
         }
         private static Category SetTargetCategory(Navigator navig, NavigatorItem item)
         {
