@@ -20,9 +20,11 @@ namespace HomeTask4.Cmd
     }
     class Program
     {
+        private static ILogger<Program> _logger;
         static async Task Main(string[] args)
         {
             var host = CreateHostBuilder(args).Build();
+            _logger = host.Services.GetRequiredService<ILogger<Program>>();
             RecipeController recCont = host.Services.GetRequiredService<RecipeController>();
             CategoryController catCont = host.Services.GetRequiredService<CategoryController>();
             RecipeStepController rsCont = host.Services.GetRequiredService<RecipeStepController>();
@@ -65,12 +67,12 @@ namespace HomeTask4.Cmd
         {
             NavigatorItem item = NavigatorItem.Recipe;
             Category targetCategory = SetTargetCategory(navig, item);
-            Recipe recipeToAdd = null;
-            bool result;
+            Recipe recipeToAdd;
+            bool result = false;
+            recipeToAdd = FormRecipe(recCont);
+            recCont.SetCategoryInRecipe(targetCategory, recipeToAdd);
             try
             {
-                recipeToAdd = FormRecipe(recCont);
-                recCont.SetCategoryInRecipe(targetCategory, recipeToAdd);
                 result = await recCont.TryCreateRecipeAsync(recipeToAdd);
             } catch (Exception)
             {
@@ -145,8 +147,9 @@ namespace HomeTask4.Cmd
                 try
                 {
                     await recCont.AddIngredientToRecipeAsync(recipeToAdd, name, measure, amount);
-                } catch (ArgumentException)
+                } catch (Exception outer)
                 {
+                    _logger.LogInformation(outer.Message);
                     Console.WriteLine("Ingredient wasn't added to recipe, please try again");
                 }
                 
@@ -159,11 +162,12 @@ namespace HomeTask4.Cmd
 
             Console.Write("Enter Category Name:");
             string name = Console.ReadLine().Trim();
-            bool result;
+
+            bool result = false;
             try
             {
                 result = await catCont.TryCreateCategoryAsync(name, targetCategory?.Id);
-            } catch ( Exception )
+            } catch (Exception)
             {
                 Console.WriteLine("Creating category is not possible!");
                 Console.ReadKey();
@@ -173,7 +177,7 @@ namespace HomeTask4.Cmd
             {
                 Console.WriteLine("Category created succesfully!");
                 await navig.UpdateSubItems();
-            }
+            } 
         }
         private static Category SetTargetCategory(Navigator navig, NavigatorItem item)
         {

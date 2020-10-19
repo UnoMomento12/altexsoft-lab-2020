@@ -44,14 +44,20 @@ namespace HomeTask4.Infrastructure.Data.Repositories
             return _context.SaveChangesAsync();
         }
 
-        public async Task<T> SingleOrDefaultAsync<T>(Expression<Func<T, bool>> predicate) where T : BaseEntity
+        public Task<T> FirstOrDefaultAsync<T>(Expression<Func<T, bool>> predicate) where T : BaseEntity
         {
-            return await _context.Set<T>().SingleOrDefaultAsync(predicate);
+            return _context.Set<T>().FirstOrDefaultAsync(predicate);
         }
 
         public Task<List<T>> WhereAsync<T>(Expression<Func<T, bool>> predicate) where T : BaseEntity
         {
             return _context.Set<T>().Where(predicate).ToListAsync();
+        }
+
+        public async Task AddRangeAsync<T>(List<T> entities) where T : BaseEntity
+        {
+            await _context.Set<T>().AddRangeAsync(entities);
+            await _context.SaveChangesAsync();
         }
     }
 }
