@@ -1,9 +1,7 @@
 ﻿using HomeTask4.Core.Entities;
 using HomeTask4.SharedKernel;
 using HomeTask4.SharedKernel.Interfaces;
-using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace HomeTask4.Core.Navigator
@@ -12,145 +10,72 @@ namespace HomeTask4.Core.Navigator
     {
         private IUnitOfWork _unitOfWork;
         private Category _root;
-        private Category _current;
-        private List<BaseEntity> _subItems;
-        private int _recipesStart;
-        
+        public Category CurrentCategory { get; private set; }
+        public int RecipesStart { get; private set; }
+        public int ItemCount { get { return SubItems.Count; } }
+        public List<BaseEntity> SubItems { get; }
         public Navigator(IUnitOfWork unit)
         {
             _unitOfWork = unit;
-            _subItems = new List<BaseEntity>();
+            SubItems = new List<BaseEntity>();
         }
         public async Task StartNavigator()
         {
-             (await _unitOfWork.Repository.WhereAsync<Category>(x => x.ParentId == null)).ForEach(x => _subItems.Add(x));
-            _recipesStart = _subItems.Count;
+             (await _unitOfWork.Repository.WhereAsync<Category>(x => x.ParentId == null)).ForEach(x => SubItems.Add(x));
+            RecipesStart = SubItems.Count;
         }
-        public async Task MoveTo(int id)
+        public bool InCategoriesBounds(int id)
         {
-            bool inBounds = id > -1 && id < _subItems.Count;
-            if (!inBounds)
-            {
-                Console.WriteLine("No category/recipe with such an id");
-                return;
-            }
-            BaseEntity retrieved = _subItems[id];
-            if(retrieved is Category check) 
-            {
-                _root = _current;
-                _current = check;
-                await UpdateSubItems();
-            }    
-            else  
-            {
-                WriteRecipe((Recipe) retrieved);
-            }
+            return id > -1 && id < RecipesStart;
         }
-
-        public void WriteRecipe(Recipe recipe)
-        { 
-            Console.WriteLine("-------------------------------------------");
-            PrintColored($"Recipe name: {recipe.Name}", ConsoleColor.Green);
-            Console.WriteLine("Ingredients:");
-            foreach (var a in recipe.Ingredients)
-            {
-                Console.WriteLine(a.Ingredient.Name + " : " + a.Amount + " " + a.Measure.Name);
-            }
-            Console.WriteLine("Steps to cook:");
-            for(int i=0; i< recipe.Steps?.OrderBy(x=>x.StepNumber).Count(); i++)
-            {
-                PrintColored( (i+1) + ". " + recipe.Steps[i].Description , ConsoleColor.Cyan);
-            }
-            PrintColored($"Description: {recipe.Description}" , ConsoleColor.Yellow);
-            Console.WriteLine("-------------------------------------------");
-            Console.WriteLine("Press any button to close recipe!");
-            Console.ReadKey();
-        }
-        
-        public void WriteNavigator()
+        public async Task MoveToCategory(int id)
         {
-            Console.Clear();
-            Console.WriteLine("Navigator!");
-            if (_current == null)
-            {
-                WriteRootNavigator();
-            }
-            else
-            {
-                WriteFullNavigator();
-            }
+            BaseEntity retrieved = SubItems[id];
+            _root = CurrentCategory;
+            CurrentCategory = retrieved as Category;
+            await UpdateSubItems();
         }
-
-        private void WriteFullNavigator()
+        public bool InRecipesBounds(int id)
         {
-            if (_subItems.Count == 0)
-            {
-                Console.WriteLine($"Category {_current.Name} is empty!");
-                return;
-            }
-            Console.WriteLine($"Subcategories and recipes in {_current.Name} category.");
-            WriteRootNavigator();
-            Console.WriteLine("Recipes:");
-            for (int b = _recipesStart; b < _subItems.Count; b++)
-            {
-                Console.WriteLine("    " + b + ". " + (_subItems[b] as Recipe)?.Name);
-            }
+            return id >= RecipesStart && id < SubItems.Count;
         }
-        private void WriteRootNavigator()
+        public List<BaseEntity> GetSubItems()
         {
-            Console.WriteLine("Categories:");
-            for (int i = 0; i < _recipesStart; i++)
-            {
-                Console.WriteLine(i + ". " + (_subItems[i] as Category)?.Name);
-            }
+            return SubItems;
         }
-        
 
         public async Task GoBack()
         {
-            _current = _root;
-            _root = _current?.Parent;
+            CurrentCategory = _root;
+            _root = CurrentCategory?.Parent;
             await UpdateSubItems();
         }
         
         public Category GetCurrent()
         {
-            return _current;
+            return CurrentCategory;
         }
         public Category GetCategory(int id)
         {
-            bool inBounds = id > -1 && id < _recipesStart;
+            bool inBounds = id > -1 && id < RecipesStart;
             if(inBounds)
             {
-                return _subItems[id] as Category;
+                return SubItems[id] as Category;
             }
             else
             {
                 return null;
             }
         }
-
-        private void PrintColored(string message, ConsoleColor consoleColor)
-        {
-            Console.ForegroundColor = consoleColor;
-            Console.WriteLine(message);
-            Console.ForegroundColor = ConsoleColor.White;
-        }
-
         public async Task UpdateSubItems()
         {
-            _subItems.Clear();
-            (await _unitOfWork.Repository.WhereAsync<Category>(x => x.Parent == _current)).ForEach(x => _subItems.Add(x));
-            _recipesStart = _subItems.Count;
-            if (_current != null)
+            SubItems.Clear();
+            (await _unitOfWork.Repository.WhereAsync<Category>(x => x.Parent == CurrentCategory)).ForEach(x => SubItems.Add(x));
+            RecipesStart = SubItems.Count;
+            if (CurrentCategory != null)
             {
-                (await _unitOfWork.Repository.WhereAsync<Recipe>(x => x.CategoryId == _current.Id)).ForEach(x => _subItems.Add(x));
+                (await _unitOfWork.Repository.WhereAsync<Recipe>(x => x.CategoryId == CurrentCategory.Id)).ForEach(x => SubItems.Add(x));
             }
-        }
-
-        public int GetSubItemsCount()
-        {
-            return _subItems.Count;
         }
     }
 }
