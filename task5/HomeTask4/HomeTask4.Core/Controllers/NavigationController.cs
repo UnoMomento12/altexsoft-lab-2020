@@ -15,7 +15,7 @@ namespace HomeTask4.Core.Controllers
         public int ItemCount { get { return SubItems.Count; } }
         public List<BaseEntity> SubItems { get; }
 
-        public NavigationController(IUnitOfWork unitOfWork, ILogger<BaseController> logger) : base(unitOfWork, logger)
+        public NavigationController(IUnitOfWork unitOfWork, ILogger<NavigationController> logger) : base(unitOfWork, logger)
         {
             SubItems = new List<BaseEntity>();
         }
