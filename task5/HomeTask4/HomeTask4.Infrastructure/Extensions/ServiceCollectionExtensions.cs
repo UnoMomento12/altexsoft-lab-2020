@@ -1,6 +1,5 @@
 using Castle.Core.Logging;
 using HomeTask4.Core.Controllers;
-using HomeTask4.Core.Navigator;
 using HomeTask4.Infrastructure.Data;
 using HomeTask4.Infrastructure.Data.Repositories;
 using HomeTask4.SharedKernel.Interfaces;
@@ -20,7 +19,7 @@ namespace HomeTask4.Infrastructure.Extensions
             services.AddScoped<CategoryController>();
             services.AddScoped<RecipeController>();
             services.AddScoped<RecipeStepController>();
-            services.AddScoped<Navigator>();
+            services.AddScoped<NavigationController>();
 
             return services;
         }
