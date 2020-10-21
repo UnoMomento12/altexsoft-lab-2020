@@ -1,6 +1,6 @@
 ﻿using System;
 using HomeTask4.Core.Entities;
-using HomeTask4.Infrastructure.Data;
+using HomeTask4.Core.Navigator;
 using HomeTask4.Infrastructure.Extensions;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -8,9 +8,11 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using HomeTask4.Core.Controllers;
 using System.Collections.Generic;
-using HomeTask4.SharedKernel.Interfaces;
 using System.Threading.Tasks;
-using HomeTask4.Core.Navigator;
+using System.Linq;
+using HomeTask4.SharedKernel;
+using System.Runtime.CompilerServices;
+
 namespace HomeTask4.Cmd
 {
     enum NavigatorItem
@@ -32,7 +34,7 @@ namespace HomeTask4.Cmd
             await navig.StartNavigator();
             while (true)
             {
-                navig.WriteNavigator();
+                WriteNavigator(navig);
                 MenuStart();
                 string input = Console.ReadLine().ToLower().Trim();
                 if (input == "exit") break;
@@ -59,8 +61,13 @@ namespace HomeTask4.Cmd
 
         private static async Task ProcessNumberAsync(int option, Navigator a)
         {
-            if (option < 0) await a.GoBack();
-                else  await a.MoveTo(option);
+            if (option < 0) { await a.GoBack(); }
+            else if (a.InCategoriesBounds(option)) { await a.MoveToCategory(option); }
+            else if (a.InRecipesBounds(option))
+            {
+                List<BaseEntity> list = a.SubItems;
+                WriteRecipe(list[option] as Recipe);
+            }
         }
 
         private static async Task ProcessRecipeAsync(RecipeController recCont, RecipeStepController rsCont, Navigator navig)
@@ -149,7 +156,7 @@ namespace HomeTask4.Cmd
                     await recCont.AddIngredientToRecipeAsync(recipeToAdd, name, measure, amount);
                 } catch (Exception outer)
                 {
-                    _logger.LogInformation(outer.Message);
+                    _logger.LogError(outer.Message);
                     Console.WriteLine("Ingredient wasn't added to recipe, please try again");
                 }
                 
@@ -184,7 +191,7 @@ namespace HomeTask4.Cmd
             Category result = null;
             Category Current = navig.GetCurrent();
 
-            if (navig.GetSubItemsCount() == 0)
+            if (navig.ItemCount == 0)
             {
                 Console.WriteLine("This category doesn't have subcategories!");
                 result = Current;
@@ -229,6 +236,70 @@ namespace HomeTask4.Cmd
                 result = navig.GetCategory(categoryID);
             }
             return result;
+        }
+
+        private static void WriteRecipe(Recipe recipe)
+        {
+            Console.WriteLine("-------------------------------------------");
+            PrintColored($"Recipe name: {recipe.Name}", ConsoleColor.Green);
+            Console.WriteLine("Ingredients:");
+            foreach (var a in recipe.Ingredients)
+            {
+                Console.WriteLine(a.Ingredient.Name + " : " + a.Amount + " " + a.Measure.Name);
+            }
+            Console.WriteLine("Steps to cook:");
+            for (int i = 0; i < recipe.Steps?.OrderBy(x => x.StepNumber).Count(); i++)
+            {
+                PrintColored((i + 1) + ". " + recipe.Steps[i].Description, ConsoleColor.Cyan);
+            }
+            PrintColored($"Description: {recipe.Description}", ConsoleColor.Yellow);
+            Console.WriteLine("-------------------------------------------");
+            Console.WriteLine("Press any button to close recipe!");
+            Console.ReadKey();
+        }
+
+        private static void WriteNavigator(Navigator navigator)
+        {
+            Console.Clear();
+            Console.WriteLine("Navigator!");
+            if (navigator.CurrentCategory == null)
+            {
+                WriteRootNavigator(navigator);
+            }
+            else
+            {
+                WriteFullNavigator(navigator);
+            }
+        }
+
+        private static void WriteFullNavigator(Navigator navigator)
+        {
+            if (navigator.ItemCount == 0)
+            {
+                Console.WriteLine($"Category {navigator.CurrentCategory.Name} is empty!");
+                return;
+            }
+            Console.WriteLine($"Subcategories and recipes in {navigator.CurrentCategory.Name} category.");
+            WriteRootNavigator(navigator);
+            Console.WriteLine("Recipes:");
+            for (int b = navigator.RecipesStart; b < navigator.ItemCount; b++)
+            {
+                Console.WriteLine("    " + b + ". " + (navigator.SubItems[b] as Recipe)?.Name);
+            }
+        }
+        private static void WriteRootNavigator(Navigator navigator)
+        {
+            Console.WriteLine("Categories:");
+            for (int i = 0; i < navigator.RecipesStart; i++)
+            {
+                Console.WriteLine(i + ". " + (navigator.SubItems[i] as Category)?.Name);
+            }
+        }
+        private static void PrintColored(string message, ConsoleColor consoleColor)
+        {
+            Console.ForegroundColor = consoleColor;
+            Console.WriteLine(message);
+            Console.ForegroundColor = ConsoleColor.White;
         }
         private static void MenuStart()
         {
