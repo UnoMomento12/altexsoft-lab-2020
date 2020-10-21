@@ -4,7 +4,6 @@ using HomeTask4.Infrastructure.Data.Repositories;
 using HomeTask4.SharedKernel.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using HomeTask4.Core.Navigator;
 namespace HomeTask4.Infrastructure.Extensions
 {
     public static class ServiceCollectionExtensions
@@ -18,7 +17,7 @@ namespace HomeTask4.Infrastructure.Extensions
             services.AddScoped<CategoryController>();
             services.AddScoped<RecipeController>();
             services.AddScoped<RecipeStepController>();
-            services.AddScoped<Navigator>();
+            services.AddScoped<NavigationController>();
             return services;
         }
     }

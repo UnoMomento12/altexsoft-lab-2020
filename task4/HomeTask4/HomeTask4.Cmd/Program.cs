@@ -1,6 +1,5 @@
 ﻿using System;
 using HomeTask4.Core.Entities;
-using HomeTask4.Core.Navigator;
 using HomeTask4.Infrastructure.Extensions;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -11,7 +10,6 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Linq;
 using HomeTask4.SharedKernel;
-using System.Runtime.CompilerServices;
 
 namespace HomeTask4.Cmd
 {
@@ -30,7 +28,7 @@ namespace HomeTask4.Cmd
             RecipeController recCont = host.Services.GetRequiredService<RecipeController>();
             CategoryController catCont = host.Services.GetRequiredService<CategoryController>();
             RecipeStepController rsCont = host.Services.GetRequiredService<RecipeStepController>();
-            Navigator navig = host.Services.GetRequiredService<Navigator>();
+            NavigationController navig = host.Services.GetRequiredService<NavigationController>();
             await navig.StartNavigator();
             while (true)
             {
@@ -59,7 +57,7 @@ namespace HomeTask4.Cmd
             }
         }
 
-        private static async Task ProcessNumberAsync(int option, Navigator a)
+        private static async Task ProcessNumberAsync(int option, NavigationController a)
         {
             if (option < 0) { await a.GoBack(); }
             else if (a.InCategoriesBounds(option)) { await a.MoveToCategory(option); }
@@ -70,7 +68,7 @@ namespace HomeTask4.Cmd
             }
         }
 
-        private static async Task ProcessRecipeAsync(RecipeController recCont, RecipeStepController rsCont, Navigator navig)
+        private static async Task ProcessRecipeAsync(RecipeController recCont, RecipeStepController rsCont, NavigationController navig)
         {
             NavigatorItem item = NavigatorItem.Recipe;
             Category targetCategory = SetTargetCategory(navig, item);
@@ -162,7 +160,7 @@ namespace HomeTask4.Cmd
                 
             }
         }
-        private static async Task ProcessCategoryAsync(CategoryController catCont, Navigator navig)
+        private static async Task ProcessCategoryAsync(CategoryController catCont, NavigationController navig)
         {
             NavigatorItem item = NavigatorItem.Category;
             Category targetCategory = SetTargetCategory(navig, item);
@@ -186,7 +184,7 @@ namespace HomeTask4.Cmd
                 await navig.UpdateSubItems();
             } 
         }
-        private static Category SetTargetCategory(Navigator navig, NavigatorItem item)
+        private static Category SetTargetCategory(NavigationController navig, NavigatorItem item)
         {
             Category result = null;
             Category Current = navig.GetCurrent();
@@ -258,7 +256,7 @@ namespace HomeTask4.Cmd
             Console.ReadKey();
         }
 
-        private static void WriteNavigator(Navigator navigator)
+        private static void WriteNavigator(NavigationController navigator)
         {
             Console.Clear();
             Console.WriteLine("Navigator!");
@@ -272,7 +270,7 @@ namespace HomeTask4.Cmd
             }
         }
 
-        private static void WriteFullNavigator(Navigator navigator)
+        private static void WriteFullNavigator(NavigationController navigator)
         {
             if (navigator.ItemCount == 0)
             {
@@ -287,7 +285,7 @@ namespace HomeTask4.Cmd
                 Console.WriteLine("    " + b + ". " + (navigator.SubItems[b] as Recipe)?.Name);
             }
         }
-        private static void WriteRootNavigator(Navigator navigator)
+        private static void WriteRootNavigator(NavigationController navigator)
         {
             Console.WriteLine("Categories:");
             for (int i = 0; i < navigator.RecipesStart; i++)

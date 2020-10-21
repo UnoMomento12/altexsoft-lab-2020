@@ -1,27 +1,28 @@
 ﻿using HomeTask4.Core.Entities;
 using HomeTask4.SharedKernel;
 using HomeTask4.SharedKernel.Interfaces;
+using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace HomeTask4.Core.Navigator
+namespace HomeTask4.Core.Controllers
 {
-    public class Navigator
+    public class NavigationController : BaseController
     {
-        private IUnitOfWork _unitOfWork;
         private Category _root;
         public Category CurrentCategory { get; private set; }
         public int RecipesStart { get; private set; }
         public int ItemCount { get { return SubItems.Count; } }
         public List<BaseEntity> SubItems { get; }
-        public Navigator(IUnitOfWork unit)
+
+        public NavigationController(IUnitOfWork unitOfWork, ILogger<BaseController> logger) : base(unitOfWork, logger)
         {
-            _unitOfWork = unit;
             SubItems = new List<BaseEntity>();
         }
+
         public async Task StartNavigator()
         {
-             (await _unitOfWork.Repository.WhereAsync<Category>(x => x.ParentId == null)).ForEach(x => SubItems.Add(x));
+             (await UnitOfWork.Repository.WhereAsync<Category>(x => x.ParentId == null)).ForEach(x => SubItems.Add(x));
             RecipesStart = SubItems.Count;
         }
         public bool InCategoriesBounds(int id)
@@ -70,11 +71,11 @@ namespace HomeTask4.Core.Navigator
         public async Task UpdateSubItems()
         {
             SubItems.Clear();
-            (await _unitOfWork.Repository.WhereAsync<Category>(x => x.Parent == CurrentCategory)).ForEach(x => SubItems.Add(x));
+            (await UnitOfWork.Repository.WhereAsync<Category>(x => x.Parent == CurrentCategory)).ForEach(x => SubItems.Add(x));
             RecipesStart = SubItems.Count;
             if (CurrentCategory != null)
             {
-                (await _unitOfWork.Repository.WhereAsync<Recipe>(x => x.CategoryId == CurrentCategory.Id)).ForEach(x => SubItems.Add(x));
+                (await UnitOfWork.Repository.WhereAsync<Recipe>(x => x.CategoryId == CurrentCategory.Id)).ForEach(x => SubItems.Add(x));
             }
         }
     }
