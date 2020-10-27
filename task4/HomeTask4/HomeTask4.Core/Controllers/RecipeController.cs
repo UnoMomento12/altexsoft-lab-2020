@@ -20,7 +20,8 @@ namespace HomeTask4.Core.Controllers
             try
             {
                 await CreateRecipeAsync(recipe);
-            } catch (ArgumentNullException nullException)
+            } 
+            catch (ArgumentNullException nullException)
             {
                 Logger.LogError(nullException.Message);
                 throw;

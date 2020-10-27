@@ -59,8 +59,14 @@ namespace HomeTask4.Cmd
 
         private static async Task ProcessNumberAsync(int option, NavigationController a)
         {
-            if (option < 0) { await a.GoBack(); }
-            else if (a.InCategoriesBounds(option)) { await a.MoveToCategory(option); }
+            if (option < 0) 
+            { 
+                await a.GoBack();
+            }
+            else if (a.InCategoriesBounds(option)) 
+            { 
+                await a.MoveToCategory(option); 
+            }
             else if (a.InRecipesBounds(option))
             {
                 List<BaseEntity> list = a.SubItems;
@@ -79,7 +85,8 @@ namespace HomeTask4.Cmd
             try
             {
                 result = await recCont.TryCreateRecipeAsync(recipeToAdd);
-            } catch (Exception)
+            } 
+            catch (Exception)
             {
                 Console.WriteLine("Creating recipe is not possible!");
                 Console.ReadKey();
@@ -152,7 +159,8 @@ namespace HomeTask4.Cmd
                 try
                 {
                     await recCont.AddIngredientToRecipeAsync(recipeToAdd, name, measure, amount);
-                } catch (Exception outer)
+                } 
+                catch (Exception outer)
                 {
                     _logger.LogError(outer.Message);
                     Console.WriteLine("Ingredient wasn't added to recipe, please try again");
@@ -172,7 +180,8 @@ namespace HomeTask4.Cmd
             try
             {
                 result = await catCont.TryCreateCategoryAsync(name, targetCategory?.Id);
-            } catch (Exception)
+            } 
+            catch (Exception)
             {
                 Console.WriteLine("Creating category is not possible!");
                 Console.ReadKey();
@@ -243,12 +252,12 @@ namespace HomeTask4.Cmd
             Console.WriteLine("Ingredients:");
             foreach (var a in recipe.Ingredients)
             {
-                Console.WriteLine(a.Ingredient.Name + " : " + a.Amount + " " + a.Measure.Name);
+                Console.WriteLine($"{a.Ingredient.Name} :  {a.Amount} {a.Measure.Name}");
             }
             Console.WriteLine("Steps to cook:");
             for (int i = 0; i < recipe.Steps?.OrderBy(x => x.StepNumber).Count(); i++)
             {
-                PrintColored((i + 1) + ". " + recipe.Steps[i].Description, ConsoleColor.Cyan);
+                PrintColored($"{i + 1}. {recipe.Steps[i].Description}", ConsoleColor.Cyan);
             }
             PrintColored($"Description: {recipe.Description}", ConsoleColor.Yellow);
             Console.WriteLine("-------------------------------------------");
@@ -282,7 +291,7 @@ namespace HomeTask4.Cmd
             Console.WriteLine("Recipes:");
             for (int b = navigator.RecipesStart; b < navigator.ItemCount; b++)
             {
-                Console.WriteLine("    " + b + ". " + (navigator.SubItems[b] as Recipe)?.Name);
+                Console.WriteLine($"    {b}. {(navigator.SubItems[b] as Recipe)?.Name}");
             }
         }
         private static void WriteRootNavigator(NavigationController navigator)
@@ -290,7 +299,7 @@ namespace HomeTask4.Cmd
             Console.WriteLine("Categories:");
             for (int i = 0; i < navigator.RecipesStart; i++)
             {
-                Console.WriteLine(i + ". " + (navigator.SubItems[i] as Category)?.Name);
+                Console.WriteLine($"{i}. {(navigator.SubItems[i] as Category)?.Name}");
             }
         }
         private static void PrintColored(string message, ConsoleColor consoleColor)
