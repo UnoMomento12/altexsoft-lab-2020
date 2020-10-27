@@ -21,11 +21,13 @@ namespace HomeTask4.Core.Controllers
             try
             {
                 await CreateCategoryAsync(category);
-            } catch (ArgumentNullException nullException)
+            } 
+            catch (ArgumentNullException nullException)
             {
                 Logger.LogError(nullException.Message);
                 throw;
-            } catch( ArgumentException argumentException)
+            } 
+            catch( ArgumentException argumentException)
             {
                 Logger.LogError(argumentException.Message);
                 throw;
