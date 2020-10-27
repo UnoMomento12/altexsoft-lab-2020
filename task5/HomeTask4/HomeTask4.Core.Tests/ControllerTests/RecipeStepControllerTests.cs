@@ -15,10 +15,13 @@ namespace HomeTask4.Core.Tests.ControllerTests
     {
         private Mock<IUnitOfWork> _unitOfWork;
         private RecipeStepController _recStepCont;
+        private Mock<IRepository> _mockRepository;
 
         public RecipeStepControllerTests()
         {
             _unitOfWork = new Mock<IUnitOfWork>();
+            _mockRepository = new Mock<IRepository>();
+            _unitOfWork.SetupGet(u => u.Repository).Returns(_mockRepository.Object);
             _recStepCont = new RecipeStepController(_unitOfWork.Object, new LoggerFactory().CreateLogger<RecipeStepController>());
         }
         [Fact(DisplayName = "AddStepsAsync method adds RecipeStep to DB ")]
@@ -26,9 +29,7 @@ namespace HomeTask4.Core.Tests.ControllerTests
         {
             //Arrange
             List<RecipeStep> recipeStepsDB = new List<RecipeStep>();
-            var repos = new Mock<IRepository>();
-            _unitOfWork.Setup(u => u.Repository).Returns(repos.Object);
-            repos.Setup(r => r.AddRangeAsync<RecipeStep>(It.IsAny<List<RecipeStep>>()))
+            _mockRepository.Setup(r => r.AddRangeAsync<RecipeStep>(It.IsAny<List<RecipeStep>>()))
                  .Callback((List<RecipeStep> some) =>
                  {
                      recipeStepsDB.AddRange(some);
@@ -45,7 +46,7 @@ namespace HomeTask4.Core.Tests.ControllerTests
             //Act
             await _recStepCont.AddStepsAsync(stepsToAdd);
             //Assert
-            repos.Verify(repos => repos.AddRangeAsync<RecipeStep>(It.IsAny<List<RecipeStep>>()), Times.Once);
+            _mockRepository.Verify(r => r.AddRangeAsync<RecipeStep>(It.IsAny<List<RecipeStep>>()), Times.Once);
             Assert.Equal(recipeStepsDB, stepsToAdd);
         }
 

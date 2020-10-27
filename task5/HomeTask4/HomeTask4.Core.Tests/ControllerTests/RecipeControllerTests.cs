@@ -17,11 +17,14 @@ namespace HomeTask4.Core.Tests.ControllerTests
         private Mock<IUnitOfWork> _unitOfWorkMock;
         private RecipeController _recipeController;
         private Mock<ILogger<RecipeController>> _loggerMock;
+        private Mock<IRepository> _mockRepository;
 
         public RecipeControllerTests()
         {
             _unitOfWorkMock = new Mock<IUnitOfWork>();
             _loggerMock = new Mock<ILogger<RecipeController>>();
+            _mockRepository = new Mock<IRepository>();
+            _unitOfWorkMock.SetupGet(u => u.Repository).Returns(_mockRepository.Object);
             _recipeController = new RecipeController(_unitOfWorkMock.Object, _loggerMock.Object);
         }
 
@@ -30,17 +33,17 @@ namespace HomeTask4.Core.Tests.ControllerTests
         {
             //Arrange
             Recipe testedRecipe = new Recipe { Name = "Some Recipe", Description = "", CategoryId = 12 };
-            var mockRepository = new Mock<IRepository>();
-            _unitOfWorkMock.SetupGet(u => u.Repository).Returns(mockRepository.Object);
-            mockRepository.Setup(r => r.AddAsync<Recipe>(It.IsAny<Recipe>()));
-            mockRepository.Setup(r => r.FirstOrDefaultAsync<Recipe>(It.IsAny<Expression<Func<Recipe, bool>>>()));
-            mockRepository.Setup(r => r.GetByIdAsync<Recipe>(It.IsAny<int>()));
+            var _mockRepository = new Mock<IRepository>();
+            _unitOfWorkMock.SetupGet(u => u.Repository).Returns(_mockRepository.Object);
+            _mockRepository.Setup(r => r.AddAsync<Recipe>(It.IsAny<Recipe>()));
+            _mockRepository.Setup(r => r.FirstOrDefaultAsync<Recipe>(It.IsAny<Expression<Func<Recipe, bool>>>()));
+            _mockRepository.Setup(r => r.GetByIdAsync<Recipe>(It.IsAny<int>()));
             //Act
             var caughtException = await Assert.ThrowsAsync<ArgumentException>(async () => await _recipeController.TryCreateRecipeAsync(testedRecipe));
             //Assert
-            mockRepository.Verify(r => r.FirstOrDefaultAsync<Recipe>(It.IsAny<Expression<Func<Recipe, bool>>>()), Times.Never);
-            mockRepository.Verify(r => r.AddAsync<Recipe>(It.IsAny<Recipe>()), Times.Never);
-            mockRepository.Verify(r => r.GetByIdAsync<Recipe>(It.IsAny<int>()), Times.Never);
+            _mockRepository.Verify(r => r.FirstOrDefaultAsync<Recipe>(It.IsAny<Expression<Func<Recipe, bool>>>()), Times.Never);
+            _mockRepository.Verify(r => r.AddAsync<Recipe>(It.IsAny<Recipe>()), Times.Never);
+            _mockRepository.Verify(r => r.GetByIdAsync<Recipe>(It.IsAny<int>()), Times.Never);
             _loggerMock.Verify(logger => logger.Log(
                 It.IsAny<LogLevel>(),
                 It.IsAny<EventId>(),
@@ -55,17 +58,17 @@ namespace HomeTask4.Core.Tests.ControllerTests
         {
             //Arrange
             Recipe testedRecipe = new Recipe { Name = "", Description = "Description", CategoryId = 12 };
-            var mockRepository = new Mock<IRepository>();
-            _unitOfWorkMock.SetupGet(u => u.Repository).Returns(mockRepository.Object); 
-            mockRepository.Setup(r => r.AddAsync<Recipe>(It.IsAny<Recipe>()));
-            mockRepository.Setup(r => r.FirstOrDefaultAsync<Recipe>(It.IsAny<Expression<Func<Recipe, bool>>>()));
-            mockRepository.Setup(r => r.GetByIdAsync<Recipe>(It.IsAny<int>()));
+            var _mockRepository = new Mock<IRepository>();
+            _unitOfWorkMock.SetupGet(u => u.Repository).Returns(_mockRepository.Object); 
+            _mockRepository.Setup(r => r.AddAsync<Recipe>(It.IsAny<Recipe>()));
+            _mockRepository.Setup(r => r.FirstOrDefaultAsync<Recipe>(It.IsAny<Expression<Func<Recipe, bool>>>()));
+            _mockRepository.Setup(r => r.GetByIdAsync<Recipe>(It.IsAny<int>()));
             //Act
             var caughtException = await Assert.ThrowsAsync<ArgumentException>(async () => await _recipeController.TryCreateRecipeAsync(testedRecipe));
             //Assert
-            mockRepository.Verify(r => r.FirstOrDefaultAsync<Recipe>(It.IsAny<Expression<Func<Recipe, bool>>>()), Times.Never);
-            mockRepository.Verify(r => r.AddAsync<Recipe>(It.IsAny<Recipe>()), Times.Never);
-            mockRepository.Verify(r => r.GetByIdAsync<Recipe>(It.IsAny<int>()), Times.Never);
+            _mockRepository.Verify(r => r.FirstOrDefaultAsync<Recipe>(It.IsAny<Expression<Func<Recipe, bool>>>()), Times.Never);
+            _mockRepository.Verify(r => r.AddAsync<Recipe>(It.IsAny<Recipe>()), Times.Never);
+            _mockRepository.Verify(r => r.GetByIdAsync<Recipe>(It.IsAny<int>()), Times.Never);
             _loggerMock.Verify(logger => logger.Log(
                 It.IsAny<LogLevel>(),
                 It.IsAny<EventId>(),
@@ -75,26 +78,29 @@ namespace HomeTask4.Core.Tests.ControllerTests
             Assert.Contains("Recipe name is null or empty", caughtException.Message);
         }
 
-        [Theory(DisplayName = "TryCreateRecipeAsync method return true flag on completion")]
-        [InlineData(3, "Recipe 3", "Description 3", 1, true)]
-        public async Task TryCreateRecipeAsync_Returns_True(int id, string name, string description, int? categoryId , bool result)
+        [Theory(DisplayName = "TryCreateRecipeAsync method return bool flag on completion")]
+        [InlineData(3, "Recipe 3", "Description 3", 1, false, true)]
+        [InlineData(3, "Recipe 3", "Description 3", 1, true, false)]
+        public async Task TryCreateRecipeAsync_Returns_Bool(int id, string name, string description, int? categoryId , bool isProblem, bool result)
         {
             //Arrange
             var testedRecipe = new Recipe { Id = id, Name = name, Description = description, CategoryId = categoryId }; // new recipe
-            //var rec2 = new Recipe { Id = 4, Name = "Recipe 2", Description = "Description 4", CategoryId = 2 }; // overlapping recipe
-            var mockRepository = new Mock<IRepository>();
+            var _mockRepository = new Mock<IRepository>();
             List<Recipe> mockDB = GetRecipes();
-            _unitOfWorkMock.SetupGet(u => u.Repository).Returns(mockRepository.Object);
-            mockRepository.Setup(r => r.AddAsync<Recipe>(It.IsAny<Recipe>())).Callback((Recipe some) => mockDB.Add(some));
-            mockRepository.Setup(r => r.FirstOrDefaultAsync<Recipe>(It.IsAny<Expression<Func<Recipe, bool>>>()))
+            _unitOfWorkMock.SetupGet(u => u.Repository).Returns(_mockRepository.Object);
+            if (!isProblem)
+            {
+                _mockRepository.Setup(r => r.AddAsync<Recipe>(It.IsAny<Recipe>())).Callback((Recipe some) => mockDB.Add(some));
+            }
+            _mockRepository.Setup(r => r.FirstOrDefaultAsync<Recipe>(It.IsAny<Expression<Func<Recipe, bool>>>()))
                  .ReturnsAsync(() => mockDB.SingleOrDefault(x => string.Equals(x.Name, testedRecipe.Name, StringComparison.OrdinalIgnoreCase) && x.CategoryId == testedRecipe.CategoryId));
-            mockRepository.Setup(r => r.GetByIdAsync<Recipe>(It.IsAny<int>())).ReturnsAsync((int a) => mockDB.FirstOrDefault(x => x.Id == a));
+            _mockRepository.Setup(r => r.GetByIdAsync<Recipe>(It.IsAny<int>())).ReturnsAsync((int a) => mockDB.FirstOrDefault(x => x.Id == a));
             //Act
             var resultFlag = await _recipeController.TryCreateRecipeAsync(testedRecipe);
             //Assert
-            mockRepository.Verify(r => r.FirstOrDefaultAsync<Recipe>(It.IsAny<Expression<Func<Recipe, bool>>>()), Times.Once);
-            mockRepository.Verify(r => r.AddAsync<Recipe>(It.IsAny<Recipe>()), Times.Once);
-            mockRepository.Verify(r => r.GetByIdAsync<Recipe>(It.IsAny<int>()), Times.Once);
+            _mockRepository.Verify(r => r.FirstOrDefaultAsync<Recipe>(It.IsAny<Expression<Func<Recipe, bool>>>()), Times.Once);
+            _mockRepository.Verify(r => r.AddAsync<Recipe>(It.IsAny<Recipe>()), Times.Once);
+            _mockRepository.Verify(r => r.GetByIdAsync<Recipe>(It.IsAny<int>()), Times.Once);
             _loggerMock.Verify(logger => logger.Log(
                 It.IsAny<LogLevel>(),
                 It.IsAny<EventId>(),
@@ -103,53 +109,24 @@ namespace HomeTask4.Core.Tests.ControllerTests
                 It.Is<Func<It.IsAnyType, Exception, string>>((v, t) => true)), Times.Never);
             Assert.True(resultFlag == result);
         }
-
-        [Theory(DisplayName = "TryCreateRecipeAsync method return false flag on completion")]
-        [InlineData(3, "Recipe 3", "Description 3", 1, false)]
-        public async Task TryCreateRecipeAsync_Returns_False(int id, string name, string description, int? categoryId, bool result)
+        [Fact(DisplayName = "TryCreateRecipeAsync method throws argument exception on duplicate recipe")]
+        public async Task TryCreateRecipeAsync_Throws_ArgumentException_On_Recipe_Duplicate()
         {
             //Arrange
-            var testedRecipe = new Recipe { Id = id, Name = name, Description = description, CategoryId = categoryId }; 
-            var mockRepository = new Mock<IRepository>();
+            var testedRecipe = new Recipe { Id = 4, Name = "Recipe 2", Description = "Description 4", CategoryId = 2 }; 
+            var _mockRepository = new Mock<IRepository>();
             List<Recipe> mockDB = GetRecipes();
-            _unitOfWorkMock.SetupGet(u => u.Repository).Returns(mockRepository.Object);
-            mockRepository.Setup(r => r.AddAsync<Recipe>(It.IsAny<Recipe>())); // emulate some problem on DB server
-            mockRepository.Setup(r => r.FirstOrDefaultAsync<Recipe>(It.IsAny<Expression<Func<Recipe, bool>>>()))
+            _unitOfWorkMock.SetupGet(u => u.Repository).Returns(_mockRepository.Object);
+            _mockRepository.Setup(r => r.AddAsync<Recipe>(It.IsAny<Recipe>())).Callback((Recipe some) => mockDB.Add(some));
+            _mockRepository.Setup(r => r.FirstOrDefaultAsync<Recipe>(It.IsAny<Expression<Func<Recipe, bool>>>()))
                  .ReturnsAsync(() => mockDB.SingleOrDefault(x => string.Equals(x.Name, testedRecipe.Name, StringComparison.OrdinalIgnoreCase) && x.CategoryId == testedRecipe.CategoryId));
-            mockRepository.Setup(r => r.GetByIdAsync<Recipe>(It.IsAny<int>())).ReturnsAsync((int a) => mockDB.FirstOrDefault(x => x.Id == a));
-            //Act
-            var resultFlag = await _recipeController.TryCreateRecipeAsync(testedRecipe);
-            //Assert
-            mockRepository.Verify(r => r.FirstOrDefaultAsync<Recipe>(It.IsAny<Expression<Func<Recipe, bool>>>()), Times.Once);
-            mockRepository.Verify(r => r.AddAsync<Recipe>(It.IsAny<Recipe>()), Times.Once);
-            mockRepository.Verify(r => r.GetByIdAsync<Recipe>(It.IsAny<int>()), Times.Once);
-            _loggerMock.Verify(logger => logger.Log(
-                It.IsAny<LogLevel>(),
-                It.IsAny<EventId>(),
-                It.Is<It.IsAnyType>((v, t) => true),
-                It.IsAny<Exception>(),
-                It.Is<Func<It.IsAnyType, Exception, string>>((v, t) => true)), Times.Never);
-            Assert.True(resultFlag == result);
-        }
-        [Theory(DisplayName = "TryCreateRecipeAsync method return false flag on completion")]
-        [InlineData(4, "Recipe 2", "Description 4", 2, false)]
-        public async Task TryCreateRecipeAsync_Throws_ArgumentException_On_Recipe_Duplicate(int id, string name, string description, int? categoryId, bool result)
-        {
-            //Arrange
-            var testedRecipe = new Recipe { Id = id, Name = name, Description = description, CategoryId = categoryId }; 
-            var mockRepository = new Mock<IRepository>();
-            List<Recipe> mockDB = GetRecipes();
-            _unitOfWorkMock.SetupGet(u => u.Repository).Returns(mockRepository.Object);
-            mockRepository.Setup(r => r.AddAsync<Recipe>(It.IsAny<Recipe>())).Callback((Recipe some) => mockDB.Add(some));
-            mockRepository.Setup(r => r.FirstOrDefaultAsync<Recipe>(It.IsAny<Expression<Func<Recipe, bool>>>()))
-                 .ReturnsAsync(() => mockDB.SingleOrDefault(x => string.Equals(x.Name, testedRecipe.Name, StringComparison.OrdinalIgnoreCase) && x.CategoryId == testedRecipe.CategoryId));
-            mockRepository.Setup(r => r.GetByIdAsync<Recipe>(It.IsAny<int>())).ReturnsAsync((int a) => mockDB.FirstOrDefault(x => x.Id == a));
+            _mockRepository.Setup(r => r.GetByIdAsync<Recipe>(It.IsAny<int>())).ReturnsAsync((int a) => mockDB.FirstOrDefault(x => x.Id == a));
             //Act
             var caughtException = await Assert.ThrowsAsync<ArgumentException>(async () => await _recipeController.TryCreateRecipeAsync(testedRecipe));
             //Assert
-            mockRepository.Verify(r => r.FirstOrDefaultAsync<Recipe>(It.IsAny<Expression<Func<Recipe, bool>>>()), Times.Once);
-            mockRepository.Verify(r => r.AddAsync<Recipe>(It.IsAny<Recipe>()), Times.Never);
-            mockRepository.Verify(r => r.GetByIdAsync<Recipe>(It.IsAny<int>()), Times.Never);
+            _mockRepository.Verify(r => r.FirstOrDefaultAsync<Recipe>(It.IsAny<Expression<Func<Recipe, bool>>>()), Times.Once);
+            _mockRepository.Verify(r => r.AddAsync<Recipe>(It.IsAny<Recipe>()), Times.Never);
+            _mockRepository.Verify(r => r.GetByIdAsync<Recipe>(It.IsAny<int>()), Times.Never);
             _loggerMock.Verify(logger => logger.Log(
                 It.IsAny<LogLevel>(),
                 It.IsAny<EventId>(),
@@ -159,23 +136,23 @@ namespace HomeTask4.Core.Tests.ControllerTests
             Assert.Contains("already exists", caughtException.Message);
         }
 
-        [Fact(DisplayName = "TryCreateRecipeAsync doesn't throw ArgumentNullException")]
-        public async Task TryCreateRecipeAsync_Doesnt_Throw_ArgumentNullException()
+        [Fact(DisplayName = "TryCreateRecipeAsync doesn't reach exception throws and returns false on null reference")]
+        public async Task TryCreateRecipeAsync_Doesnt_Reach_Exception_Throws_And_Returns_False()
         {
             Recipe testedRecipe = null;
-            var mockRepository = new Mock<IRepository>();
-            _unitOfWorkMock.SetupGet(u => u.Repository).Returns(mockRepository.Object);
-            mockRepository.Setup(r => r.FirstOrDefaultAsync<Recipe>(It.IsAny<Expression<Func<Recipe, bool>>>()));
+            var _mockRepository = new Mock<IRepository>();
+            _unitOfWorkMock.SetupGet(u => u.Repository).Returns(_mockRepository.Object);
+            _mockRepository.Setup(r => r.FirstOrDefaultAsync<Recipe>(It.IsAny<Expression<Func<Recipe, bool>>>()));
             //Act
             var resultFlag = await _recipeController.TryCreateRecipeAsync(testedRecipe);
             //Assert
-            mockRepository.Verify(r => r.FirstOrDefaultAsync<Recipe>(It.IsAny<Expression<Func<Recipe, bool>>>()), Times.Never);
+            _mockRepository.Verify(r => r.FirstOrDefaultAsync<Recipe>(It.IsAny<Expression<Func<Recipe, bool>>>()), Times.Never);
             Assert.False(resultFlag);
         }
 
 
         [Fact(DisplayName = "AddIngredientToRecipeAsync method throws ArgumentException on non-existent recipe")]
-        public async Task AddIngredientToRecipeAsync_Throws_ArgumentException_On_NonExisting_Recipe()
+        public async Task AddIngredientToRecipeAsync_Throws_ArgumentException_On_NonExistent_Recipe()
         {
             //Arrange
             #region SameIngredientDetailArrange
@@ -183,29 +160,29 @@ namespace HomeTask4.Core.Tests.ControllerTests
             List<Measure> mockMeasureDB = GetMeasures();
             List<Ingredient> mockIngredientDB = GetIngredients();
             List<IngredientDetail> mockIDDB = GetIngredientDetails();
-            var mockRepository = new Mock<IRepository>();
-            _unitOfWorkMock.SetupGet(u => u.Repository).Returns(mockRepository.Object);
+            var _mockRepository = new Mock<IRepository>();
+            _unitOfWorkMock.SetupGet(u => u.Repository).Returns(_mockRepository.Object);
             //----------------------------------------------------------------------------------------------------------------------------------------//
-            mockRepository.Setup(r => r.AddAsync<Measure>(It.IsAny<Measure>()))
+            _mockRepository.Setup(r => r.AddAsync<Measure>(It.IsAny<Measure>()))
                 .Callback((Measure some) =>
                 {
                     some.Id = mockMeasureDB.Last().Id + 1;
                     mockMeasureDB.Add(some);
                 });
-            mockRepository.Setup(r => r.AddAsync<Ingredient>(It.IsAny<Ingredient>()))
+            _mockRepository.Setup(r => r.AddAsync<Ingredient>(It.IsAny<Ingredient>()))
                 .Callback((Ingredient some) =>
                 {
                     some.Id = mockIngredientDB.Last().Id + 1;
                     mockIngredientDB.Add(some);
                 });
 
-            mockRepository.Setup(r => r.AddAsync<IngredientDetail>(It.IsAny<IngredientDetail>()))
+            _mockRepository.Setup(r => r.AddAsync<IngredientDetail>(It.IsAny<IngredientDetail>()))
                 .Callback((IngredientDetail some) =>
                 {
                     some.Id = mockIDDB.Last().Id + 1;
                     mockIDDB.Add(some);
                 });
-            mockRepository.Setup(r => r.UpdateAsync<IngredientDetail>(It.IsAny<IngredientDetail>()))
+            _mockRepository.Setup(r => r.UpdateAsync<IngredientDetail>(It.IsAny<IngredientDetail>()))
                 .Callback((IngredientDetail some) =>
                 {
                     mockIDDB.SingleOrDefault(x => x.RecipeId == some.RecipeId && x.IngredientId == x.IngredientId).Amount += some.Amount;
@@ -215,21 +192,21 @@ namespace HomeTask4.Core.Tests.ControllerTests
             string ingName = "beef";
             double amount = 800;
             string measure = "g";
-            mockRepository.Setup(r => r.FirstOrDefaultAsync<Recipe>(It.IsAny<Expression<Func<Recipe, bool>>>()))
+            _mockRepository.Setup(r => r.FirstOrDefaultAsync<Recipe>(It.IsAny<Expression<Func<Recipe, bool>>>()))
                 .ReturnsAsync(() => mockRecipeDB.FirstOrDefault(x => string.Equals(x.Name, testedRecipe.Name, StringComparison.OrdinalIgnoreCase) && x.CategoryId == testedRecipe.CategoryId && x.Id == testedRecipe.Id));
-            mockRepository.Setup(r => r.FirstOrDefaultAsync<Measure>(It.IsAny<Expression<Func<Measure, bool>>>()));
-            mockRepository.Setup(r => r.FirstOrDefaultAsync<Ingredient>(It.IsAny<Expression<Func<Ingredient, bool>>>()));
-            mockRepository.Setup(r => r.FirstOrDefaultAsync<IngredientDetail>(It.IsAny<Expression<Func<IngredientDetail, bool>>>()));
+            _mockRepository.Setup(r => r.FirstOrDefaultAsync<Measure>(It.IsAny<Expression<Func<Measure, bool>>>()));
+            _mockRepository.Setup(r => r.FirstOrDefaultAsync<Ingredient>(It.IsAny<Expression<Func<Ingredient, bool>>>()));
+            _mockRepository.Setup(r => r.FirstOrDefaultAsync<IngredientDetail>(It.IsAny<Expression<Func<IngredientDetail, bool>>>()));
             //Act
             var caughtException = await Assert.ThrowsAsync<ArgumentException>(async () => await _recipeController.AddIngredientToRecipeAsync(testedRecipe, ingName, measure, amount));
             //Assert
-            mockRepository.Verify(r => r.FirstOrDefaultAsync<Recipe>(It.IsAny<Expression<Func<Recipe, bool>>>()), Times.Once);
-            mockRepository.Verify(r => r.FirstOrDefaultAsync<Measure>(It.IsAny<Expression<Func<Measure, bool>>>()), Times.Never);
-            mockRepository.Verify(r => r.FirstOrDefaultAsync<Ingredient>(It.IsAny<Expression<Func<Ingredient, bool>>>()), Times.Never);
-            mockRepository.Verify(r => r.FirstOrDefaultAsync<IngredientDetail>(It.IsAny<Expression<Func<IngredientDetail, bool>>>()), Times.Never);
-            mockRepository.Verify(r => r.AddAsync<Measure>(It.IsAny<Measure>()), Times.Never);
-            mockRepository.Verify(r => r.AddAsync<Ingredient>(It.IsAny<Ingredient>()), Times.Never);
-            mockRepository.Verify(r => r.AddAsync<IngredientDetail>(It.IsAny<IngredientDetail>()), Times.Never);
+            _mockRepository.Verify(r => r.FirstOrDefaultAsync<Recipe>(It.IsAny<Expression<Func<Recipe, bool>>>()), Times.Once);
+            _mockRepository.Verify(r => r.FirstOrDefaultAsync<Measure>(It.IsAny<Expression<Func<Measure, bool>>>()), Times.Never);
+            _mockRepository.Verify(r => r.FirstOrDefaultAsync<Ingredient>(It.IsAny<Expression<Func<Ingredient, bool>>>()), Times.Never);
+            _mockRepository.Verify(r => r.FirstOrDefaultAsync<IngredientDetail>(It.IsAny<Expression<Func<IngredientDetail, bool>>>()), Times.Never);
+            _mockRepository.Verify(r => r.AddAsync<Measure>(It.IsAny<Measure>()), Times.Never);
+            _mockRepository.Verify(r => r.AddAsync<Ingredient>(It.IsAny<Ingredient>()), Times.Never);
+            _mockRepository.Verify(r => r.AddAsync<IngredientDetail>(It.IsAny<IngredientDetail>()), Times.Never);
             Assert.Contains("doesn't exist in Database", caughtException.Message);
         }
 
@@ -242,29 +219,29 @@ namespace HomeTask4.Core.Tests.ControllerTests
             List<Measure> mockMeasureDB = GetMeasures();
             List<Ingredient> mockIngredientDB = GetIngredients();
             List<IngredientDetail> mockIDDB = GetIngredientDetails();
-            var mockRepository = new Mock<IRepository>();
-            _unitOfWorkMock.SetupGet(u => u.Repository).Returns(mockRepository.Object);
+            var _mockRepository = new Mock<IRepository>();
+            _unitOfWorkMock.SetupGet(u => u.Repository).Returns(_mockRepository.Object);
             //----------------------------------------------------------------------------------------------------------------------------------------//
-            mockRepository.Setup(r => r.AddAsync<Measure>(It.IsAny<Measure>()))
+            _mockRepository.Setup(r => r.AddAsync<Measure>(It.IsAny<Measure>()))
                  .Callback((Measure some) =>
                  {
                      some.Id = mockMeasureDB.Last().Id + 1;
                      mockMeasureDB.Add(some);
                  });
-            mockRepository.Setup(r => r.AddAsync<Ingredient>(It.IsAny<Ingredient>()))
+            _mockRepository.Setup(r => r.AddAsync<Ingredient>(It.IsAny<Ingredient>()))
                 .Callback((Ingredient some) =>
                 {
                     some.Id = mockIngredientDB.Last().Id + 1;
                     mockIngredientDB.Add(some);
                 });
 
-            mockRepository.Setup(r => r.AddAsync<IngredientDetail>(It.IsAny<IngredientDetail>()))
+            _mockRepository.Setup(r => r.AddAsync<IngredientDetail>(It.IsAny<IngredientDetail>()))
                 .Callback((IngredientDetail some) =>
                 {
                     some.Id = mockIDDB.Last().Id + 1;
                     mockIDDB.Add(some);
                 });
-            mockRepository.Setup(r => r.UpdateAsync<IngredientDetail>(It.IsAny<IngredientDetail>()))
+            _mockRepository.Setup(r => r.UpdateAsync<IngredientDetail>(It.IsAny<IngredientDetail>()))
                 .Callback((IngredientDetail some) =>
                 {
                     mockIDDB.SingleOrDefault(x => x.RecipeId == some.RecipeId && x.IngredientId == x.IngredientId).Amount += some.Amount;
@@ -274,20 +251,20 @@ namespace HomeTask4.Core.Tests.ControllerTests
             string ingName = "";
             double amount = 800;
             string measure = "g";
-            mockRepository.Setup(r => r.FirstOrDefaultAsync<Recipe>(It.IsAny<Expression<Func<Recipe, bool>>>()));
-            mockRepository.Setup(r => r.FirstOrDefaultAsync<Measure>(It.IsAny<Expression<Func<Measure, bool>>>()));
-            mockRepository.Setup(r => r.FirstOrDefaultAsync<Ingredient>(It.IsAny<Expression<Func<Ingredient, bool>>>()));
-            mockRepository.Setup(r => r.FirstOrDefaultAsync<IngredientDetail>(It.IsAny<Expression<Func<IngredientDetail, bool>>>()));
+            _mockRepository.Setup(r => r.FirstOrDefaultAsync<Recipe>(It.IsAny<Expression<Func<Recipe, bool>>>()));
+            _mockRepository.Setup(r => r.FirstOrDefaultAsync<Measure>(It.IsAny<Expression<Func<Measure, bool>>>()));
+            _mockRepository.Setup(r => r.FirstOrDefaultAsync<Ingredient>(It.IsAny<Expression<Func<Ingredient, bool>>>()));
+            _mockRepository.Setup(r => r.FirstOrDefaultAsync<IngredientDetail>(It.IsAny<Expression<Func<IngredientDetail, bool>>>()));
             //Act
             var caughtException = await Assert.ThrowsAsync<ArgumentException>(async () => await _recipeController.AddIngredientToRecipeAsync(testedRecipe, ingName, measure, amount));
             //Assert
-            mockRepository.Verify(r => r.FirstOrDefaultAsync<Recipe>(It.IsAny<Expression<Func<Recipe, bool>>>()), Times.Never);
-            mockRepository.Verify(r => r.FirstOrDefaultAsync<Measure>(It.IsAny<Expression<Func<Measure, bool>>>()), Times.Never);
-            mockRepository.Verify(r => r.FirstOrDefaultAsync<Ingredient>(It.IsAny<Expression<Func<Ingredient, bool>>>()), Times.Never);
-            mockRepository.Verify(r => r.FirstOrDefaultAsync<IngredientDetail>(It.IsAny<Expression<Func<IngredientDetail, bool>>>()), Times.Never);
-            mockRepository.Verify(r => r.AddAsync<Measure>(It.IsAny<Measure>()), Times.Never);
-            mockRepository.Verify(r => r.AddAsync<Ingredient>(It.IsAny<Ingredient>()), Times.Never);
-            mockRepository.Verify(r => r.AddAsync<IngredientDetail>(It.IsAny<IngredientDetail>()), Times.Never);
+            _mockRepository.Verify(r => r.FirstOrDefaultAsync<Recipe>(It.IsAny<Expression<Func<Recipe, bool>>>()), Times.Never);
+            _mockRepository.Verify(r => r.FirstOrDefaultAsync<Measure>(It.IsAny<Expression<Func<Measure, bool>>>()), Times.Never);
+            _mockRepository.Verify(r => r.FirstOrDefaultAsync<Ingredient>(It.IsAny<Expression<Func<Ingredient, bool>>>()), Times.Never);
+            _mockRepository.Verify(r => r.FirstOrDefaultAsync<IngredientDetail>(It.IsAny<Expression<Func<IngredientDetail, bool>>>()), Times.Never);
+            _mockRepository.Verify(r => r.AddAsync<Measure>(It.IsAny<Measure>()), Times.Never);
+            _mockRepository.Verify(r => r.AddAsync<Ingredient>(It.IsAny<Ingredient>()), Times.Never);
+            _mockRepository.Verify(r => r.AddAsync<IngredientDetail>(It.IsAny<IngredientDetail>()), Times.Never);
             Assert.Contains("IngredientName is empty", caughtException.Message);
         }
 
@@ -300,29 +277,29 @@ namespace HomeTask4.Core.Tests.ControllerTests
             List<Measure> mockMeasureDB = GetMeasures();
             List<Ingredient> mockIngredientDB = GetIngredients();
             List<IngredientDetail> mockIDDB = GetIngredientDetails();
-            var mockRepository = new Mock<IRepository>();
-            _unitOfWorkMock.SetupGet(u => u.Repository).Returns(mockRepository.Object);
+            var _mockRepository = new Mock<IRepository>();
+            _unitOfWorkMock.SetupGet(u => u.Repository).Returns(_mockRepository.Object);
             //----------------------------------------------------------------------------------------------------------------------------------------//
-            mockRepository.Setup(r => r.AddAsync<Measure>(It.IsAny<Measure>()))
+            _mockRepository.Setup(r => r.AddAsync<Measure>(It.IsAny<Measure>()))
                 .Callback((Measure some) =>
                 {
                     some.Id = mockMeasureDB.Last().Id + 1;
                     mockMeasureDB.Add(some);
                 });
-            mockRepository.Setup(r => r.AddAsync<Ingredient>(It.IsAny<Ingredient>()))
+            _mockRepository.Setup(r => r.AddAsync<Ingredient>(It.IsAny<Ingredient>()))
                 .Callback((Ingredient some) =>
                 {
                     some.Id = mockIngredientDB.Last().Id + 1;
                     mockIngredientDB.Add(some);
                 });
 
-            mockRepository.Setup(r => r.AddAsync<IngredientDetail>(It.IsAny<IngredientDetail>()))
+            _mockRepository.Setup(r => r.AddAsync<IngredientDetail>(It.IsAny<IngredientDetail>()))
                 .Callback((IngredientDetail some) =>
                 {
                     some.Id = mockIDDB.Last().Id + 1;
                     mockIDDB.Add(some);
                 });
-            mockRepository.Setup(r => r.UpdateAsync<IngredientDetail>(It.IsAny<IngredientDetail>()))
+            _mockRepository.Setup(r => r.UpdateAsync<IngredientDetail>(It.IsAny<IngredientDetail>()))
                 .Callback((IngredientDetail some) =>
                 {
                     mockIDDB.SingleOrDefault(x => x.RecipeId == some.RecipeId && x.IngredientId == x.IngredientId).Amount += some.Amount;
@@ -334,25 +311,25 @@ namespace HomeTask4.Core.Tests.ControllerTests
             string measure = "fille"; //id = 5
             IngredientDetail detail = new IngredientDetail { RecipeId = testedRecipe.Id, IngredientId = 6, MeasureId = 5 };
 
-            mockRepository.Setup(r => r.FirstOrDefaultAsync<Recipe>(It.IsAny<Expression<Func<Recipe, bool>>>()))
+            _mockRepository.Setup(r => r.FirstOrDefaultAsync<Recipe>(It.IsAny<Expression<Func<Recipe, bool>>>()))
                 .ReturnsAsync(() => mockRecipeDB.SingleOrDefault(x => string.Equals(x.Name, testedRecipe.Name, StringComparison.OrdinalIgnoreCase) && x.CategoryId == testedRecipe.CategoryId && x.Id == testedRecipe.Id));
-            mockRepository.Setup(r => r.FirstOrDefaultAsync<Ingredient>(It.IsAny<Expression<Func<Ingredient, bool>>>()))
+            _mockRepository.Setup(r => r.FirstOrDefaultAsync<Ingredient>(It.IsAny<Expression<Func<Ingredient, bool>>>()))
                 .ReturnsAsync(() => mockIngredientDB.SingleOrDefault(x => string.Equals(x.Name, ingName, StringComparison.OrdinalIgnoreCase)));
-            mockRepository.Setup(r => r.FirstOrDefaultAsync<Measure>(It.IsAny<Expression<Func<Measure, bool>>>()))
+            _mockRepository.Setup(r => r.FirstOrDefaultAsync<Measure>(It.IsAny<Expression<Func<Measure, bool>>>()))
                 .ReturnsAsync(() => mockMeasureDB.SingleOrDefault(x => string.Equals(x.Name, measure, StringComparison.OrdinalIgnoreCase)));
-            mockRepository.Setup(r => r.FirstOrDefaultAsync<IngredientDetail>(It.IsAny<Expression<Func<IngredientDetail, bool>>>()))
+            _mockRepository.Setup(r => r.FirstOrDefaultAsync<IngredientDetail>(It.IsAny<Expression<Func<IngredientDetail, bool>>>()))
                 .ReturnsAsync(() => mockIDDB.SingleOrDefault(x => x.RecipeId == detail.RecipeId && x.IngredientId == detail.IngredientId));
             //Act
             await _recipeController.AddIngredientToRecipeAsync(testedRecipe, ingName, measure, amount);
             IngredientDetail retrieved = mockIDDB.SingleOrDefault(x => x.RecipeId == testedRecipe.Id && x.IngredientId == mockIngredientDB.SingleOrDefault(x => x.Name == ingName)?.Id);
             //Assert
-            mockRepository.Verify(r => r.FirstOrDefaultAsync<Recipe>(It.IsAny<Expression<Func<Recipe, bool>>>()), Times.Once);
-            mockRepository.Verify(r => r.FirstOrDefaultAsync<Measure>(It.IsAny<Expression<Func<Measure, bool>>>()), Times.Once);
-            mockRepository.Verify(r => r.FirstOrDefaultAsync<Ingredient>(It.IsAny<Expression<Func<Ingredient, bool>>>()), Times.Once);
-            mockRepository.Verify(r => r.FirstOrDefaultAsync<IngredientDetail>(It.IsAny<Expression<Func<IngredientDetail, bool>>>()), Times.Once);
-            mockRepository.Verify(mockRepository => mockRepository.AddAsync<Measure>(It.IsAny<Measure>()), Times.Once);
-            mockRepository.Verify(mockRepository => mockRepository.AddAsync<Ingredient>(It.IsAny<Ingredient>()), Times.Once);
-            mockRepository.Verify(mockRepository => mockRepository.AddAsync<IngredientDetail>(It.IsAny<IngredientDetail>()), Times.Once);
+            _mockRepository.Verify(r => r.FirstOrDefaultAsync<Recipe>(It.IsAny<Expression<Func<Recipe, bool>>>()), Times.Once);
+            _mockRepository.Verify(r => r.FirstOrDefaultAsync<Measure>(It.IsAny<Expression<Func<Measure, bool>>>()), Times.Once);
+            _mockRepository.Verify(r => r.FirstOrDefaultAsync<Ingredient>(It.IsAny<Expression<Func<Ingredient, bool>>>()), Times.Once);
+            _mockRepository.Verify(r => r.FirstOrDefaultAsync<IngredientDetail>(It.IsAny<Expression<Func<IngredientDetail, bool>>>()), Times.Once);
+            _mockRepository.Verify(_mockRepository => _mockRepository.AddAsync<Measure>(It.IsAny<Measure>()), Times.Once);
+            _mockRepository.Verify(_mockRepository => _mockRepository.AddAsync<Ingredient>(It.IsAny<Ingredient>()), Times.Once);
+            _mockRepository.Verify(_mockRepository => _mockRepository.AddAsync<IngredientDetail>(It.IsAny<IngredientDetail>()), Times.Once);
             Assert.NotNull(retrieved);
         }
         private List<Recipe> GetRecipes()
