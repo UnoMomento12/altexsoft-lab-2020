@@ -29,11 +29,7 @@ namespace HomeTask4.Core.Tests.ControllerTests
         {
             //Arrange
             List<RecipeStep> recipeStepsDB = new List<RecipeStep>();
-            _mockRepository.Setup(r => r.AddRangeAsync<RecipeStep>(It.IsAny<List<RecipeStep>>()))
-                 .Callback((List<RecipeStep> some) =>
-                 {
-                     recipeStepsDB.AddRange(some);
-                 });
+            bool isPassedList = false;
             List<RecipeStep> stepsToAdd = new List<RecipeStep>
             {
                 new RecipeStep{ Id = 1 , Description = "step 1.1" , RecipeId = 1, StepNumber = 1},
@@ -43,11 +39,18 @@ namespace HomeTask4.Core.Tests.ControllerTests
                 new RecipeStep{ Id = 5 , Description = "step 2.2" , RecipeId = 2, StepNumber = 2},
                 new RecipeStep{ Id = 6 , Description = "step 2.3" , RecipeId = 2, StepNumber = 3},
             };
+            _mockRepository.Setup(r => r.AddRangeAsync<RecipeStep>(It.IsAny<List<RecipeStep>>()))
+                 .Callback((List<RecipeStep> passedList) =>
+                 {
+                     recipeStepsDB.AddRange(passedList);
+                     isPassedList = passedList == stepsToAdd;
+                 });
             //Act
             await _recStepCont.AddStepsAsync(stepsToAdd);
             //Assert
             _mockRepository.Verify(r => r.AddRangeAsync<RecipeStep>(It.IsAny<List<RecipeStep>>()), Times.Once);
             Assert.Equal(recipeStepsDB, stepsToAdd);
+            Assert.True(isPassedList);
         }
 
     }
