@@ -51,10 +51,8 @@ namespace HomeTask4.Core.Tests.ControllerTests
             //Arrange
             Category categoryToTest = new Category { Id = 3, Name = "First set", ParentId = null };
             List<Category> mockDB = GetCategories();
-            _mockRepository.Setup(r => r.AddAsync<Category>(categoryToTest)).Callback((Category passedCategory) => mockDB.Add(passedCategory));
             _mockRepository.Setup(r => r.FirstOrDefaultAsync<Category>(It.IsAny<Expression<Func<Category, bool>>>()))
                 .ReturnsAsync(() => mockDB.FirstOrDefault(x => string.Equals(x.Name, categoryToTest.Name, StringComparison.OrdinalIgnoreCase) && x.ParentId == categoryToTest.ParentId));
-            _mockRepository.Setup(r => r.GetByIdAsync<Category>(categoryToTest.Id)).ReturnsAsync((int a) => mockDB.FirstOrDefault(x => x.Id == a));
             //Act
             var caughtException = await Assert.ThrowsAsync<ArgumentException>(async () => await _categoryController.TryCreateCategoryAsync(categoryToTest));
             //Assert
