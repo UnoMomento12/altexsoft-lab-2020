@@ -56,6 +56,7 @@ namespace HomeTask4.Core.Tests.ControllerTests
             //Act
             var caughtException = await Assert.ThrowsAsync<ArgumentException>(async () => await _categoryController.TryCreateCategoryAsync(categoryToTest));
             //Assert
+            _mockRepository.Verify(r => r.FirstOrDefaultAsync<Category>(It.IsAny<Expression<Func<Category, bool>>>()), Times.Once);
             _loggerMock.Verify(logger => logger.Log(
                 It.IsAny<LogLevel>(),
                 It.IsAny<EventId>(),
@@ -85,6 +86,8 @@ namespace HomeTask4.Core.Tests.ControllerTests
             //Act
             var actualResult = await _categoryController.TryCreateCategoryAsync(categoryToTest);
             //Assert
+            _mockRepository.Verify(r => r.FirstOrDefaultAsync<Category>(It.IsAny<Expression<Func<Category, bool>>>()), Times.Once);
+            _mockRepository.Verify(r => r.GetByIdAsync<Category>(id), Times.Once);
             _mockRepository.Verify(r => r.AddAsync<Category>(categoryToTest), Times.Once);
             Assert.True(actualResult == expectedResult);
         }
