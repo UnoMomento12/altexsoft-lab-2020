@@ -181,11 +181,6 @@ namespace HomeTask4.Core.Tests.ControllerTests
                     ingredientDetail.Id = mockIDDB.Last().Id + 1;
                     mockIDDB.Add(ingredientDetail);
                 });
-            _mockRepository.Setup(r => r.UpdateAsync<IngredientDetail>(It.IsAny<IngredientDetail>()))
-                .Callback((IngredientDetail ingredientDetail) =>
-                {
-                    mockIDDB.SingleOrDefault(x => x.RecipeId == ingredientDetail.RecipeId && x.IngredientId == x.IngredientId).Amount += ingredientDetail.Amount;
-                });
             #endregion
             Recipe recipeToTest = new Recipe { Id = 1, Name = "Recipe 1", CategoryId = 1 };
             string ingredientName = "Salmon"; // id = 6
