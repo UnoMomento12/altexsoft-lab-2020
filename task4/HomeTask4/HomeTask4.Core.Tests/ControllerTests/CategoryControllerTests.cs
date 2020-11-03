@@ -51,7 +51,7 @@ namespace HomeTask4.Core.Tests.ControllerTests
             //Arrange
             Category categoryToTest = new Category { Id = 3, Name = "First set", ParentId = null };
             List<Category> mockDB = GetCategories();
-            _mockRepository.Setup(r => r.AddAsync<Category>(It.IsAny<Category>())).Callback((Category passedCategory) => mockDB.Add(passedCategory));
+            _mockRepository.Setup(r => r.AddAsync<Category>(categoryToTest)).Callback((Category passedCategory) => mockDB.Add(passedCategory));
             _mockRepository.Setup(r => r.FirstOrDefaultAsync<Category>(It.IsAny<Expression<Func<Category, bool>>>()))
                 .ReturnsAsync(() => mockDB.FirstOrDefault(x => string.Equals(x.Name, categoryToTest.Name, StringComparison.OrdinalIgnoreCase) && x.ParentId == categoryToTest.ParentId));
             _mockRepository.Setup(r => r.GetByIdAsync<Category>(categoryToTest.Id)).ReturnsAsync((int a) => mockDB.FirstOrDefault(x => x.Id == a));
@@ -75,18 +75,10 @@ namespace HomeTask4.Core.Tests.ControllerTests
             //Arrange
             Category categoryToTest = new Category { Id = id, Name = name, ParentId = parentId };
             List<Category> mockDB = GetCategories();
-            bool isPassedCategory = false;
             if (!isProblem)
             {
-                _mockRepository.Setup(r => r.AddAsync<Category>(It.IsAny<Category>())).Callback((Category passedCategory) => {
+                _mockRepository.Setup(r => r.AddAsync<Category>(categoryToTest)).Callback((Category passedCategory) => {
                     mockDB.Add(passedCategory);
-                    isPassedCategory = passedCategory == categoryToTest;
-                });
-            } 
-            else
-            {
-                _mockRepository.Setup(r => r.AddAsync<Category>(It.IsAny<Category>())).Callback((Category passedCategory) => {
-                    isPassedCategory = passedCategory == categoryToTest;
                 });
             }
             _mockRepository.Setup(r => r.FirstOrDefaultAsync<Category>(It.IsAny<Expression<Func<Category, bool>>>()))
@@ -95,14 +87,8 @@ namespace HomeTask4.Core.Tests.ControllerTests
             //Act
             var actualResult = await _categoryController.TryCreateCategoryAsync(categoryToTest);
             //Assert
-            _loggerMock.Verify(logger => logger.Log(
-                It.IsAny<LogLevel>(),
-                It.IsAny<EventId>(),
-                It.Is<It.IsAnyType>((v, t) => true),
-                It.IsAny<Exception>(),
-                It.Is<Func<It.IsAnyType, Exception, string>>((v, t) => true)), Times.Never);
+            _mockRepository.Verify(r => r.AddAsync<Category>(categoryToTest), Times.Once);
             Assert.True(actualResult == expectedResult);
-            Assert.True(isPassedCategory);
         }
 
         [Fact]
@@ -110,22 +96,9 @@ namespace HomeTask4.Core.Tests.ControllerTests
         {
             //Arrange
             Category categoryToTest = null;
-            List<Category> mockDB = GetCategories();
-            _mockRepository.Setup(r => r.AddAsync<Category>(It.IsAny<Category>())).Callback((Category passedCategory) =>
-            {
-                mockDB.Add(passedCategory);
-            });
-            _mockRepository.Setup(r => r.FirstOrDefaultAsync<Category>(It.IsAny<Expression<Func<Category, bool>>>()));
-            _mockRepository.Setup(r => r.GetByIdAsync<Category>(It.IsAny<int>())).ReturnsAsync((int a) => mockDB.FirstOrDefault(x => x.Id == a));
             //Act
             var actualResult =  await _categoryController.TryCreateCategoryAsync(categoryToTest);
             //Assert
-            _loggerMock.Verify(logger => logger.Log(
-                It.IsAny<LogLevel>(),
-                It.IsAny<EventId>(),
-                It.Is<It.IsAnyType>((v, t) => true),
-                It.IsAny<Exception>(),
-                It.Is<Func<It.IsAnyType, Exception, string>>((v, t) => true)), Times.Never);
             Assert.False(actualResult);
         }
         private static List<Category> GetCategories()

@@ -70,19 +70,12 @@ namespace HomeTask4.Core.Tests.ControllerTests
             //Arrange
             var recipeToTest = new Recipe { Id = id, Name = name, Description = description, CategoryId = categoryId }; // new recipe
             List<Recipe> mockDB = GetRecipes();
-            bool isPassedRecipe = false;
             if (!isProblem)
             {
-                _mockRepository.Setup(r => r.AddAsync<Recipe>(It.IsAny<Recipe>())).Callback((Recipe passedRecipe) => {
+                _mockRepository.Setup(r => r.AddAsync<Recipe>(recipeToTest)).Callback((Recipe passedRecipe) => {
                     mockDB.Add(passedRecipe);
-                    isPassedRecipe = passedRecipe == recipeToTest;
                 });
-            } else
-            {
-                _mockRepository.Setup(r => r.AddAsync<Recipe>(It.IsAny<Recipe>())).Callback((Recipe passedRecipe) => {
-                    isPassedRecipe = passedRecipe == recipeToTest;
-                });
-            }
+            } 
             _mockRepository.Setup(r => r.FirstOrDefaultAsync<Recipe>(It.IsAny<Expression<Func<Recipe, bool>>>()))
                  .ReturnsAsync(() => mockDB.SingleOrDefault(x => string.Equals(x.Name, recipeToTest.Name, StringComparison.OrdinalIgnoreCase) && x.CategoryId == recipeToTest.CategoryId));
             _mockRepository.Setup(r => r.GetByIdAsync<Recipe>(It.IsAny<int>())).ReturnsAsync((int a) => mockDB.FirstOrDefault(x => x.Id == a));
@@ -90,14 +83,8 @@ namespace HomeTask4.Core.Tests.ControllerTests
             var resultFlag = await _recipeController.TryCreateRecipeAsync(recipeToTest);
             //Assert
             _mockRepository.Verify(r => r.FirstOrDefaultAsync<Recipe>(It.IsAny<Expression<Func<Recipe, bool>>>()), Times.Once);
-            _mockRepository.Verify(r => r.AddAsync<Recipe>(It.IsAny<Recipe>()), Times.Once);
+            _mockRepository.Verify(r => r.AddAsync<Recipe>(recipeToTest), Times.Once);
             _mockRepository.Verify(r => r.GetByIdAsync<Recipe>(It.IsAny<int>()), Times.Once);
-            _loggerMock.Verify(logger => logger.Log(
-                It.IsAny<LogLevel>(),
-                It.IsAny<EventId>(),
-                It.Is<It.IsAnyType>((v, t) => true),
-                It.IsAny<Exception>(),
-                It.Is<Func<It.IsAnyType, Exception, string>>((v, t) => true)), Times.Never);
             Assert.True(resultFlag == result);
         }
         [Fact(DisplayName = "TryCreateRecipeAsync method throws argument exception on duplicate recipe")]
@@ -137,34 +124,6 @@ namespace HomeTask4.Core.Tests.ControllerTests
             //Arrange
             #region SameIngredientDetailArrange
             List<Recipe> mockRecipeDB = GetRecipes();
-            List<Measure> mockMeasureDB = GetMeasures();
-            List<Ingredient> mockIngredientDB = GetIngredients();
-            List<IngredientDetail> mockIDDB = GetIngredientDetails();
-            //----------------------------------------------------------------------------------------------------------------------------------------//
-            _mockRepository.Setup(r => r.AddAsync<Measure>(It.IsAny<Measure>()))
-                .Callback((Measure measure) =>
-                {
-                    measure.Id = mockMeasureDB.Last().Id + 1;
-                    mockMeasureDB.Add(measure);
-                });
-            _mockRepository.Setup(r => r.AddAsync<Ingredient>(It.IsAny<Ingredient>()))
-                .Callback((Ingredient ingredient) =>
-                {
-                    ingredient.Id = mockIngredientDB.Last().Id + 1;
-                    mockIngredientDB.Add(ingredient);
-                });
-
-            _mockRepository.Setup(r => r.AddAsync<IngredientDetail>(It.IsAny<IngredientDetail>()))
-                .Callback((IngredientDetail ingredientDetail) =>
-                {
-                    ingredientDetail.Id = mockIDDB.Last().Id + 1;
-                    mockIDDB.Add(ingredientDetail);
-                });
-            _mockRepository.Setup(r => r.UpdateAsync<IngredientDetail>(It.IsAny<IngredientDetail>()))
-                .Callback((IngredientDetail ingredientDetail) =>
-                {
-                    mockIDDB.SingleOrDefault(x => x.RecipeId == ingredientDetail.RecipeId && x.IngredientId == x.IngredientId).Amount += ingredientDetail.Amount;
-                });
             #endregion
             Recipe recipeToTest = new Recipe { Id = 0, Name = "Recipe 1", CategoryId = 1 }; // Non-existent in DB recipe
             string ingredientName = "beef";
@@ -181,39 +140,7 @@ namespace HomeTask4.Core.Tests.ControllerTests
         [Fact(DisplayName = "AddIngredientToRecipeAsync method throws ArgumentException on empty ingredient name")]
         public async Task AddIngredientToRecipeAsync_Throws_ArgumentException_On_Empty_IngredientName()
         {
-            //Arrange
-            #region SameIngredientDetailArrange
-            List<Recipe> mockRecipeDB = GetRecipes();
-            List<Measure> mockMeasureDB = GetMeasures();
-            List<Ingredient> mockIngredientDB = GetIngredients();
-            List<IngredientDetail> mockIDDB = GetIngredientDetails();
-            //----------------------------------------------------------------------------------------------------------------------------------------//
-            _mockRepository.Setup(r => r.AddAsync<Measure>(It.IsAny<Measure>()))
-                .Callback((Measure measure) =>
-                {
-                    measure.Id = mockMeasureDB.Last().Id + 1;
-                    mockMeasureDB.Add(measure);
-                });
-            _mockRepository.Setup(r => r.AddAsync<Ingredient>(It.IsAny<Ingredient>()))
-                .Callback((Ingredient ingredient) =>
-                {
-                    ingredient.Id = mockIngredientDB.Last().Id + 1;
-                    mockIngredientDB.Add(ingredient);
-                });
-
-            _mockRepository.Setup(r => r.AddAsync<IngredientDetail>(It.IsAny<IngredientDetail>()))
-                .Callback((IngredientDetail ingredientDetail) =>
-                {
-                    ingredientDetail.Id = mockIDDB.Last().Id + 1;
-                    mockIDDB.Add(ingredientDetail);
-                });
-            _mockRepository.Setup(r => r.UpdateAsync<IngredientDetail>(It.IsAny<IngredientDetail>()))
-                .Callback((IngredientDetail ingredientDetail) =>
-                {
-                    mockIDDB.SingleOrDefault(x => x.RecipeId == ingredientDetail.RecipeId && x.IngredientId == x.IngredientId).Amount += ingredientDetail.Amount;
-                });
-            #endregion
-            Recipe recipeToTest = new Recipe { Id = 1, Name = "Recipe 1", CategoryId = 1 }; // Non-existent in DB recipe
+            Recipe recipeToTest = new Recipe { Id = 1, Name = "Recipe 1", CategoryId = 1 };
             string ingredientName = "";
             double amount = 800;
             string measure = "g";
@@ -258,7 +185,7 @@ namespace HomeTask4.Core.Tests.ControllerTests
                     mockIDDB.SingleOrDefault(x => x.RecipeId == ingredientDetail.RecipeId && x.IngredientId == x.IngredientId).Amount += ingredientDetail.Amount;
                 });
             #endregion
-            Recipe recipeToTest = new Recipe { Id = 1, Name = "Recipe 1", CategoryId = 1 }; // Non-existent in DB recipe
+            Recipe recipeToTest = new Recipe { Id = 1, Name = "Recipe 1", CategoryId = 1 }; 
             string ingredientName = "Salmon"; // id = 6
             double amount = 6;
             string measure = "fille"; //id = 5
