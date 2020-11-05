@@ -123,9 +123,7 @@ namespace HomeTask4.Core.Tests.ControllerTests
         public async Task AddIngredientToRecipeAsync_Throws_ArgumentException_On_NonExistent_Recipe()
         {
             //Arrange
-            #region SameIngredientDetailArrange
             List<Recipe> mockRecipeDB = GetRecipes();
-            #endregion
             Recipe recipeToTest = new Recipe { Id = 0, Name = "Recipe 1", CategoryId = 1 }; // Non-existent in DB recipe
             string ingredientName = "beef";
             double amount = 800;
@@ -161,7 +159,6 @@ namespace HomeTask4.Core.Tests.ControllerTests
             List<Measure> mockMeasureDB = GetMeasures();
             List<Ingredient> mockIngredientDB = GetIngredients();
             List<IngredientDetail> mockIDDB = GetIngredientDetails();
-            //----------------------------------------------------------------------------------------------------------------------------------------//
             _mockRepository.Setup(r => r.AddAsync<Measure>(It.IsAny<Measure>()))
                 .Callback((Measure measure) =>
                 {
@@ -204,9 +201,9 @@ namespace HomeTask4.Core.Tests.ControllerTests
             _mockRepository.Verify(r => r.FirstOrDefaultAsync<Measure>(It.IsAny<Expression<Func<Measure, bool>>>()), Times.Once);
             _mockRepository.Verify(r => r.FirstOrDefaultAsync<Ingredient>(It.IsAny<Expression<Func<Ingredient, bool>>>()), Times.Once);
             _mockRepository.Verify(r => r.FirstOrDefaultAsync<IngredientDetail>(It.IsAny<Expression<Func<IngredientDetail, bool>>>()), Times.Once);
-            _mockRepository.Verify(_mockRepository => _mockRepository.AddAsync<Measure>(It.IsAny<Measure>()), Times.Once);
-            _mockRepository.Verify(_mockRepository => _mockRepository.AddAsync<Ingredient>(It.IsAny<Ingredient>()), Times.Once);
-            _mockRepository.Verify(_mockRepository => _mockRepository.AddAsync<IngredientDetail>(It.IsAny<IngredientDetail>()), Times.Once);
+            _mockRepository.Verify(r => r.AddAsync<Measure>(It.Is<Measure>(entity => entity.Name ==  measure)), Times.Once);
+            _mockRepository.Verify(r => r.AddAsync<Ingredient>(It.Is<Ingredient>(entity => entity.Name == ingredientName)), Times.Once);
+            _mockRepository.Verify(r => r.AddAsync<IngredientDetail>(It.Is<IngredientDetail>(entity => entity.RecipeId == recipeToTest.Id && entity.IngredientId == 6 && entity.Amount == amount && entity.MeasureId == 5)), Times.Once);
             Assert.NotNull(retrieved);
         }
 
@@ -226,9 +223,9 @@ namespace HomeTask4.Core.Tests.ControllerTests
                 });
             #endregion
             Recipe recipeToTest = new Recipe { Id = 1, Name = "Recipe 1", CategoryId = 1 };
-            string ingredientName = "Sugar"; 
+            string ingredientName = "Sugar"; //id = 2
             double amount = 200;
-            string measure = "g"; 
+            string measure = "g"; // id = 3
             IngredientDetail detail = new IngredientDetail { RecipeId = recipeToTest.Id, IngredientId = 2, MeasureId = 3 };
 
             _mockRepository.Setup(r => r.FirstOrDefaultAsync<Recipe>(It.IsAny<Expression<Func<Recipe, bool>>>()))
@@ -247,7 +244,7 @@ namespace HomeTask4.Core.Tests.ControllerTests
             _mockRepository.Verify(r => r.FirstOrDefaultAsync<Measure>(It.IsAny<Expression<Func<Measure, bool>>>()), Times.Once);
             _mockRepository.Verify(r => r.FirstOrDefaultAsync<Ingredient>(It.IsAny<Expression<Func<Ingredient, bool>>>()), Times.Once);
             _mockRepository.Verify(r => r.FirstOrDefaultAsync<IngredientDetail>(It.IsAny<Expression<Func<IngredientDetail, bool>>>()), Times.Once);
-            _mockRepository.Verify(_mockRepository => _mockRepository.UpdateAsync<IngredientDetail>(It.IsAny<IngredientDetail>()), Times.Once);
+            _mockRepository.Verify(r => r.UpdateAsync<IngredientDetail>(It.Is<IngredientDetail>(entity => entity.RecipeId == recipeToTest.Id && entity.IngredientId == 2 && entity.MeasureId == 3 )), Times.Once);
             Assert.NotNull(retrieved);
         }
         private List<Recipe> GetRecipes()
