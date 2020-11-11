@@ -32,7 +32,6 @@ namespace HomeTask4.Core.Tests.ControllerTests
         [Fact ( DisplayName = "TryCreateCategoryAsync method throws ArgumentException on empty name") ]
         public async Task TryCreateCategoryAsync_Throws_Exception_On_Empty_Name()
         {
-            //Arrange
             //Act
             var caughtException = await Assert.ThrowsAsync<ArgumentException>(async () => await _categoryController.TryCreateCategoryAsync("", 1));
             //Assert
@@ -67,19 +66,16 @@ namespace HomeTask4.Core.Tests.ControllerTests
         }
 
         [Theory(DisplayName = "TryCreateCategoryAsync method returns bool flag on completion")]
-        [InlineData(3, "Soups", 1, false, true)]
-        [InlineData(3, "Soups", 1, true, false)]
-        public async Task TryCreateCategoryAsync_Returns_Bool(int id, string name, int? parentId, bool isProblem, bool expectedResult)
+        [InlineData(3, "Soups", 1)]
+        [InlineData(4, "Hot Soups", 3)]
+        public async Task TryCreateCategoryAsync_Returns_Bool(int id, string name, int? parentId)
         {
             //Arrange
             Category categoryToTest = new Category { Id = id, Name = name, ParentId = parentId };
             List<Category> mockDB = GetCategories();
-            if (!isProblem)
-            {
-                _mockRepository.Setup(r => r.AddAsync<Category>(categoryToTest)).Callback((Category passedCategory) => {
-                    mockDB.Add(passedCategory);
-                });
-            }
+            _mockRepository.Setup(r => r.AddAsync<Category>(categoryToTest)).Callback((Category passedCategory) => {
+                mockDB.Add(passedCategory);
+            });
             _mockRepository.Setup(r => r.FirstOrDefaultAsync<Category>(It.IsAny<Expression<Func<Category, bool>>>()))
                 .ReturnsAsync(() => mockDB.FirstOrDefault(x => string.Equals(x.Name, name, StringComparison.OrdinalIgnoreCase) && x.ParentId == parentId));
             _mockRepository.Setup(r => r.GetByIdAsync<Category>(id)).ReturnsAsync((int a) => mockDB.FirstOrDefault(x => x.Id == a));
@@ -89,7 +85,7 @@ namespace HomeTask4.Core.Tests.ControllerTests
             _mockRepository.Verify(r => r.FirstOrDefaultAsync<Category>(It.IsAny<Expression<Func<Category, bool>>>()), Times.Once);
             _mockRepository.Verify(r => r.GetByIdAsync<Category>(id), Times.Once);
             _mockRepository.Verify(r => r.AddAsync<Category>(categoryToTest), Times.Once);
-            Assert.True(actualResult == expectedResult);
+            Assert.True(actualResult);
         }
 
         [Fact]
