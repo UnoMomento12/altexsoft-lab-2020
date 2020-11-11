@@ -36,7 +36,7 @@ namespace HomeTask4.Core.Controllers
             return result;
         }
 
-        private async Task CreateRecipeAsync(Recipe recipe)// everything is thrown here
+        public async Task CreateRecipeAsync(Recipe recipe)// everything is thrown here
         {
             if (recipe == null) throw new ArgumentNullException("Recipe reference is null.");
             if (recipe.Name.IsNullOrEmpty()) throw new ArgumentException("Recipe name is null or empty.");
@@ -91,6 +91,38 @@ namespace HomeTask4.Core.Controllers
                 await UnitOfWork.Repository.AddAsync<IngredientDetail>(ingDetail);
             }
         }
+        public async Task AddIngredientToRecipeAsync(Recipe recipe, string ingredientName, double amount, int measureId)
+        {
+            if (recipe == null) throw new ArgumentException("Recipe reference is null.");
+            if (ingredientName.IsNullOrEmpty()) throw new ArgumentException("IngredientName is empty.");
+
+            var checkRecipe = (await UnitOfWork.Repository.FirstOrDefaultAsync<Recipe>(x => x.Name.ToLower() == recipe.Name.ToLower() && x.CategoryId == recipe.CategoryId && x.Id == recipe.Id));
+            if (checkRecipe == null)
+            {
+                throw new ArgumentException($"Recipe {recipe.Name} : {recipe.Id} doesn't exist in Database.");
+            }
+
+            var ingred = (await UnitOfWork.Repository.FirstOrDefaultAsync<Ingredient>(x => x.Name.ToLower() == ingredientName.ToLower()));
+            if (ingred == null)
+            {
+                ingred = new Ingredient { Name = ingredientName };
+                await UnitOfWork.Repository.AddAsync<Ingredient>(ingred);
+            }
+
+            var ingDetail = new IngredientDetail() { RecipeId = checkRecipe.Id, IngredientId = ingred.Id, Amount = amount, MeasureId = measureId };
+
+            var checkerDetail = (await UnitOfWork.Repository.FirstOrDefaultAsync<IngredientDetail>(x => x.RecipeId == ingDetail.RecipeId && x.IngredientId == ingDetail.IngredientId));
+            if (checkerDetail != null)
+            {
+                checkerDetail.Amount += ingDetail.Amount;
+                await UnitOfWork.Repository.UpdateAsync<IngredientDetail>(checkerDetail);
+            }
+            else
+            {
+                checkRecipe.Ingredients.Add(ingDetail);
+                await UnitOfWork.Repository.UpdateAsync<Recipe>(checkRecipe);
+            }
+        }
 
         public void SetCategoryInRecipe(Category category, Recipe recipe)
         {
@@ -111,7 +143,13 @@ namespace HomeTask4.Core.Controllers
         {
             var retrieved = await UnitOfWork.Repository.GetByIdAsync<Recipe>(toUpdate.Id);
             retrieved.Name = toUpdate.Name;
+            retrieved.Description = toUpdate.Description;
+            retrieved.CategoryId = toUpdate.CategoryId;
             await UnitOfWork.Repository.UpdateAsync(retrieved);
+        }
+        public Task<Recipe> GetRecipeByIdAsync(int id)
+        {
+            return UnitOfWork.Repository.GetByIdAsync<Recipe>(id);
         }
     }
 }

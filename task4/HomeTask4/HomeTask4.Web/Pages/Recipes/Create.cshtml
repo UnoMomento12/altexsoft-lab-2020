@@ -1,0 +1,16 @@
+﻿@page
+@model HomeTask4.Web.Pages.Recipes.CreateModel
+@{
+    ViewData["Title"] = "Recipe creation page";
+}
+<div class="container">
+    <form method="post">
+        <div asp-validation-summary="ModelOnly"></div>
+        <div class="form-group">
+            <input asp-for="Created.CategoryId" hidden />
+            <input class="form-control" asp-for="Created.Name" type="text" placeholder="Recipe Name" />
+            <input class="form-control" asp-for="Created.Description" type="text" placeholder="Description" />
+            <button asp-page-handler="Create" type="submit" class="btn btn-success">Create</button>
+        </div>
+    </form>
+</div>

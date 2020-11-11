@@ -1,0 +1,61 @@
+﻿@page
+@model HomeTask4.Web.Pages.Recipes.EditModel
+@{
+    ViewData["Title"] = "Edit recipe page";
+}
+<div class="container">
+    <h5 class="h3">Edit recipe page</h5>
+    <form method="post">
+        <div class="row">
+            <div class="card" style="margin:5px">
+                <div class="card-body">
+                    <input asp-for="toEdit.Id" hidden />
+                    <input asp-for="toEdit.Ingredients" hidden />
+                    <input asp-for="toEdit.Steps" hidden />
+                    <button type="submit" asp-page-handler="Edit" class="btn btn-success" style="display:block">Save changes</button>
+                    <label asp-for="toEdit.Name" ></label>
+                    <input asp-for="toEdit.Name" class="form-control" type="text" placeholder="Recipe Name" />
+                    <label asp-for="toEdit.Category.Name">Category:</label>
+                    <select asp-for="toEdit.CategoryId" asp-items="@Model.Categories" class="custom-select"></select>
+                    <label asp-for="toEdit.Description"></label>
+                    <input asp-for="toEdit.Description" class="form-control" type="text" placeholder="Description">
+                    <h5>Ingredients:</h5>
+                    <ul class="list-group list-group-flush" id="card-ingredients">
+                        @for (int i = 0; i < Model.toEdit.Ingredients.Count; i++)
+                        {
+                            <li class="list-group-item " style="display:flex">
+                                <input value="@Model.toEdit.Ingredients[i].Ingredient.Name" class="form-control" type="text" placeholder="Ingredient Name" disabled />
+                                <input value="@Model.toEdit.Ingredients[i].Amount " class="form-control" type="text" placeholder="Amount" disabled />
+                                <input value="@Model.toEdit.Ingredients[i].Measure.Name" class="form-control" type="text" placeholder="Amount" disabled />
+                                <button asp-route-recipeId="@Model.toEdit.Ingredients[i].RecipeId" asp-route-ingredientId="@Model.toEdit.Ingredients[i].IngredientId" asp-page-handler="DeleteIngredient" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to delete @Model.toEdit.Ingredients[i].Ingredient.Name ingredient?')">Delete</button>
+                            </li>
+                        }
+                        <p>New Ingredient</p>
+                        <li class="list-group-item">
+                            <input name="newIngredient" class="form-control" type="text" placeholder="Ingredient Name" />
+                            <input name="newAmount" class="form-control" type="text" placeholder="Amount" />
+                            <select name="measureId" asp-items="Model.Measures" class="custom-select"></select>
+                            <button asp-page-handler="AddIngredient" class="btn btn-success">Add ingredient</button>
+                        </li>
+                    </ul>
+                    <h5>Steps:</h5>
+                    <ul class="list-group list-group-flush" id="card-ingredients">
+                        @for (int i = 0; i < Model.toEdit.Steps.Count; i++)
+                        {
+                            <li class="list-group-item" style="display:flex">
+                                <input value="@Model.toEdit.Steps[i].StepNumber" class="form-control" type="text" disabled />
+                                <input value="@Model.toEdit.Steps[i].Description" class="form-control" type="text" disabled />
+                                <button asp-route-stepId="@Model.toEdit.Steps[i].Id" asp-page-handler="DeleteStep" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to delete @Model.toEdit.Steps[i].StepNumber step?')">Delete</button>
+                            </li>
+                        }
+                        <p>New Step</p>
+                        <li class="list-group-item">
+                            <input name="description" class="form-control" type="text" placeholder="Step Description" />
+                            <button asp-page-handler="AddStep" class="btn btn-success">Add step</button>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
