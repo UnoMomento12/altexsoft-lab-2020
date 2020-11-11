@@ -20,7 +20,7 @@
             @foreach (var category in Model.ListedSubcategories)
             {
                 <tr>
-                    <td><a class="page-link d-inline border-0 float-left" asp-page="Index" asp-route-Id="@category.Id">@category.Name + @category.Id + @category.ParentId </a></td>
+                    <td><a class="page-link d-inline border-0 float-left" asp-page="Index" asp-route-Id="@category.Id">@category.Name</a></td>
                     <td><a class="page-link d-inline border-0 float-right" asp-page="Edit" asp-route-Id="@category.Id">Edit category</a></td>
                     <td><button type="submit" asp-page-handler="Delete" asp-route-deleteId="@category.Id" class="btn-light" onclick="return confirm('Are you sure you want to delete @category.Name category?')">Delete</button></td>
                 </tr>

@@ -19,6 +19,7 @@ namespace HomeTask4.Infrastructure.Extensions
             services.AddScoped<RecipeController>();
             services.AddScoped<RecipeStepController>();
             services.AddScoped<NavigationController>();
+            services.AddScoped<MeasureController>();
             return services;
         }
     }
