@@ -15,7 +15,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Pages\Ingredients\" />
     <Folder Include="Pages\Recipes\" />
   </ItemGroup>
 

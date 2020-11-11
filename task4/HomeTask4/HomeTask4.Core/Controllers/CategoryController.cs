@@ -66,7 +66,7 @@ namespace HomeTask4.Core.Controllers
         {
             return UnitOfWork.Repository.WhereAsync<Category>(x => x.ParentId == parentId);
         }
-        public Task<Category> GetCategoryById(int id)
+        public Task<Category> GetCategoryByIdAsync(int id)
         {
             return UnitOfWork.Repository.GetByIdAsync<Category>(id);
         }

@@ -7,23 +7,23 @@ using HomeTask4.Core.Entities;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
-namespace HomeTask4.Web.Pages.Categories
+namespace HomeTask4.Web.Pages.Ingredients
 {
     public class EditModel : PageModel
     {
-        private CategoryController _categoryController;
+        private IngredientController _ingredientController;
         [BindProperty]
-        public Category toEdit { get; set; } 
+        public Ingredient toEdit { get; set; } 
 
-        public EditModel(CategoryController categoryController)
+        public EditModel(IngredientController ingredientController)
         {
-            _categoryController = categoryController;
+            _ingredientController = ingredientController;
         }
         public async Task OnGetAsync(int? Id)
         {
             if (Id != null)
             {
-                toEdit = await _categoryController.GetCategoryByIdAsync((int) Id);
+                toEdit = await _ingredientController.GetIngredientByIdAsync((int) Id);
             }
         }
         public async Task<IActionResult> OnPostEditAsync()
@@ -32,8 +32,8 @@ namespace HomeTask4.Web.Pages.Categories
             {
                 try
                 {
-                    await _categoryController.UpdateCategoryAsync(toEdit);
-                    return RedirectToPage("Index", new { Id = toEdit.ParentId });
+                    await _ingredientController.UpdateIngredientAsync(toEdit);
+                    return RedirectToPage("Index");
                 }
                 catch (Exception)
                 {

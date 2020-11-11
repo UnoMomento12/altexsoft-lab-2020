@@ -1,0 +1,21 @@
+﻿@page 
+@model HomeTask4.Web.Pages.Ingredients.IndexModel
+@{
+    ViewData["Title"] = "Category Tree";
+}
+<div class="container">
+    <a asp-page="Create">Create ingredients</a>
+    <h3 class="h3">All ingredients:</h3>
+    <form method="post">
+        <table class="table">
+            @foreach (var ingredient in Model.Ingredients)
+            {
+                <tr>
+                    <td><p class="d-inline border-0 float-left">@ingredient.Name</p></td>
+                    <td><a class="page-link d-inline border-0 float-right" asp-page="Edit" asp-route-Id="@ingredient.Id">Edit</a></td>
+                    <td><button type="submit" asp-page-handler="Delete" asp-route-deleteId="@ingredient.Id" class="btn-light" onclick="return confirm('Are you sure you want to delete @ingredient.Name ingredient?')">Delete</button></td>
+                </tr>
+            }
+        </table>
+    </form>
+</div>

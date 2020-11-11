@@ -25,7 +25,7 @@ namespace HomeTask4.Web.Pages.Categories
         {
             if (Id != null)
             {
-                CurrentCategory = await _categoryController.GetCategoryById((int) Id);
+                CurrentCategory = await _categoryController.GetCategoryByIdAsync((int) Id);
                 ListedSubcategories = CurrentCategory.Categories;
             }
             else
