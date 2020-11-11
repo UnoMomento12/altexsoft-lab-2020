@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using System.Security.Cryptography;
 using Castle.Core.Internal;
+using System.Collections.Generic;
 
 namespace HomeTask4.Core.Controllers
 {
@@ -95,6 +96,22 @@ namespace HomeTask4.Core.Controllers
         {
                 recipe.CategoryId = category.Id;
                 recipe.Category = category;
+        }
+        public Task<List<Recipe>> GetAllRecipesAsync()
+        {
+            return UnitOfWork.Repository.ListAsync<Recipe>();
+        }
+        public async Task DeleteRecipeByIdAsync(int id)
+        {
+            Recipe toDelete = await UnitOfWork.Repository.GetByIdAsync<Recipe>(id);
+            await UnitOfWork.Repository.DeleteAsync<Recipe>(toDelete);
+        }
+
+        public async Task UpdateRecipeAsync(Recipe toUpdate)
+        {
+            var retrieved = await UnitOfWork.Repository.GetByIdAsync<Recipe>(toUpdate.Id);
+            retrieved.Name = toUpdate.Name;
+            await UnitOfWork.Repository.UpdateAsync(retrieved);
         }
     }
 }

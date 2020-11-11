@@ -14,8 +14,4 @@
     <ProjectReference Include="..\HomeTask4.SharedKernel\HomeTask4.SharedKernel.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Pages\Recipes\" />
-  </ItemGroup>
-
 </Project>
