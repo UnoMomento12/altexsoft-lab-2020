@@ -9,29 +9,33 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace HomeTask4.Web.Pages.Categories
 {
-    public class CreateModel : PageModel
+    public class EditModel : PageModel
     {
         private CategoryController _categoryController;
         [BindProperty]
-        public Category Created {get;set;}
+        public Category toEdit { get; set; } 
 
-        public CreateModel(CategoryController categoryController)
+        public EditModel(CategoryController categoryController)
         {
-            Created = new Category();
             _categoryController = categoryController;
         }
-        public void OnGet(int? Parentid)
+        public async Task OnGetAsync(int? Id)
         {
-            Created.ParentId = Parentid;
+            if (Id != null)
+            {
+                toEdit = await _categoryController.GetCategoryById((int) Id);
+            }
         }
-        public async Task<IActionResult> OnPostCreateAsync()
+        public async Task<IActionResult> OnPostEditAsync()
         {
-            if (ModelState.IsValid){
+            if (ModelState.IsValid)
+            {
                 try
                 {
-                    await _categoryController.CreateCategoryAsync(Created);
-                    return RedirectToPage("Index", new { Id = Created.ParentId });
-                }catch(Exception e)
+                    await _categoryController.UpdateCategoryAsync(toEdit);
+                    return RedirectToPage("Index", new { Id = toEdit.ParentId });
+                }
+                catch (Exception)
                 {
                     return RedirectToPage("/Error");
                 }

@@ -6,6 +6,7 @@ using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 namespace HomeTask4.Core.Controllers
 {
@@ -57,22 +58,28 @@ namespace HomeTask4.Core.Controllers
         {
             return UnitOfWork.Repository.GetByIdAsync<Category>(parentId.GetValueOrDefault());
         }
-        public async Task<List<Category>> GetAllCategoriesAsync() {
-            return await UnitOfWork.Repository.ListAsync<Category>();
+        public Task<List<Category>> GetAllCategoriesAsync() {
+            return UnitOfWork.Repository.ListAsync<Category>();
         }
 
-        public async Task<List<Category>> GetCategoriesByParentId(int? parentId)
+        public Task<List<Category>> GetCategoriesByParentId(int? parentId)
         {
-            return await UnitOfWork.Repository.WhereAsync<Category>(x => x.ParentId == parentId);
+            return UnitOfWork.Repository.WhereAsync<Category>(x => x.ParentId == parentId);
         }
-        public async Task<Category> GetCategoryById(int id)
+        public Task<Category> GetCategoryById(int id)
         {
-            return await UnitOfWork.Repository.GetByIdAsync<Category>(id);
+            return UnitOfWork.Repository.GetByIdAsync<Category>(id);
         }
         public async Task DeleteCategoryByIdAsync(int id)
         {
             Category toDelete = await UnitOfWork.Repository.GetByIdAsync<Category>(id);
             await UnitOfWork.Repository.DeleteAsync<Category>(toDelete);
+        }
+        public async Task UpdateCategoryAsync(Category toUpdate)
+        {
+            var retrieved = await UnitOfWork.Repository.GetByIdAsync<Category>(toUpdate.Id);
+            retrieved.Name = toUpdate.Name;
+            await UnitOfWork.Repository.UpdateAsync(retrieved);
         }
     }
 }

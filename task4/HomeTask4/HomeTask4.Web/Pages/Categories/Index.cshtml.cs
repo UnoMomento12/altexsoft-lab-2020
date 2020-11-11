@@ -37,7 +37,7 @@ namespace HomeTask4.Web.Pages.Categories
         public async Task<IActionResult> OnPostDeleteAsync(int deleteId)
         {
             await _categoryController.DeleteCategoryByIdAsync(deleteId);
-            return RedirectToPage("Index", new { Id = CurrentCategory.Id});
+            return RedirectToPage("Index", new { Id = CurrentCategory?.Id});
         }
     }
 }
