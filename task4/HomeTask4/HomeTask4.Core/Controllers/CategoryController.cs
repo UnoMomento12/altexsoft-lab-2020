@@ -4,6 +4,7 @@ using HomeTask4.SharedKernel.Interfaces;
 using Microsoft.EntityFrameworkCore.Query.SqlExpressions;
 using Microsoft.Extensions.Logging;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 namespace HomeTask4.Core.Controllers
@@ -40,7 +41,7 @@ namespace HomeTask4.Core.Controllers
             return TryCreateCategoryAsync(new Category { Name = categoryName, ParentId = parentId });
         }
 
-        private async Task CreateCategoryAsync(Category category) //everything is thrown here and moves up
+        public async Task CreateCategoryAsync(Category category) //everything is thrown here and moves up
         {
             if (category == null) throw new ArgumentNullException($"Category reference is null.");
             if (category.Name.IsNullOrEmpty()) throw new ArgumentException("Category name is null or empty!");
@@ -49,16 +50,29 @@ namespace HomeTask4.Core.Controllers
             {
                 throw new ArgumentException("This category already exists !");
             }
-            if (category.ParentId != null)
-            {
-                category.Parent = (await GetParentCategoryAsync(category.ParentId));
-            }
             await UnitOfWork.Repository.AddAsync<Category>(category);
         }
 
         private Task<Category> GetParentCategoryAsync(int? parentId)
         {
             return UnitOfWork.Repository.GetByIdAsync<Category>(parentId.GetValueOrDefault());
+        }
+        public async Task<List<Category>> GetAllCategoriesAsync() {
+            return await UnitOfWork.Repository.ListAsync<Category>();
+        }
+
+        public async Task<List<Category>> GetCategoriesByParentId(int? parentId)
+        {
+            return await UnitOfWork.Repository.WhereAsync<Category>(x => x.ParentId == parentId);
+        }
+        public async Task<Category> GetCategoryById(int id)
+        {
+            return await UnitOfWork.Repository.GetByIdAsync<Category>(id);
+        }
+        public async Task DeleteCategoryByIdAsync(int id)
+        {
+            Category toDelete = await UnitOfWork.Repository.GetByIdAsync<Category>(id);
+            await UnitOfWork.Repository.DeleteAsync<Category>(toDelete);
         }
     }
 }
