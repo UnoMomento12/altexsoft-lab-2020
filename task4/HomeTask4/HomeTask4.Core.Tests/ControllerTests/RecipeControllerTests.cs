@@ -238,7 +238,7 @@ namespace HomeTask4.Core.Tests.ControllerTests
             Assert.NotNull(retrieved);
         }
         [Fact]
-        public async Task GetRecipeByIdAsync_Should_Delete_Recipe()
+        public async Task DeleteRecipeByIdAsync_Should_Delete_Recipe()
         {
             //Arrange
             List<Recipe> mockRecipeDB = GetRecipes();

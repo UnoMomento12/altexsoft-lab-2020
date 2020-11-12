@@ -9,7 +9,6 @@ using Microsoft.Extensions.Logging;
 using HomeTask4.Core.Entities;
 using System.Linq;
 using System.Linq.Expressions;
-using System.ComponentModel;
 
 namespace HomeTask4.Core.Tests.ControllerTests
 {
@@ -97,6 +96,46 @@ namespace HomeTask4.Core.Tests.ControllerTests
             var actualResult =  await _categoryController.TryCreateCategoryAsync(categoryToTest);
             //Assert
             Assert.False(actualResult);
+        }
+        [Fact]
+        public async Task DeleteCategoryByIdAsync_Should_Delete_Recipe()
+        {
+            //Arrange
+            List<Category> mockCategoryDB = GetCategories();
+            int id = 2;
+            _mockRepository.Setup(r => r.GetByIdAsync<Category>(id)).ReturnsAsync((int a) => mockCategoryDB.FirstOrDefault(x => x.Id == a));
+            _mockRepository.Setup(r => r.DeleteAsync<Category>(It.Is<Category>(entity => entity.Id == id)))
+                .Callback((Category category) =>
+                {
+                    mockCategoryDB.Remove(category);
+                });
+            //Act
+            await _categoryController.DeleteCategoryByIdAsync(id);
+            //Assert
+            var mustBeNull = mockCategoryDB.FirstOrDefault(x => x.Id == id);
+            _mockRepository.Verify(r => r.GetByIdAsync<Category>(id), Times.Once);
+            _mockRepository.Verify(r => r.DeleteAsync<Category>(It.Is<Category>(entity => entity.Id == id)), Times.Once);
+            Assert.Null(mustBeNull);
+        }
+        [Fact]
+        public async Task UpdateCategoryAsync_Should_Update()
+        {
+            //Arrange
+            List<Category> mockCategoryDB = GetCategories();
+            Category toUpdate = new Category { Id = 1, Name = "First set updated", ParentId = null };
+            _mockRepository.Setup(r => r.GetByIdAsync<Category>(toUpdate.Id)).ReturnsAsync((int a) => mockCategoryDB.FirstOrDefault(x => x.Id == a));
+            _mockRepository.Setup(r => r.UpdateAsync<Category>(It.Is<Category>(entity => entity.Id == toUpdate.Id)))
+                .Callback((Category recipe) =>
+                {
+                    recipe.Name = toUpdate.Name;
+                });
+            //Act
+            await _categoryController.UpdateCategoryAsync(toUpdate);
+            //Assert
+            var retrieved = mockCategoryDB.FirstOrDefault(x => x.Id == toUpdate.Id);
+            _mockRepository.Verify(r => r.GetByIdAsync<Category>(toUpdate.Id), Times.Once);
+            _mockRepository.Verify(r => r.UpdateAsync<Category>(It.Is<Category>(entity => entity.Id == toUpdate.Id)), Times.Once);
+            Assert.Contains("updated", retrieved.Name);
         }
         private static List<Category> GetCategories()
         {
