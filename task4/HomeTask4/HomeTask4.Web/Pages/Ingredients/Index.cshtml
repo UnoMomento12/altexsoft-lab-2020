@@ -13,7 +13,7 @@
                 <tr>
                     <td><p class="d-inline border-0 float-left">@ingredient.Name</p></td>
                     <td><a class="page-link d-inline border-0 float-right" asp-page="Edit" asp-route-Id="@ingredient.Id">Edit</a></td>
-                    <td><button type="submit" asp-page-handler="Delete" asp-route-deleteId="@ingredient.Id" class="btn-light" onclick="return confirm('Are you sure you want to delete @ingredient.Name ingredient?')">Delete</button></td>
+                    <td><button type="submit" asp-page-handler="Delete" asp-route-deleteId="@ingredient.Id" class="btn btn-danger" onclick="return confirm('Are you sure you want to delete @ingredient.Name ingredient?')">Delete</button></td>
                 </tr>
             }
         </table>
