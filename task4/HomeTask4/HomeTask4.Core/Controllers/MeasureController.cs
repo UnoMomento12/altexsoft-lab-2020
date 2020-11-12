@@ -2,6 +2,7 @@
 using HomeTask4.Core.Entities;
 using HomeTask4.SharedKernel.Interfaces;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json.Serialization;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -15,21 +16,25 @@ namespace HomeTask4.Core.Controllers
         }
         public async Task CreateMeasureAsync(Measure toCreate)
         {
+            string errorM = "";
             if (toCreate == null)
             {
-                Logger.LogError("Measure reference is null.");
-                throw new ArgumentException("Measure reference is null.");
+                errorM = "Measure reference is null.";
+                Logger.LogError(errorM);
+                throw new ArgumentException(errorM);
             }
             if (toCreate.Name == null)
             {
-                Logger.LogError("Measure name is null!");
-                throw new ArgumentException("Measure name is null!");
+                errorM = "Measure name is null!";
+                Logger.LogError(errorM);
+                throw new ArgumentException(errorM);
             }
             var retrieved = await UnitOfWork.Repository.FirstOrDefaultAsync<Measure>(x => x.Name.ToLower() == toCreate.Name.ToLower());
             if (retrieved != null)
             {
-                Logger.LogError("This Measure already exists");
-                throw new ArgumentException("This Measure already exists");
+                errorM = "This Measure already exists";
+                Logger.LogError(errorM);
+                throw new ArgumentException(errorM);
             }
             await UnitOfWork.Repository.AddAsync<Measure>(toCreate);
         }
