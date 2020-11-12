@@ -7,6 +7,7 @@ using Microsoft.Extensions.Logging;
 using System.Security.Cryptography;
 using Castle.Core.Internal;
 using System.Collections.Generic;
+using Microsoft.Extensions.FileSystemGlobbing.Internal.PathSegments;
 
 namespace HomeTask4.Core.Controllers
 {
@@ -55,41 +56,13 @@ namespace HomeTask4.Core.Controllers
         }
         public async Task AddIngredientToRecipeAsync(Recipe recipe, string ingredientName, string measure, double amount)
         {
-            if (recipe == null) throw new ArgumentException("Recipe reference is null.");
-            if (ingredientName.IsNullOrEmpty()) throw new ArgumentException("IngredientName is empty.");
-
-            var checkRecipe = (await UnitOfWork.Repository.FirstOrDefaultAsync<Recipe>(x => x.Name.ToLower() == recipe.Name.ToLower() && x.CategoryId == recipe.CategoryId && x.Id == recipe.Id));
-            if (checkRecipe == null)
-            {
-                throw new ArgumentException($"Recipe {recipe.Name} : {recipe.Id} doesn't exist in Database.");
-            }
-
-            var ingred = (await UnitOfWork.Repository.FirstOrDefaultAsync<Ingredient>(x => x.Name.ToLower() == ingredientName.ToLower()));
-            if (ingred == null)
-            {
-                ingred = new Ingredient { Name = ingredientName};
-                await UnitOfWork.Repository.AddAsync<Ingredient>(ingred);
-            }
-            
             var measuredIn = (await UnitOfWork.Repository.FirstOrDefaultAsync<Measure>(x => x.Name.ToLower() ==  measure.ToLower()));
             if( measuredIn == null)
             {
                 measuredIn = new Measure { Name = measure };
                 await UnitOfWork.Repository.AddAsync<Measure>(measuredIn);
             }
-
-            var ingDetail = new IngredientDetail() { RecipeId = recipe.Id, IngredientId = ingred.Id, Amount = amount , MeasureId = measuredIn.Id };
-
-            var checkerDetail = (await UnitOfWork.Repository.FirstOrDefaultAsync<IngredientDetail>(x => x.RecipeId == ingDetail.RecipeId && x.IngredientId == ingDetail.IngredientId));
-            if (checkerDetail != null)
-            {
-                checkerDetail.Amount += ingDetail.Amount;
-                await UnitOfWork.Repository.UpdateAsync<IngredientDetail>(checkerDetail);
-            }
-            else
-            {
-                await UnitOfWork.Repository.AddAsync<IngredientDetail>(ingDetail);
-            }
+            await AddIngredientToRecipeAsync(recipe, ingredientName, amount, measuredIn.Id);
         }
         public async Task AddIngredientToRecipeAsync(Recipe recipe, string ingredientName, double amount, int measureId)
         {

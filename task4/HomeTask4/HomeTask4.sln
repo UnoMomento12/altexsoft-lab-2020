@@ -13,6 +13,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HomeTask4.Core", "HomeTask4
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HomeTask4.Web", "HomeTask4.Web\HomeTask4.Web.csproj", "{C61165C5-4650-4909-B2AA-C57ED47625CC}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HomeTask4.Core.Tests", "HomeTask4.Core.Tests\HomeTask4.Core.Tests.csproj", "{9917C768-9737-4ECF-8B30-512E76DCE207}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -39,6 +41,10 @@ Global
 		{C61165C5-4650-4909-B2AA-C57ED47625CC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C61165C5-4650-4909-B2AA-C57ED47625CC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C61165C5-4650-4909-B2AA-C57ED47625CC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9917C768-9737-4ECF-8B30-512E76DCE207}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9917C768-9737-4ECF-8B30-512E76DCE207}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9917C768-9737-4ECF-8B30-512E76DCE207}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9917C768-9737-4ECF-8B30-512E76DCE207}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

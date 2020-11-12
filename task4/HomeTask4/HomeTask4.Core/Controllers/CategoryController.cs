@@ -53,11 +53,6 @@ namespace HomeTask4.Core.Controllers
             }
             await UnitOfWork.Repository.AddAsync<Category>(category);
         }
-
-        private Task<Category> GetParentCategoryAsync(int? parentId)
-        {
-            return UnitOfWork.Repository.GetByIdAsync<Category>(parentId.GetValueOrDefault());
-        }
         public Task<List<Category>> GetAllCategoriesAsync() {
             return UnitOfWork.Repository.ListAsync<Category>();
         }

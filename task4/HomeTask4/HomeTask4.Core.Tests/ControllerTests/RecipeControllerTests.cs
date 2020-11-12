@@ -150,7 +150,7 @@ namespace HomeTask4.Core.Tests.ControllerTests
         public async Task AddIngredientToRecipeAsync_Creates_New_DataBase_Entry_On_Each_Step()
         {
             //Arrange
-            Recipe recipeToTest = new Recipe { Id = 1, Name = "Recipe 1", CategoryId = 1 };
+            Recipe recipeToTest = new Recipe { Id = 1, Name = "Recipe 1", CategoryId = 1, Ingredients = new List<IngredientDetail>() };
             string ingredientName = "Salmon"; // id = 6
             double amount = 6;
             string measure = "fille"; //id = 5
@@ -172,11 +172,11 @@ namespace HomeTask4.Core.Tests.ControllerTests
                     mockIngredientDB.Add(ingredient);
                 });
 
-            _mockRepository.Setup(r => r.AddAsync<IngredientDetail>(It.Is<IngredientDetail>(entity => entity.RecipeId == recipeToTest.Id && entity.IngredientId == 6 && entity.Amount == amount && entity.MeasureId == 5)))
-                .Callback((IngredientDetail ingredientDetail) =>
+            _mockRepository.Setup(r => r.UpdateAsync<Recipe>(It.Is<Recipe>(entity => entity.Id == recipeToTest.Id && entity.Name == recipeToTest.Name && entity.CategoryId == recipeToTest.CategoryId)))
+                .Callback(() =>
                 {
-                    ingredientDetail.Id = mockIDDB.Last().Id + 1;
-                    mockIDDB.Add(ingredientDetail);
+                    detail.Id = mockIDDB.Last().Id + 1;
+                    mockIDDB.Add(detail);
                 });
             _mockRepository.Setup(r => r.FirstOrDefaultAsync<Recipe>(It.IsAny<Expression<Func<Recipe, bool>>>()))
                 .ReturnsAsync(() => mockRecipeDB.SingleOrDefault(x => string.Equals(x.Name, recipeToTest.Name, StringComparison.OrdinalIgnoreCase) && x.CategoryId == recipeToTest.CategoryId && x.Id == recipeToTest.Id));
@@ -196,7 +196,7 @@ namespace HomeTask4.Core.Tests.ControllerTests
             _mockRepository.Verify(r => r.FirstOrDefaultAsync<IngredientDetail>(It.IsAny<Expression<Func<IngredientDetail, bool>>>()), Times.Once);
             _mockRepository.Verify(r => r.AddAsync<Measure>(It.Is<Measure>(entity => entity.Name ==  measure)), Times.Once);
             _mockRepository.Verify(r => r.AddAsync<Ingredient>(It.Is<Ingredient>(entity => entity.Name == ingredientName)), Times.Once);
-            _mockRepository.Verify(r => r.AddAsync<IngredientDetail>(It.Is<IngredientDetail>(entity => entity.RecipeId == recipeToTest.Id && entity.IngredientId == 6 && entity.Amount == amount && entity.MeasureId == 5)), Times.Once);
+            _mockRepository.Verify(r => r.UpdateAsync<Recipe>(It.Is<Recipe>(entity => entity.Id == recipeToTest.Id && entity.Name == recipeToTest.Name && entity.CategoryId == recipeToTest.CategoryId)), Times.Once);
             Assert.NotNull(retrieved);
         }
 
@@ -237,11 +237,52 @@ namespace HomeTask4.Core.Tests.ControllerTests
             _mockRepository.Verify(r => r.UpdateAsync<IngredientDetail>(It.Is<IngredientDetail>(entity => entity.RecipeId == recipeToTest.Id && entity.IngredientId == 2 && entity.MeasureId == 3 )), Times.Once);
             Assert.NotNull(retrieved);
         }
+        [Fact]
+        public async Task GetRecipeByIdAsync_Should_Delete_Recipe()
+        {
+            //Arrange
+            List<Recipe> mockRecipeDB = GetRecipes();
+            int id = 2;
+            _mockRepository.Setup(r => r.GetByIdAsync<Recipe>(id)).ReturnsAsync((int a) => mockRecipeDB.FirstOrDefault(x => x.Id == a));
+            _mockRepository.Setup(r => r.DeleteAsync<Recipe>(It.Is<Recipe>(entity => entity.Id == id)))
+                .Callback((Recipe recipe) =>
+                {
+                    mockRecipeDB.Remove(recipe);
+                });
+            //Act
+            await _recipeController.DeleteRecipeByIdAsync(id);
+            //Assert
+            var mustBeNull = mockRecipeDB.FirstOrDefault(x => x.Id == id);
+            _mockRepository.Verify(r => r.GetByIdAsync<Recipe>(id), Times.Once);
+            _mockRepository.Verify(r => r.DeleteAsync<Recipe>(It.Is<Recipe>(entity => entity.Id == id)), Times.Once);
+            Assert.Null(mustBeNull);
+        }
+        [Fact]
+        public async Task UpdateRecipeAsync_Should_Update()
+        {
+            //Arrange
+            List<Recipe> mockRecipeDB = GetRecipes();
+            Recipe toUpdate = new Recipe { Id = 1, Name = "Recipe updated", CategoryId = 1 };
+            _mockRepository.Setup(r => r.GetByIdAsync<Recipe>(toUpdate.Id)).ReturnsAsync((int a) => mockRecipeDB.FirstOrDefault(x => x.Id == a));
+            _mockRepository.Setup(r => r.UpdateAsync<Recipe>(It.Is<Recipe>(entity => entity.Id == toUpdate.Id)))
+                .Callback((Recipe recipe) =>
+                {
+                    recipe.Name = toUpdate.Name;
+                });
+            //Act
+            await _recipeController.UpdateRecipeAsync(toUpdate);
+            //Assert
+            var retrieved = mockRecipeDB.FirstOrDefault(x => x.Id == toUpdate.Id);
+            _mockRepository.Verify(r => r.GetByIdAsync<Recipe>(toUpdate.Id), Times.Once);
+            _mockRepository.Verify(r => r.UpdateAsync<Recipe>(It.Is<Recipe>(entity => entity.Id == toUpdate.Id)), Times.Once);
+            Assert.Contains("updated", retrieved.Name);
+        }
+
         private List<Recipe> GetRecipes()
         {
             return new List<Recipe> {
-                new Recipe { Id = 1 , Name = "Recipe 1", CategoryId = 1},
-                new Recipe { Id = 2 , Name = "Recipe 2" , CategoryId = 2}
+                new Recipe { Id = 1 , Name = "Recipe 1", CategoryId = 1, Ingredients = new List<IngredientDetail>()},
+                new Recipe { Id = 2 , Name = "Recipe 2" , CategoryId = 2, Ingredients = new List<IngredientDetail>()}
             };
         }
         private List<Measure> GetMeasures()
