@@ -16,12 +16,23 @@ namespace HomeTask4.Core.Controllers
         }
         public async Task CreateIngredientAsync(Ingredient toCreate)
         {
-            if (toCreate == null) throw new ArgumentException("Ingredient reference is null.");
-            if (toCreate.Name.IsNullOrEmpty()) throw new ArgumentException("Ingredient name is null or empty!");
+            string errorM = "";
+            if (toCreate == null) {
+                errorM = "Ingredient reference is null.";
+                Logger.LogError(errorM);
+                throw new ArgumentException(errorM);
+            }
+            if (toCreate.Name.IsNullOrEmpty()) {
+                errorM = "Ingredient name is null or empty!";
+                Logger.LogError(errorM);
+                throw new ArgumentException(errorM);
+            }
             var retrieved = await UnitOfWork.Repository.FirstOrDefaultAsync<Ingredient>(x => x.Name.ToLower() == toCreate.Name.ToLower());
             if (retrieved != null)
             {
-                throw new ArgumentException("This ingredient already exists");
+                errorM = "This ingredient already exists";
+                Logger.LogError(errorM);
+                throw new ArgumentException(errorM);
             }
             await UnitOfWork.Repository.AddAsync<Ingredient>(toCreate);
         }
