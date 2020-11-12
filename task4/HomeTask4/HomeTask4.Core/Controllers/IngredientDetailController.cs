@@ -10,7 +10,7 @@ namespace HomeTask4.Core.Controllers
         public IngredientDetailController(IUnitOfWork unitOfWork, ILogger<IngredientDetailController> logger) : base(unitOfWork, logger)
         {
         }
-        public async Task DeleteIngredientDetailByIds(int recipeId, int ingredientId)
+        public async Task DeleteIngredientDetailByIdsAsync(int recipeId, int ingredientId)
         {
             IngredientDetail retrieved = await UnitOfWork.Repository.FirstOrDefaultAsync<IngredientDetail>(x => x.RecipeId == recipeId && x.IngredientId == ingredientId);
             if(retrieved != null)

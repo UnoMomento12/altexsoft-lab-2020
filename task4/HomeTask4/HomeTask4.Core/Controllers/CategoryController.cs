@@ -68,13 +68,19 @@ namespace HomeTask4.Core.Controllers
         public async Task DeleteCategoryByIdAsync(int id)
         {
             Category toDelete = await UnitOfWork.Repository.GetByIdAsync<Category>(id);
-            await UnitOfWork.Repository.DeleteAsync<Category>(toDelete);
+            if (toDelete != null)
+            {
+                await UnitOfWork.Repository.DeleteAsync<Category>(toDelete);
+            }
         }
         public async Task UpdateCategoryAsync(Category toUpdate)
         {
             var retrieved = await UnitOfWork.Repository.GetByIdAsync<Category>(toUpdate.Id);
-            retrieved.Name = toUpdate.Name;
-            await UnitOfWork.Repository.UpdateAsync(retrieved);
+            if (retrieved != null)
+            {
+                retrieved.Name = toUpdate.Name;
+                await UnitOfWork.Repository.UpdateAsync(retrieved);
+            }
         }
     }
 }

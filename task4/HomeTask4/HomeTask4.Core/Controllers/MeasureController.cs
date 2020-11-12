@@ -46,7 +46,10 @@ namespace HomeTask4.Core.Controllers
         public async Task DeleteMeasureByIdAsync(int id)
         {
             Measure toDelete = await UnitOfWork.Repository.GetByIdAsync<Measure>(id);
-            await UnitOfWork.Repository.DeleteAsync<Measure>(toDelete);
+            if (toDelete != null)
+            {
+                await UnitOfWork.Repository.DeleteAsync<Measure>(toDelete);
+            }
         }
         public Task<Measure> GetMeasureByIdAsync(int id)
         {
@@ -55,8 +58,11 @@ namespace HomeTask4.Core.Controllers
         public async Task UpdateMeasureAsync(Measure toUpdate)
         {
             var retrieved = await UnitOfWork.Repository.GetByIdAsync<Measure>(toUpdate.Id);
-            retrieved.Name = toUpdate.Name;
-            await UnitOfWork.Repository.UpdateAsync(retrieved);
+            if (retrieved != null)
+            {
+                retrieved.Name = toUpdate.Name;
+                await UnitOfWork.Repository.UpdateAsync(retrieved);
+            }
         }
     }
 }

@@ -109,16 +109,22 @@ namespace HomeTask4.Core.Controllers
         public async Task DeleteRecipeByIdAsync(int id)
         {
             Recipe toDelete = await UnitOfWork.Repository.GetByIdAsync<Recipe>(id);
-            await UnitOfWork.Repository.DeleteAsync<Recipe>(toDelete);
+            if (toDelete != null)
+            {
+                await UnitOfWork.Repository.DeleteAsync<Recipe>(toDelete);
+            }
         }
 
         public async Task UpdateRecipeAsync(Recipe toUpdate)
         {
             var retrieved = await UnitOfWork.Repository.GetByIdAsync<Recipe>(toUpdate.Id);
-            retrieved.Name = toUpdate.Name;
-            retrieved.Description = toUpdate.Description;
-            retrieved.CategoryId = toUpdate.CategoryId;
-            await UnitOfWork.Repository.UpdateAsync(retrieved);
+            if (retrieved != null)
+            {
+                retrieved.Name = toUpdate.Name;
+                retrieved.Description = toUpdate.Description;
+                retrieved.CategoryId = toUpdate.CategoryId;
+                await UnitOfWork.Repository.UpdateAsync(retrieved);
+            }
         }
         public Task<Recipe> GetRecipeByIdAsync(int id)
         {

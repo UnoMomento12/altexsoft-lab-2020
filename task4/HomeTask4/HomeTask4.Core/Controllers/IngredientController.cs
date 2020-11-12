@@ -44,7 +44,10 @@ namespace HomeTask4.Core.Controllers
         public async Task DeleteIngredientByIdAsync(int id)
         {
             Ingredient toDelete = await UnitOfWork.Repository.GetByIdAsync<Ingredient>(id);
-            await UnitOfWork.Repository.DeleteAsync<Ingredient>(toDelete);
+            if (toDelete != null)
+            {
+                await UnitOfWork.Repository.DeleteAsync<Ingredient>(toDelete);
+            }
         }
         public Task<Ingredient> GetIngredientByIdAsync(int id)
         {
@@ -53,8 +56,11 @@ namespace HomeTask4.Core.Controllers
         public async Task UpdateIngredientAsync(Ingredient toUpdate)
         {
             var retrieved = await UnitOfWork.Repository.GetByIdAsync<Ingredient>(toUpdate.Id);
-            retrieved.Name = toUpdate.Name;
-            await UnitOfWork.Repository.UpdateAsync(retrieved);
+            if (retrieved != null)
+            {
+                retrieved.Name = toUpdate.Name;
+                await UnitOfWork.Repository.UpdateAsync(retrieved);
+            }
         }
     }
 }

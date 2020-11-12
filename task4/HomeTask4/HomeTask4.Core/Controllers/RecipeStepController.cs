@@ -18,19 +18,35 @@ namespace HomeTask4.Core.Controllers
             await UnitOfWork.Repository.AddRangeAsync<RecipeStep>(steps);
         }
 
-        public async Task DeleteStepAsync(int stepId)
+        public async Task DeleteStepByIdAsync(int stepId)
         {
             RecipeStep toDelete = await UnitOfWork.Repository.GetByIdAsync<RecipeStep>(stepId);
-            await UnitOfWork.Repository.DeleteAsync<RecipeStep>(toDelete);
+            if (toDelete != null)
+            {
+                await UnitOfWork.Repository.DeleteAsync<RecipeStep>(toDelete);
+            }
         }
         public async Task AddStepToRecipeAsync(Recipe recipe, string description)
         {
-            if (recipe == null) throw new ArgumentException("Recipe reference is null.");
-            if (description.IsNullOrEmpty()) throw new ArgumentException("Description is empty.");
+            string errorM = "";
+            if (recipe == null)
+            {
+                errorM = "Recipe reference is null.";
+                Logger.LogError(errorM);
+                throw new ArgumentException(errorM);
+            }
+            if (description.IsNullOrEmpty())
+            {
+                errorM = "Step Description is empty.";
+                Logger.LogError(errorM);
+                throw new ArgumentException(errorM);
+            }
             var checkRecipe = (await UnitOfWork.Repository.FirstOrDefaultAsync<Recipe>(x => x.Name.ToLower() == recipe.Name.ToLower() && x.CategoryId == recipe.CategoryId && x.Id == recipe.Id));
             if (checkRecipe == null)
             {
-                throw new ArgumentException($"Recipe {recipe.Name} : {recipe.Id} doesn't exist in Database.");
+                errorM = $"Recipe {recipe.Name} : {recipe.Id} doesn't exist in Database.";
+                Logger.LogError(errorM);
+                throw new ArgumentException(errorM);
             }
             var recipeStep = new RecipeStep() { RecipeId = checkRecipe.Id, Description=description, StepNumber = checkRecipe.Steps.Count + 1 };
             checkRecipe.Steps.Add(recipeStep);
