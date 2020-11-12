@@ -99,7 +99,7 @@ namespace HomeTask4.Core.Tests.ControllerTests
             Assert.False(actualResult);
         }
         [Fact]
-        public async Task DeleteCategoryByIdAsync_Should_Delete_Recipe()
+        public async Task DeleteCategoryByIdAsync_Should_Delete_Category()
         {
             //Arrange
             List<Category> mockCategoryDB = GetCategories();
