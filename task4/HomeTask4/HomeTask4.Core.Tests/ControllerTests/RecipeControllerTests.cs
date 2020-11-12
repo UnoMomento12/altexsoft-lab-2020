@@ -171,7 +171,6 @@ namespace HomeTask4.Core.Tests.ControllerTests
                     ingredient.Id = mockIngredientDB.Last().Id + 1;
                     mockIngredientDB.Add(ingredient);
                 });
-
             _mockRepository.Setup(r => r.UpdateAsync<Recipe>(It.Is<Recipe>(entity => entity.Id == recipeToTest.Id && entity.Name == recipeToTest.Name && entity.CategoryId == recipeToTest.CategoryId)))
                 .Callback(() =>
                 {
@@ -237,6 +236,7 @@ namespace HomeTask4.Core.Tests.ControllerTests
             _mockRepository.Verify(r => r.UpdateAsync<IngredientDetail>(It.Is<IngredientDetail>(entity => entity.RecipeId == recipeToTest.Id && entity.IngredientId == 2 && entity.MeasureId == 3 )), Times.Once);
             Assert.NotNull(retrieved);
         }
+
         [Fact]
         public async Task DeleteRecipeByIdAsync_Should_Delete_Recipe()
         {
