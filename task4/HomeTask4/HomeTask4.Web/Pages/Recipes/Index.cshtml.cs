@@ -23,7 +23,14 @@ namespace HomeTask4.Web.Pages.Recipes
         }
         public async Task<IActionResult> OnPostDeleteAsync(int deleteId)
         {
-            await _recipeController.DeleteRecipeByIdAsync(deleteId);
+            try
+            {
+                await _recipeController.DeleteRecipeByIdAsync(deleteId);
+            }
+            catch (Exception)
+            {
+                return RedirectToPage("/Error");
+            }
             return RedirectToPage("Index");
         }
     }

@@ -75,12 +75,26 @@ namespace HomeTask4.Web.Pages.Recipes
 
         public async Task<IActionResult> OnPostDeleteIngredientAsync(int recipeId, int ingredientId)
         {
-            await _ingredientDetailController.DeleteIngredientDetailByIdsAsync(recipeId, ingredientId);
+            try
+            {
+                await _ingredientDetailController.DeleteIngredientDetailByIdsAsync(recipeId, ingredientId);
+            }
+            catch (Exception)
+            {
+                return RedirectToPage("/Error");
+            }
             return RedirectToPage("Edit", new { Id = toEdit.Id });
         }
         public async Task<IActionResult> OnPostDeleteStepAsync(int stepId)
         {
-            await _recipeStepController.DeleteStepByIdAsync(stepId);
+            try
+            {
+                await _recipeStepController.DeleteStepByIdAsync(stepId);
+            }
+            catch (Exception)
+            {
+                return RedirectToPage("/Error");
+            }
             return RedirectToPage("Edit", new { Id = toEdit.Id });
         }
 

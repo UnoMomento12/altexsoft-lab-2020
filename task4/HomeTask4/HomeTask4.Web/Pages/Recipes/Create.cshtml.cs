@@ -31,7 +31,7 @@ namespace HomeTask4.Web.Pages.Recipes
                 {
                     await _recipeController.CreateRecipeAsync(Created);
                     return RedirectToPage("/Recipes/Index");
-                }catch(Exception e)
+                }catch(Exception)
                 {
                     return RedirectToPage("/Error");
                 }

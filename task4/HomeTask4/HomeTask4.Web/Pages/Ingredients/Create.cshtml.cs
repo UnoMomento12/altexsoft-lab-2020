@@ -30,7 +30,7 @@ namespace HomeTask4.Web.Pages.Ingredients
                 {
                     await _ingredientController.CreateIngredientAsync(Created);
                     return RedirectToPage("Index");
-                }catch(Exception e)
+                }catch(Exception)
                 {
                     return RedirectToPage("/Error");
                 }

@@ -23,7 +23,14 @@ namespace HomeTask4.Web.Pages.Measures
         }
         public async Task<IActionResult> OnPostDeleteAsync(int deleteId)
         {
-            await _measureController.DeleteMeasureByIdAsync(deleteId);
+            try
+            {
+                await _measureController.DeleteMeasureByIdAsync(deleteId);
+            }
+            catch (Exception)
+            {
+                return RedirectToPage("/Error");
+            }
             return RedirectToPage("Index");
         }
     }

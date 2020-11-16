@@ -31,7 +31,7 @@ namespace HomeTask4.Web.Pages.Categories
                 {
                     await _categoryController.CreateCategoryAsync(Created);
                     return RedirectToPage("Index", new { Id = Created.ParentId });
-                }catch(Exception e)
+                }catch(Exception)
                 {
                     return RedirectToPage("/Error");
                 }
