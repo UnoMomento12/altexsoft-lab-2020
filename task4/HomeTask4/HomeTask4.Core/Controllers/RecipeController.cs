@@ -8,7 +8,7 @@ using System.Security.Cryptography;
 using Castle.Core.Internal;
 using System.Collections.Generic;
 using Microsoft.Extensions.FileSystemGlobbing.Internal.PathSegments;
-
+using HomeTask4.Core.Exceptions;
 namespace HomeTask4.Core.Controllers
 {
     public class RecipeController : BaseController
@@ -28,9 +28,14 @@ namespace HomeTask4.Core.Controllers
                 Logger.LogError(nullException.Message);
                 throw;
             }
-            catch (ArgumentException argumentException)
+            catch (EmptyFieldException emptyFieldException)
             {
-                Logger.LogError(argumentException.Message);
+                Logger.LogError(emptyFieldException.Message);
+                throw;
+            } 
+            catch (EntryAlreadyExistsException entryAlreadyExistsException)
+            {
+                Logger.LogError(entryAlreadyExistsException.Message);
                 throw;
             }
             bool result = await UnitOfWork.Repository.GetByIdAsync<Recipe>(recipe.Id) != null;
@@ -40,12 +45,12 @@ namespace HomeTask4.Core.Controllers
         public async Task CreateRecipeAsync(Recipe recipe)// everything is thrown here
         {
             if (recipe == null) throw new ArgumentNullException("Recipe reference is null.");
-            if (recipe.Name.IsNullOrEmpty()) throw new ArgumentException("Recipe name is null or empty.");
-            if (recipe.Description.IsNullOrEmpty()) throw new ArgumentException("Recipe description is null or empty.");
+            if (recipe.Name.IsNullOrEmpty()) throw new EmptyFieldException("Recipe name is null or empty.");
+            if (recipe.Description.IsNullOrEmpty()) throw new EmptyFieldException("Recipe description is null or empty.");
             var checker = (await UnitOfWork.Repository.FirstOrDefaultAsync<Recipe>(x => x.Name.ToLower() == recipe.Name.ToLower() && x.CategoryId == recipe.CategoryId));
             if (checker != null)
             {
-                throw new ArgumentException($"Recipe {checker.Name} : {checker.Id} already exists");
+                throw new EntryAlreadyExistsException($"Recipe {checker.Name} : {checker.Id} already exists");
             }
             await UnitOfWork.Repository.AddAsync<Recipe>(recipe);
         }
@@ -66,13 +71,13 @@ namespace HomeTask4.Core.Controllers
         }
         public async Task AddIngredientToRecipeAsync(Recipe recipe, string ingredientName, double amount, int measureId)
         {
-            if (recipe == null) throw new ArgumentException("Recipe reference is null.");
-            if (ingredientName.IsNullOrEmpty()) throw new ArgumentException("IngredientName is empty.");
+            if (recipe == null) throw new ArgumentNullException("Recipe reference is null.");
+            if (ingredientName.IsNullOrEmpty()) throw new EmptyFieldException("IngredientName is empty.");
 
             var checkRecipe = (await UnitOfWork.Repository.FirstOrDefaultAsync<Recipe>(x => x.Name.ToLower() == recipe.Name.ToLower() && x.CategoryId == recipe.CategoryId && x.Id == recipe.Id));
             if (checkRecipe == null)
             {
-                throw new ArgumentException($"Recipe {recipe.Name} : {recipe.Id} doesn't exist in Database.");
+                throw new  EntryNotFoundException($"Recipe {recipe.Name} : {recipe.Id} doesn't exist in Database.");
             }
 
             var ingred = (await UnitOfWork.Repository.FirstOrDefaultAsync<Ingredient>(x => x.Name.ToLower() == ingredientName.ToLower()));
@@ -109,22 +114,24 @@ namespace HomeTask4.Core.Controllers
         public async Task DeleteRecipeByIdAsync(int id)
         {
             Recipe toDelete = await UnitOfWork.Repository.GetByIdAsync<Recipe>(id);
-            if (toDelete != null)
+            if (toDelete == null)
             {
-                await UnitOfWork.Repository.DeleteAsync<Recipe>(toDelete);
+                throw new EntryNotFoundException("This recipe doesn't exist in database.");
             }
+            await UnitOfWork.Repository.DeleteAsync<Recipe>(toDelete);
         }
 
         public async Task UpdateRecipeAsync(Recipe toUpdate)
         {
             var retrieved = await UnitOfWork.Repository.GetByIdAsync<Recipe>(toUpdate.Id);
-            if (retrieved != null)
+            if (retrieved == null)
             {
-                retrieved.Name = toUpdate.Name;
-                retrieved.Description = toUpdate.Description;
-                retrieved.CategoryId = toUpdate.CategoryId;
-                await UnitOfWork.Repository.UpdateAsync(retrieved);
+                throw new EntryNotFoundException($"This {toUpdate.Name} recipe doesn't exist in database.");
             }
+            retrieved.Name = toUpdate.Name;
+            retrieved.Description = toUpdate.Description;
+            retrieved.CategoryId = toUpdate.CategoryId;
+            await UnitOfWork.Repository.UpdateAsync(retrieved);
         }
         public Task<Recipe> GetRecipeByIdAsync(int id)
         {

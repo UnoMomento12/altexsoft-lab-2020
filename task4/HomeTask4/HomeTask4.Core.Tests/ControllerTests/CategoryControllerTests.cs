@@ -9,8 +9,7 @@ using Microsoft.Extensions.Logging;
 using HomeTask4.Core.Entities;
 using System.Linq;
 using System.Linq.Expressions;
-using System.ComponentModel;
-
+using HomeTask4.Core.Exceptions;
 namespace HomeTask4.Core.Tests.ControllerTests
 {
     public class CategoryControllerTests
@@ -29,11 +28,11 @@ namespace HomeTask4.Core.Tests.ControllerTests
             _categoryController = new CategoryController(_unitOfWorkMock.Object, _loggerMock.Object);
         }
 
-        [Fact ( DisplayName = "TryCreateCategoryAsync method throws ArgumentException on empty name") ]
+        [Fact ( DisplayName = "TryCreateCategoryAsync method throws EmptyFieldException on empty name") ]
         public async Task TryCreateCategoryAsync_Throws_Exception_On_Empty_Name()
         {
             //Act
-            var caughtException = await Assert.ThrowsAsync<ArgumentException>(async () => await _categoryController.TryCreateCategoryAsync("", 1));
+            var caughtException = await Assert.ThrowsAsync<EmptyFieldException>(async () => await _categoryController.TryCreateCategoryAsync("", 1));
             //Assert
             _loggerMock.Verify(logger => logger.Log(
                 It.IsAny<LogLevel>(),
@@ -44,7 +43,7 @@ namespace HomeTask4.Core.Tests.ControllerTests
             Assert.Contains("null or empty", caughtException.Message);
         }
 
-        [Fact(DisplayName = "TryCreateCategoryAsync method throws ArgumentException if category already exists")]
+        [Fact(DisplayName = "TryCreateCategoryAsync method throws EntryAlreadyExistsException if category already exists")]
         public async Task TryCreateCategory_Throws_ArgumentException_If_Category_Exists()
         {
             //Arrange
@@ -53,7 +52,7 @@ namespace HomeTask4.Core.Tests.ControllerTests
             _mockRepository.Setup(r => r.FirstOrDefaultAsync<Category>(It.IsAny<Expression<Func<Category, bool>>>()))
                 .ReturnsAsync(() => mockDB.FirstOrDefault(x => string.Equals(x.Name, categoryToTest.Name, StringComparison.OrdinalIgnoreCase) && x.ParentId == categoryToTest.ParentId));
             //Act
-            var caughtException = await Assert.ThrowsAsync<ArgumentException>(async () => await _categoryController.TryCreateCategoryAsync(categoryToTest));
+            var caughtException = await Assert.ThrowsAsync<EntryAlreadyExistsException>(async () => await _categoryController.TryCreateCategoryAsync(categoryToTest));
             //Assert
             _mockRepository.Verify(r => r.FirstOrDefaultAsync<Category>(It.IsAny<Expression<Func<Category, bool>>>()), Times.Once);
             _loggerMock.Verify(logger => logger.Log(
@@ -118,6 +117,20 @@ namespace HomeTask4.Core.Tests.ControllerTests
             _mockRepository.Verify(r => r.DeleteAsync<Category>(It.Is<Category>(entity => entity.Id == id)), Times.Once);
             Assert.Null(mustBeNull);
         }
+
+        [Fact]
+        public async Task DeleteCategoryByIdAsync_Should_Throw_EntryNotFoundException()
+        {
+            //Arrange
+            List<Category> mockCategoryDB = GetCategories();
+            int id = 5;
+            _mockRepository.Setup(r => r.GetByIdAsync<Category>(id)).ReturnsAsync((int a) => mockCategoryDB.FirstOrDefault(x => x.Id == a));
+            //Act
+            var caughtException = await Assert.ThrowsAsync<EntryNotFoundException>( async ()=> await _categoryController.DeleteCategoryByIdAsync(id));
+            //Assert
+            _mockRepository.Verify(r => r.GetByIdAsync<Category>(id), Times.Once);
+            Assert.Contains("doesn't exist", caughtException.Message);
+        }
         [Fact]
         public async Task UpdateCategoryAsync_Should_Update()
         {
@@ -137,6 +150,19 @@ namespace HomeTask4.Core.Tests.ControllerTests
             _mockRepository.Verify(r => r.GetByIdAsync<Category>(toUpdate.Id), Times.Once);
             _mockRepository.Verify(r => r.UpdateAsync<Category>(It.Is<Category>(entity => entity.Id == toUpdate.Id)), Times.Once);
             Assert.Contains("updated", retrieved.Name);
+        }
+
+        [Fact]
+        public async Task UpdateCategoryAsync_Should_Throw_EntryNotFoundException()
+        {
+            //Arrange
+            List<Category> mockCategoryDB = GetCategories();
+            Category toUpdate = new Category { Id = 5, Name = "First set updated", ParentId = null };
+            //Act
+            var caughtException = await Assert.ThrowsAsync<EntryNotFoundException>( async ()=> await _categoryController.UpdateCategoryAsync(toUpdate));
+            //Assert
+            _mockRepository.Verify(r => r.GetByIdAsync<Category>(toUpdate.Id), Times.Once);
+            Assert.Contains("doesn't exist", caughtException.Message);
         }
         private static List<Category> GetCategories()
         {

@@ -9,7 +9,7 @@ using Microsoft.Extensions.Logging;
 using HomeTask4.Core.Entities;
 using System.Linq;
 using System.Linq.Expressions;
-
+using HomeTask4.Core.Exceptions;
 namespace HomeTask4.Core.Tests.ControllerTests
 {
     public class RecipeStepControllerTests
@@ -27,14 +27,14 @@ namespace HomeTask4.Core.Tests.ControllerTests
             _unitOfWork.SetupGet(u => u.Repository).Returns(_mockRepository.Object);
             _recipeStepController = new RecipeStepController(_unitOfWork.Object, _loggerMock.Object);
         }
-        [Fact(DisplayName = "AddStepToRecipeAsync method throws ArgumentException on recipe null reference")]
+        [Fact(DisplayName = "AddStepToRecipeAsync method throws ArgumentNullException on recipe null reference")]
         public async Task AddStepToRecipeAsync_Throws_ArgumentException_On_Recipe_Null_Reference()
         {
             //Arrange
             Recipe recipeToTest = null;
             string step = "test step";
             //Act
-            var caughtException = await Assert.ThrowsAsync<ArgumentException>(async () => await _recipeStepController.AddStepToRecipeAsync(recipeToTest, step));
+            var caughtException = await Assert.ThrowsAsync<ArgumentNullException>(async () => await _recipeStepController.AddStepToRecipeAsync(recipeToTest, step));
             //Assert
             _loggerMock.Verify(logger => logger.Log(
                 It.IsAny<LogLevel>(),
@@ -45,13 +45,13 @@ namespace HomeTask4.Core.Tests.ControllerTests
             Assert.Contains("Recipe reference is null", caughtException.Message);
         }
         [Fact(DisplayName = "AddStepToRecipeAsync method throws ArgumentException on empty step description")]
-        public async Task AddStepToRecipeAsync_Throws_ArgumentException_On_Empty_Description()
+        public async Task AddStepToRecipeAsync_Throws_EmptyFieldException_On_Empty_Description()
         {
             //Arrange
             Recipe recipeToTest = new Recipe { Name = "Some Recipe", Description = "some desc", CategoryId = 12 };
             string step = "";
             //Act
-            var caughtException = await Assert.ThrowsAsync<ArgumentException>(async () => await _recipeStepController.AddStepToRecipeAsync(recipeToTest, step));
+            var caughtException = await Assert.ThrowsAsync<EmptyFieldException>(async () => await _recipeStepController.AddStepToRecipeAsync(recipeToTest, step));
             //Assert
             _loggerMock.Verify(logger => logger.Log(
                 It.IsAny<LogLevel>(),
@@ -62,8 +62,8 @@ namespace HomeTask4.Core.Tests.ControllerTests
             Assert.Contains("Description is empty", caughtException.Message);
         }
 
-        [Fact(DisplayName = "AddStepToRecipeAsync method throws ArgumentException on non-existent recipe")]
-        public async Task AddStepToRecipeAsync_Throws_ArgumentException_On_NonExistent_Recipe()
+        [Fact(DisplayName = "AddStepToRecipeAsync method throws EntryAlreadyExistsException on non-existent recipe")]
+        public async Task AddStepToRecipeAsync_Throws_EntryAlreadyExistsException_On_NonExistent_Recipe()
         {
             //Arrange
             List<Recipe> mockRecipeDB = GetRecipes();
@@ -72,7 +72,7 @@ namespace HomeTask4.Core.Tests.ControllerTests
             _mockRepository.Setup(r => r.FirstOrDefaultAsync<Recipe>(It.IsAny<Expression<Func<Recipe, bool>>>()))
                  .ReturnsAsync(() => mockRecipeDB.FirstOrDefault(x => string.Equals(x.Name, recipeToTest.Name, StringComparison.OrdinalIgnoreCase) && x.CategoryId == recipeToTest.CategoryId));
             //Act
-            var caughtException = await Assert.ThrowsAsync<ArgumentException>(async () => await _recipeStepController.AddStepToRecipeAsync(recipeToTest, step));
+            var caughtException = await Assert.ThrowsAsync<EntryAlreadyExistsException>(async () => await _recipeStepController.AddStepToRecipeAsync(recipeToTest, step));
             //Assert
             _mockRepository.Verify(r => r.FirstOrDefaultAsync<Recipe>(It.IsAny<Expression<Func<Recipe, bool>>>()), Times.Once);
             _loggerMock.Verify(logger => logger.Log(
@@ -144,6 +144,20 @@ namespace HomeTask4.Core.Tests.ControllerTests
             _mockRepository.Verify(r => r.GetByIdAsync<RecipeStep>(id), Times.Once);
             _mockRepository.Verify(r => r.DeleteAsync<RecipeStep>(It.Is<RecipeStep>(entity => entity.Id == id)), Times.Once);
             Assert.Null(mustBeNull);
+        }
+
+        [Fact]
+        public async Task DeleteStepByIdAsync_Should_Throw_EntryNotFoundException()
+        {
+            //Arrange
+            List<RecipeStep> mockRecipeStepDB = GetSteps();
+            int id = 10;
+            _mockRepository.Setup(r => r.GetByIdAsync<RecipeStep>(id)).ReturnsAsync((int a) => mockRecipeStepDB.FirstOrDefault(x => x.Id == a));
+            //Act
+            var caughtException=  await Assert.ThrowsAsync<EntryNotFoundException>( async ()=> await _recipeStepController.DeleteStepByIdAsync(id));
+            //Assert
+            _mockRepository.Verify(r => r.GetByIdAsync<RecipeStep>(id), Times.Once);
+            Assert.Contains("doesn't exist", caughtException.Message);
         }
         private List<Recipe> GetRecipes()
         {

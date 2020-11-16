@@ -9,7 +9,7 @@ using Microsoft.Extensions.Logging;
 using HomeTask4.Core.Entities;
 using System.Linq;
 using System.Linq.Expressions;
-
+using HomeTask4.Core.Exceptions;
 namespace HomeTask4.Core.Tests.ControllerTests
 {
     public class MeasureControllerTests
@@ -28,13 +28,13 @@ namespace HomeTask4.Core.Tests.ControllerTests
             _measureController = new MeasureController(_unitOfWorkMock.Object, _loggerMock.Object);
         }
 
-        [Fact ( DisplayName = "CreateMeasureAsync method throws ArgumentException on name null reference") ]
+        [Fact ( DisplayName = "CreateMeasureAsync method throws ArgumentNullException on name null reference") ]
         public async Task CreateMeasureAsync_Throws_Exception_On_Name_Null()
         {
             //Arrange
             Measure toCreate = new Measure { Name = null };
             //Act
-            var caughtException = await Assert.ThrowsAsync<ArgumentException>(async () => await _measureController.CreateMeasureAsync(toCreate));
+            var caughtException = await Assert.ThrowsAsync<ArgumentNullException>(async () => await _measureController.CreateMeasureAsync(toCreate));
             //Assert
             _loggerMock.Verify(logger => logger.Log(
                 It.IsAny<LogLevel>(),
@@ -46,12 +46,12 @@ namespace HomeTask4.Core.Tests.ControllerTests
         }
 
         [Fact]
-        public async Task CreateMeasureAsync_Throws_ArgumentException_On_Null_Reference()
+        public async Task CreateMeasureAsync_Throws_ArgumentNullException_On_Null_Reference()
         {
             //Arrange
             Measure measureToTest = null;
             //Act
-            var caughtException = await Assert.ThrowsAsync<ArgumentException>(async () => await _measureController.CreateMeasureAsync(measureToTest));
+            var caughtException = await Assert.ThrowsAsync<ArgumentNullException>(async () => await _measureController.CreateMeasureAsync(measureToTest));
             //Assert
             _loggerMock.Verify(logger => logger.Log(
                 It.IsAny<LogLevel>(),
@@ -62,7 +62,7 @@ namespace HomeTask4.Core.Tests.ControllerTests
             Assert.Contains("reference is null", caughtException.Message);
         }
 
-        [Fact(DisplayName = "CreateMeasureAsync method throws ArgumentException if measure already exists")]
+        [Fact(DisplayName = "CreateMeasureAsync method throws EntryAlreadyExistsException if measure already exists")]
         public async Task CreateMeasure_Throws_ArgumentException_If_Measure_Exists()
         {
             //Arrange
@@ -71,7 +71,7 @@ namespace HomeTask4.Core.Tests.ControllerTests
             _mockRepository.Setup(r => r.FirstOrDefaultAsync<Measure>(It.IsAny<Expression<Func<Measure, bool>>>()))
                 .ReturnsAsync(() => mockDB.FirstOrDefault(x => string.Equals(x.Name, measureToTest.Name, StringComparison.OrdinalIgnoreCase)));
             //Act
-            var caughtException = await Assert.ThrowsAsync<ArgumentException>(async () => await _measureController.CreateMeasureAsync(measureToTest));
+            var caughtException = await Assert.ThrowsAsync<EntryAlreadyExistsException>(async () => await _measureController.CreateMeasureAsync(measureToTest));
             //Assert
             _mockRepository.Verify(r => r.FirstOrDefaultAsync<Measure>(It.IsAny<Expression<Func<Measure, bool>>>()), Times.Once);
             _loggerMock.Verify(logger => logger.Log(
@@ -123,6 +123,20 @@ namespace HomeTask4.Core.Tests.ControllerTests
             _mockRepository.Verify(r => r.DeleteAsync<Measure>(It.Is<Measure>(entity => entity.Id == id)), Times.Once);
             Assert.Null(mustBeNull);
         }
+
+        [Fact]
+        public async Task DeleteMeasureByIdAsync_Should_Throw_EntryNotFoundException()
+        {
+            //Arrange
+            List<Measure> mockMeasureDB = GetMeasures();
+            int id = 5;
+            _mockRepository.Setup(r => r.GetByIdAsync<Measure>(id)).ReturnsAsync((int a) => mockMeasureDB.FirstOrDefault(x => x.Id == a));
+            //Act
+            var caughtException = await Assert.ThrowsAsync<EntryNotFoundException>(async ()=> await _measureController.DeleteMeasureByIdAsync(id));
+            //Assert
+            _mockRepository.Verify(r => r.GetByIdAsync<Measure>(id), Times.Once);
+            Assert.Contains("doesn't exist in database.", caughtException.Message);
+        }
         [Fact]
         public async Task UpdateMeasureAsync_Should_Update()
         {
@@ -142,6 +156,20 @@ namespace HomeTask4.Core.Tests.ControllerTests
             _mockRepository.Verify(r => r.GetByIdAsync<Measure>(toUpdate.Id), Times.Once);
             _mockRepository.Verify(r => r.UpdateAsync<Measure>(It.Is<Measure>(entity => entity.Id == toUpdate.Id)), Times.Once);
             Assert.Contains("gr", retrieved.Name);
+        }
+
+        [Fact]
+        public async Task UpdateMeasureAsync_Should_Throw_EntryNotFoundException()
+        {
+            //Arrange
+            List<Measure> mockMeasureDB = GetMeasures();
+            Measure toUpdate = new Measure { Id = 5, Name = "gram" };
+            _mockRepository.Setup(r => r.GetByIdAsync<Measure>(toUpdate.Id)).ReturnsAsync((int a) => mockMeasureDB.FirstOrDefault(x => x.Id == a));
+            //Act
+            var caughtException = await Assert.ThrowsAsync <EntryNotFoundException>( async ()=> await _measureController.UpdateMeasureAsync(toUpdate));
+            //Assert
+            _mockRepository.Verify(r => r.GetByIdAsync<Measure>(toUpdate.Id), Times.Once);
+            Assert.Contains("doesn't exist in database.", caughtException.Message);
         }
         private static List<Measure> GetMeasures()
         {

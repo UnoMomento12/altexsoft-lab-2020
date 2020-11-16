@@ -9,7 +9,7 @@ using Microsoft.Extensions.Logging;
 using HomeTask4.Core.Entities;
 using System.Linq;
 using System.Linq.Expressions;
-
+using HomeTask4.Core.Exceptions;
 namespace HomeTask4.Core.Tests.ControllerTests
 {
     public class IngredientDetailControllerTests
@@ -48,6 +48,21 @@ namespace HomeTask4.Core.Tests.ControllerTests
             _mockRepository.Verify(r => r.FirstOrDefaultAsync<IngredientDetail>(It.IsAny<Expression<Func<IngredientDetail, bool>>>()), Times.Once);
             _mockRepository.Verify(r => r.DeleteAsync<IngredientDetail>(It.Is<IngredientDetail>(entity => entity.RecipeId == toDelete.RecipeId && entity.IngredientId == toDelete.IngredientId)), Times.Once);
             Assert.Null(mustBeNull);
+        }
+
+        [Fact]
+        public async Task DeleteIngredientDetailByIdsAsync_Throws_EntryNotFoundException()
+        {
+            //Arrange
+            List<IngredientDetail> mockIngredientDetailDB = GetDetails();
+            IngredientDetail toDelete = new IngredientDetail { RecipeId = 1, IngredientId = 4 }; // this doesn't exist
+            _mockRepository.Setup(r => r.FirstOrDefaultAsync<IngredientDetail>(It.IsAny<Expression<Func<IngredientDetail, bool>>>()))
+                .ReturnsAsync(() => mockIngredientDetailDB.FirstOrDefault(x => x.RecipeId == toDelete.RecipeId && x.IngredientId == toDelete.IngredientId));
+            //Act
+            var caughtException = await Assert.ThrowsAsync<EntryNotFoundException>( async ()=> await _ingredientDetailController.DeleteIngredientDetailByIdsAsync(toDelete.RecipeId, toDelete.IngredientId));
+            //Assert
+            _mockRepository.Verify(r => r.FirstOrDefaultAsync<IngredientDetail>(It.IsAny<Expression<Func<IngredientDetail, bool>>>()), Times.Once);
+            Assert.Contains("IngredientDetail doesn't exist in database", caughtException.Message);
         }
         private List<IngredientDetail> GetDetails()
         {
