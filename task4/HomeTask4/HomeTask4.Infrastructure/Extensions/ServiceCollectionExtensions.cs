@@ -21,6 +21,7 @@ namespace HomeTask4.Infrastructure.Extensions
             services.AddScoped<NavigationController>();
             services.AddScoped<MeasureController>();
             services.AddScoped<IngredientDetailController>();
+
             return services;
         }
     }

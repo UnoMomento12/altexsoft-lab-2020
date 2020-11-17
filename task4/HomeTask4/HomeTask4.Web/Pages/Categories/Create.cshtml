@@ -8,8 +8,17 @@
         <div asp-validation-summary="ModelOnly"></div>
         <div class="form-group">
             <input asp-for="Created.ParentId" hidden />
-            <input class="form-control" asp-for="Created.Name" type="text" placeholder="Category Name" />
+            <div>
+                <label asp-for="Created.Name"></label><br />
+                <input class="form-control" asp-for="Created.Name" type="text" placeholder="Category Name" />
+                <span asp-validation-for="Created.Name"></span>
+            </div>
             <button asp-page-handler="Create" type="submit" class="btn btn-light">Create</button>
         </div>
     </form>
 </div>
+@section scripts{
+
+    <script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
+    <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
+}

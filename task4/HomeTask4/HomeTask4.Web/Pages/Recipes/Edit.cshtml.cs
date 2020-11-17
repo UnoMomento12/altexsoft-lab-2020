@@ -20,7 +20,7 @@ namespace HomeTask4.Web.Pages.Recipes
         public SelectList Measures { get; set; }
         public SelectList Categories { get; set; }
         [BindProperty]
-        public Recipe toEdit { get; set; } 
+        public Recipe RecipeToEdit { get; set; } 
 
         public EditModel(RecipeController recipeController, 
             MeasureController measureController, 
@@ -38,8 +38,8 @@ namespace HomeTask4.Web.Pages.Recipes
         {
             if (Id != null)
             {
-                toEdit = await _recipeController.GetRecipeByIdAsync((int) Id);
-                toEdit.Steps = toEdit.Steps.OrderBy(x => x.StepNumber).ToList();
+                RecipeToEdit = await _recipeController.GetRecipeByIdAsync((int) Id);
+                RecipeToEdit.Steps = RecipeToEdit.Steps.OrderBy(x => x.StepNumber).ToList();
                 Measures = new SelectList( await _measureController.GetAllMeasuresAsync(),"Id", "Name");
                 Categories = new SelectList(await _categoryController.GetAllCategoriesAsync(), "Id", "Name");
             }
@@ -50,7 +50,7 @@ namespace HomeTask4.Web.Pages.Recipes
             {
                 try
                 {
-                    await _recipeController.UpdateRecipeAsync(toEdit);
+                    await _recipeController.UpdateRecipeAsync(RecipeToEdit);
                     return RedirectToPage("Index");
                 }
                 catch (Exception)
@@ -62,15 +62,23 @@ namespace HomeTask4.Web.Pages.Recipes
         }
         public async Task<IActionResult> OnPostAddIngredientAsync(string newIngredient, double newAmount, int measureId)
         {
-            try
+            if(ModelState.IsValid)
             {
-                await _recipeController.AddIngredientToRecipeAsync(toEdit, newIngredient, newAmount, measureId);
-            }
-            catch (Exception)
+                try
+                {
+                    await _recipeController.AddIngredientToRecipeAsync(RecipeToEdit, newIngredient, newAmount, measureId);
+                }
+                catch (Exception)
+                {
+                    return RedirectToPage("/Error");
+                }
+            } else
             {
                 return RedirectToPage("/Error");
+
             }
-            return RedirectToPage("/Recipes/Edit", new {Id = toEdit.Id });
+            
+            return RedirectToPage("/Recipes/Edit", new {Id = RecipeToEdit.Id });
         }
 
         public async Task<IActionResult> OnPostDeleteIngredientAsync(int recipeId, int ingredientId)
@@ -83,7 +91,7 @@ namespace HomeTask4.Web.Pages.Recipes
             {
                 return RedirectToPage("/Error");
             }
-            return RedirectToPage("Edit", new { Id = toEdit.Id });
+            return RedirectToPage("Edit", new { Id = RecipeToEdit.Id });
         }
         public async Task<IActionResult> OnPostDeleteStepAsync(int stepId)
         {
@@ -95,20 +103,31 @@ namespace HomeTask4.Web.Pages.Recipes
             {
                 return RedirectToPage("/Error");
             }
-            return RedirectToPage("Edit", new { Id = toEdit.Id });
+            return RedirectToPage("Edit", new { Id = RecipeToEdit.Id });
         }
 
         public async Task<IActionResult> OnPostAddStepAsync(string description)
         {
-            try
+            if (ModelState.IsValid)
             {
-                await _recipeStepController.AddStepToRecipeAsync(toEdit, description);
-            }
-            catch (Exception)
+                try
+                {
+                    await _recipeStepController.AddStepToRecipeAsync(RecipeToEdit, description);
+                }
+                catch (Exception)
+                {
+                    return RedirectToPage("/Error");
+                }
+            } else
             {
-                return RedirectToPage("/Error");
+                string result = "";
+                foreach( var message in ModelState.Values.SelectMany(e => e.Errors).Select(x => x.ErrorMessage))
+                {
+                    result += message;
+                }
+                return Content(result);
             }
-            return RedirectToPage("/Recipes/Edit", new { Id = toEdit.Id });
+            return RedirectToPage("/Recipes/Edit", new { Id = RecipeToEdit.Id });
         }
 
     }

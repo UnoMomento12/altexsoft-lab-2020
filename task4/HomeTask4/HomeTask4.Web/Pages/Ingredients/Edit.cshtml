@@ -8,8 +8,17 @@
         <div asp-validation-summary="ModelOnly"></div>
         <div class="form-group">
             <input asp-for="toEdit.Id" hidden />
-            <input class="form-control" asp-for="toEdit.Name" type="text" placeholder="Ingredient Name" />
+            <div>
+                <label asp-for="toEdit.Name"></label><br />
+                <input class="form-control" asp-for="toEdit.Name" type="text" placeholder="Ingredient Name" />
+                <span asp-validation-for="toEdit.Name"></span>
+            </div>
             <button asp-page-handler="Edit" type="submit" class="form-control btn btn-light">Update</button>
         </div>
     </form>
 </div>
+@section scripts{
+
+    <script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
+    <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
+}

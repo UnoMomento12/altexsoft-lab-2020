@@ -9,7 +9,10 @@ using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-
+using HomeTask4.Infrastructure.Validators;
+using FluentValidation.AspNetCore;
+using FluentValidation;
+using HomeTask4.Core.Entities;
 namespace HomeTask4.Web
 {
     public class Startup
@@ -24,6 +27,17 @@ namespace HomeTask4.Web
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddTransient<IValidator<Category>, CategoryValidator>();
+            services.AddTransient<IValidator<Recipe>, RecipeValidator>();
+            services.AddTransient<IValidator<RecipeStep>, RecipeStepValidator>();
+            services.AddTransient<IValidator<Measure>, MeasureValidator>();
+            services.AddTransient<IValidator<Ingredient>, IngredientValidator>();
+            services.AddTransient<IValidator<IngredientDetail>, IngredientDetailValidator>();
+
+            services.AddMvc().AddFluentValidation(fv => {
+                fv.RunDefaultMvcValidationAfterFluentValidationExecutes = false;
+            });
+            
             services.AddInfrastructure(Configuration.GetConnectionString("Default"));
             services.AddRazorPages().AddRazorRuntimeCompilation();
         }
