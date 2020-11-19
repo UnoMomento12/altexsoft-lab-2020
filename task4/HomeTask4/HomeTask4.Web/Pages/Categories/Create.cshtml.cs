@@ -14,15 +14,17 @@ namespace HomeTask4.Web.Pages.Categories
         private CategoryController _categoryController;
         [BindProperty]
         public Category Created {get;set;}
+        [BindProperty(SupportsGet = true)]
+        public int? ParentId { get; set; }
 
         public CreateModel(CategoryController categoryController)
         {
             Created = new Category();
             _categoryController = categoryController;
         }
-        public void OnGet(int? Parentid)
+        public void OnGet()
         {
-            Created.ParentId = Parentid;
+            Created.ParentId = ParentId;
         }
         public async Task<IActionResult> OnPostCreateAsync()
         {

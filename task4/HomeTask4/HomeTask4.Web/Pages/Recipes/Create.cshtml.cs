@@ -14,13 +14,15 @@ namespace HomeTask4.Web.Pages.Recipes
         private RecipeController _recipeController;
         [BindProperty]
         public Recipe Created {get;set;}
+        [BindProperty(SupportsGet =true)]
+        public int? CategoryId { get; set; }
 
         public CreateModel(RecipeController recipeController)
         {
             Created = new Recipe();
             _recipeController = recipeController;
         }
-        public void OnGet(int? CategoryId)
+        public void OnGet()
         {
             Created.CategoryId = CategoryId;
         }

@@ -14,12 +14,14 @@ namespace HomeTask4.Web.Pages.Categories
         private CategoryController _categoryController;
         [BindProperty]
         public Category toEdit { get; set; } 
+        [BindProperty(SupportsGet = true)]
+        public int? Id { get; set; }
 
         public EditModel(CategoryController categoryController)
         {
             _categoryController = categoryController;
         }
-        public async Task OnGetAsync(int? Id)
+        public async Task OnGetAsync()
         {
             if (Id != null)
             {

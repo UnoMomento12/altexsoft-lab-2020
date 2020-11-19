@@ -21,6 +21,8 @@ namespace HomeTask4.Web.Pages.Recipes
         public SelectList Categories { get; set; }
         [BindProperty]
         public Recipe RecipeToEdit { get; set; } 
+        [BindProperty(SupportsGet = true)]
+        public int? Id { get; set; }
 
         public EditModel(RecipeController recipeController, 
             MeasureController measureController, 
@@ -34,7 +36,7 @@ namespace HomeTask4.Web.Pages.Recipes
             _ingredientDetailController = ingredientDetailController;
             _recipeStepController = recipeStepController;
         }
-        public async Task OnGetAsync(int? Id)
+        public async Task OnGetAsync()
         {
             if (Id != null)
             {
@@ -118,15 +120,7 @@ namespace HomeTask4.Web.Pages.Recipes
                 {
                     return RedirectToPage("/Error");
                 }
-            } else
-            {
-                string result = "";
-                foreach( var message in ModelState.Values.SelectMany(e => e.Errors).Select(x => x.ErrorMessage))
-                {
-                    result += message;
-                }
-                return Content(result);
-            }
+            } 
             return RedirectToPage("/Recipes/Edit", new { Id = RecipeToEdit.Id });
         }
 
