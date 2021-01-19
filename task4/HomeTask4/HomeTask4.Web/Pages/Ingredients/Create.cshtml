@@ -1,0 +1,21 @@
+﻿@page
+@model HomeTask4.Web.Pages.Ingredients.CreateModel
+@{
+    ViewData["Title"] = "Ingredient creation page";
+}
+<div class="container">
+    <form method="post">
+        <div asp-validation-summary="ModelOnly"></div>
+        <div class="form-group">
+            <div>
+                <label asp-for="Created.Name"></label><br />
+                <input class="form-control" asp-for="Created.Name" type="text" placeholder="Ingredient Name" />
+                <span asp-validation-for="Created.Name"></span>
+            </div>
+            <button asp-page-handler="Create" type="submit" class="btn btn-light">Create</button>
+        </div>
+    </form>
+</div>
+@section scripts{
+    @{await Html.PartialAsync("_ValidationScriptsPartial"); }
+}

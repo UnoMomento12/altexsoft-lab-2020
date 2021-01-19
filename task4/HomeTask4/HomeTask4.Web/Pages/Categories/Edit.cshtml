@@ -1,0 +1,22 @@
+﻿@page
+@model HomeTask4.Web.Pages.Categories.EditModel
+@{
+}
+<div class="container">
+    <form method="post">
+        <div asp-validation-summary="ModelOnly"></div>
+        <div class="form-group">
+            <input asp-for="toEdit.Id" hidden />
+            <input asp-for="toEdit.ParentId" hidden />
+            <div>
+                <label asp-for="toEdit.Name"></label><br />
+                <input class="form-control" asp-for="toEdit.Name" type="text" placeholder="Category Name" />
+                <span asp-validation-for="toEdit.Name"></span>
+            </div>
+            <button asp-page-handler="Edit" type="submit" class="btn btn-light">Update</button>
+        </div>
+    </form>
+</div>
+@section scripts{
+    @{await Html.PartialAsync("_ValidationScriptsPartial"); }
+}

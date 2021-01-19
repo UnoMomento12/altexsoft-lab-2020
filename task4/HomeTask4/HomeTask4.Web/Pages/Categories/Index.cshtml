@@ -1,0 +1,31 @@
+﻿@page 
+@model HomeTask4.Web.Pages.Categories.IndexModel
+@{
+    ViewData["Title"] = "Category Tree";
+}
+<div class="container">
+    @if (Model.CurrentCategory == null)
+    {
+        <h3 class="h3">Root</h3>
+    }
+    else
+    {
+        <h3 class="h3">Category name: @Model.CurrentCategory.Name</h3>
+    }
+    <a asp-page="Create" asp-route-ParentId="@Model.CurrentCategory?.Id">Create subcategory</a>
+    <h4 class="h4">Listed subcategories:</h4>
+    <a class="page-link border-0" asp-page="Index" asp-route-Id="@Model.CurrentCategory?.ParentId">Back</a>
+    <form method="post">
+        <table class="table">
+            @foreach (var category in Model.ListedSubcategories)
+            {
+            <tr>
+                <td><a class="page-link d-inline border-0 float-left" asp-page="Index" asp-route-Id="@category.Id">@category.Name</a></td>
+                <td><a class="page-link d-inline border-0 float-right" asp-page="/Recipes/Create" asp-route-CategoryId="@category.Id">Add recipe</a></td>
+                <td><a class="page-link d-inline border-0 float-right" asp-page="Edit" asp-route-Id="@category.Id">Edit category</a></td>
+                <td><button type="submit" asp-page-handler="Delete" asp-route-deleteId="@category.Id" class="btn btn-danger" onclick="return confirm('Are you sure you want to delete @category.Name category?')">Delete</button></td>
+            </tr>
+            }
+        </table>
+    </form>
+</div>
