@@ -14,14 +14,12 @@ namespace HomeTask4.Web.Pages.Categories
         private CategoryController _categoryController;
         public List<Category> ListedSubcategories { get; set; }
         public Category CurrentCategory { get; set; }
-        [BindProperty(SupportsGet = true)]
-        public int? Id { get; set; }
         public IndexModel(CategoryController categoryController)
         {
             CurrentCategory = null;
             _categoryController = categoryController;
         }
-        public async Task OnGetAsync()
+        public async Task OnGetAsync(int? Id)
         {
             if (Id != null)
             {
@@ -36,6 +34,7 @@ namespace HomeTask4.Web.Pages.Categories
         }
         public async Task<IActionResult> OnPostDeleteAsync(int deleteId)
         {
+            int? parentIdToReturn = (await _categoryController.GetCategoryByIdAsync(deleteId)).ParentId;
             try
             {
                 await _categoryController.DeleteCategoryByIdAsync(deleteId);
@@ -43,7 +42,7 @@ namespace HomeTask4.Web.Pages.Categories
             {
                 return RedirectToPage("/Error");
             }
-            return RedirectToPage("Index", new { Id = CurrentCategory?.Id});
+            return RedirectToPage("Index", new { Id = parentIdToReturn});
         }
     }
 }

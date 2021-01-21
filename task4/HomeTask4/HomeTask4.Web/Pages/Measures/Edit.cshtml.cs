@@ -14,14 +14,12 @@ namespace HomeTask4.Web.Pages.Measures
         private MeasureController _measureController;
         [BindProperty]
         public Measure toEdit { get; set; } 
-        [BindProperty(SupportsGet = true)]
-        public int? Id { get; set; }
 
         public EditModel(MeasureController measureController)
         {
             _measureController = measureController;
         }
-        public async Task OnGetAsync()
+        public async Task OnGetAsync(int? Id)
         {
             if (Id != null)
             {

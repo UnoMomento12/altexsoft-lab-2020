@@ -14,17 +14,15 @@ namespace HomeTask4.Web.Pages.Recipes
         private RecipeController _recipeController;
         [BindProperty]
         public Recipe Created {get;set;}
-        [BindProperty(SupportsGet =true)]
-        public int? CategoryId { get; set; }
 
         public CreateModel(RecipeController recipeController)
         {
             Created = new Recipe();
             _recipeController = recipeController;
         }
-        public void OnGet()
+        public void OnGet(int? categoryId)
         {
-            Created.CategoryId = CategoryId;
+            Created.CategoryId = categoryId;
         }
         public async Task<IActionResult> OnPostCreateAsync()
         {

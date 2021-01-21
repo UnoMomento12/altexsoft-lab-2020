@@ -14,14 +14,12 @@ namespace HomeTask4.Web.Pages.Ingredients
         private IngredientController _ingredientController;
         [BindProperty]
         public Ingredient toEdit { get; set; } 
-        [BindProperty(SupportsGet = true)]
-        public int? Id { get; set; }
 
         public EditModel(IngredientController ingredientController)
         {
             _ingredientController = ingredientController;
         }
-        public async Task OnGetAsync()
+        public async Task OnGetAsync(int? Id)
         {
             if (Id != null)
             {

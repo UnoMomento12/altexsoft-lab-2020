@@ -21,8 +21,6 @@ namespace HomeTask4.Web.Pages.Recipes
         public SelectList Categories { get; set; }
         [BindProperty]
         public Recipe RecipeToEdit { get; set; } 
-        [BindProperty(SupportsGet = true)]
-        public int? Id { get; set; }
 
         public EditModel(RecipeController recipeController, 
             MeasureController measureController, 
@@ -36,7 +34,7 @@ namespace HomeTask4.Web.Pages.Recipes
             _ingredientDetailController = ingredientDetailController;
             _recipeStepController = recipeStepController;
         }
-        public async Task OnGetAsync()
+        public async Task OnGetAsync(int? Id)
         {
             if (Id != null)
             {
